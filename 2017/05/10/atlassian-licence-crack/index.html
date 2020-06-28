@@ -1,0 +1,947 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jira,Atlassian,X509,PKI," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="撰写本文的目的，仅在于研究学习授权的原理和机制。">
+<meta name="keywords" content="jira,Atlassian,X509,PKI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Atlassian授权研究备忘录">
+<meta property="og:url" content="https://notes.mengxin.science/2017/05/10/atlassian-licence-crack/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="撰写本文的目的，仅在于研究学习授权的原理和机制。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-28T14:44:50.891Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Atlassian授权研究备忘录">
+<meta name="twitter:description" content="撰写本文的目的，仅在于研究学习授权的原理和机制。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/05/10/atlassian-licence-crack/"/>
+
+
+
+
+
+  <title> Atlassian授权研究备忘录 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/05/10/atlassian-licence-crack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Atlassian授权研究备忘录
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-10T23:00:00+00:00">
+                2017-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/10/atlassian-licence-crack/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/10/atlassian-licence-crack/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script src="/crypto-js.js"></script><script src="/mcommon.js"></script><h3 id="encrypt-message">该文章需要密码访问</h3><div id="security"> <div> <div class="input-group"> <input type="text" class="form-control" aria-label="enter the password" id="pass"/> <div class="input-group-btn"> <button type="button" class="btn btn-default" onclick="decryptAES()">Decryption</button> </div> </div> </div> </div> <div id="encrypt-blog" style="display:none"> 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 </div>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jira/" rel="tag"># jira</a>
+          
+            <a href="/tags/Atlassian/" rel="tag"># Atlassian</a>
+          
+            <a href="/tags/X509/" rel="tag"># X509</a>
+          
+            <a href="/tags/PKI/" rel="tag"># PKI</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/09/jackson-jersey-2-i18n/" rel="next" title="基于Jackson实现Restful API框架的i18n国际化">
+                <i class="fa fa-chevron-left"></i> 基于Jackson实现Restful API框架的i18n国际化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/12/x509-in-practice-1-digital-signature/" rel="prev" title="X509证书从理论到实践之数字签名理论基础">
+                X509证书从理论到实践之数字签名理论基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">151</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">160</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#授权原理概述"><span class="nav-number">1.</span> <span class="nav-text">授权原理概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#破解方法概述"><span class="nav-number">2.</span> <span class="nav-text">破解方法概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#制造证书"><span class="nav-number">3.</span> <span class="nav-text">制造证书</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/05/10/atlassian-licence-crack/';
+          this.page.identifier = '2017/05/10/atlassian-licence-crack/';
+          this.page.title = 'Atlassian授权研究备忘录';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>
