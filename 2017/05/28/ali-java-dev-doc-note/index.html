@@ -1,0 +1,1051 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java,ali," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="今天有幸发现了阿里的这份 Java 开发手册，可以说算了 Google 的风格指南与惯例（conventions）的一个补充和快速实践手册。个人感觉对开发中有很大的帮助，对一些之前模棱两可的概念有了较为明确的回答。虽然只有30多页，但是目前足以包含开发中大部分问题。接下来针对没一点，尤其是自己之前没有注意过的问题进行解析，目的是在以后开发中应用这些准则。">
+<meta name="keywords" content="java,ali">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里Java开发手册笔记-工程结构">
+<meta property="og:url" content="https://notes.mengxin.science/2017/05/28/ali-java-dev-doc-note/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="今天有幸发现了阿里的这份 Java 开发手册，可以说算了 Google 的风格指南与惯例（conventions）的一个补充和快速实践手册。个人感觉对开发中有很大的帮助，对一些之前模棱两可的概念有了较为明确的回答。虽然只有30多页，但是目前足以包含开发中大部分问题。接下来针对没一点，尤其是自己之前没有注意过的问题进行解析，目的是在以后开发中应用这些准则。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/ali-java-app-architecture.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="阿里Java开发手册笔记-工程结构">
+<meta name="twitter:description" content="今天有幸发现了阿里的这份 Java 开发手册，可以说算了 Google 的风格指南与惯例（conventions）的一个补充和快速实践手册。个人感觉对开发中有很大的帮助，对一些之前模棱两可的概念有了较为明确的回答。虽然只有30多页，但是目前足以包含开发中大部分问题。接下来针对没一点，尤其是自己之前没有注意过的问题进行解析，目的是在以后开发中应用这些准则。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/ali-java-app-architecture.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/05/28/ali-java-dev-doc-note/"/>
+
+
+
+
+
+  <title> 阿里Java开发手册笔记-工程结构 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/05/28/ali-java-dev-doc-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                阿里Java开发手册笔记-工程结构
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-28T23:00:00+00:00">
+                2017-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/开发笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">开发笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/28/ali-java-dev-doc-note/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/28/ali-java-dev-doc-note/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天有幸发现了阿里的这份 Java 开发手册，可以说算了 Google 的风格指南与惯例（conventions）的一个补充和快速实践手册。个人感觉对开发中有很大的帮助，对一些之前模棱两可的概念有了较为明确的回答。虽然只有30多页，但是目前足以包含开发中大部分问题。接下来针对没一点，尤其是自己之前没有注意过的问题进行解析，目的是在以后开发中应用这些准则。</p>
+<a id="more"></a>
+<p>总体目录如下</p>
+<ol>
+<li>编程规约</li>
+<li>异常日志</li>
+<li>MySQL 数据库</li>
+<li><strong>工程结构</strong></li>
+<li>安全归约</li>
+</ol>
+<h2 id="应用分层"><a href="#应用分层" class="headerlink" title="应用分层"></a>应用分层</h2><h3 id="1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于-Web-层，也可以直接依赖于-Service-层，依此类推："><a href="#1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于-Web-层，也可以直接依赖于-Service-层，依此类推：" class="headerlink" title="1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于 Web 层，也可以直接依赖于 Service 层，依此类推："></a>1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于 Web 层，也可以直接依赖于 Service 层，依此类推：</h3><p><img src="https://www.github.com/xmeng1/images/raw/master/ali-java-app-architecture.png" alt="ali-java-app-architecture" title="ali-java-app-architecture"></p>
+<blockquote>
+<p>开放接口层：可直接封装 Service 方法暴露成 RPC 接口；通过 Web 封装成 http 接口；进行 网关安全控制、流量控制等。</p>
+<p>终端显示层：各个端的模板渲染并执行显示的层。当前主要是 velocity 渲染，JS 渲染， JSP 渲染，移动端展示等。</p>
+<p>Web 层：主要是对访问控制进行转发，各类基本参数校验，或者不复用的业务简单处理等。</p>
+<p>Service 层：相对具体的业务逻辑服务层。</p>
+<p>Manager 层：通用业务处理层，它有如下特征：<br>1） 对第三方平台封装的层，预处理返回结果及转化异常信息；<br>2）对 Service 层通用能力的下沉，如缓存方案、中间件通用处理；<br>3）与 DAO 层交互，对多个 DAO 的组合复用。</p>
+<p>DAO 层：数据访问层，与底层 MySQL、Oracle、Hbase 进行数据交互。</p>
+<p>外部接口或第三方平台：包括其它部门 RPC 开放接口，基础平台，其它公司的 HTTP 接口。</p>
+</blockquote>
+<p>我们的程序基本可以参考这个模型在该模型上进行拓展。其中 Manager 层之前没有涉及，更多的是放到 service 层中，以后需要对 service 层中的某些业务处理下沉到 manager 层，提供更好的低耦合性。</p>
+<p>同时这个层次说明是不是可以作为我们程序的子模块划分的依据呢？至少应该算是一个参考，具体划分还需要更多的实践在参考。</p>
+<h3 id="2【参考】分层异常处理规约"><a href="#2【参考】分层异常处理规约" class="headerlink" title="2【参考】分层异常处理规约"></a>2【参考】分层异常处理规约</h3><blockquote>
+<p>在 <code>DAO</code> 层，产生的异常类型有很多，无法用细粒度的异常进行 <code>catch</code>，使用 <code>catch(Exception e)</code> 方式，并 <code>throw new DAOException(e)</code>，不需要打印日志，因为日志在 Manager/Service 层一定需要捕获并打到日志文件中去，如果同台服务器 再打日志，浪费性能和存储。<strong>在 Service 层出现异常时，必须记录出错日志到磁盘，尽可能带 上参数信息，相当于保护案发现场</strong>。如果 Manager 层与 Service 同机部署，日志方式与 DAO 层处理一致，如果是单独部署，则采用与 Service 一致的处理方式。<strong>Web 层绝不应该继续往上 抛异常，因为已经处于顶层，无继续处理异常的方式</strong>，如果意识到这个异常将导致页面无法正常渲染，那么就应该直接跳转到<strong>友好错误页面</strong>，加上友好的错误提示信息。<strong>开放接口层要将异常处理成错误码和错误信息方式返回。</strong></p>
+</blockquote>
+<p>异常处理是一个十分重要的话题，而且我们需要对整体有提纲挈领的设计，进而保证整个应用能够友好的处理错误，并且记录错误。</p>
+<h3 id="3【参考】分层领域模型规约："><a href="#3【参考】分层领域模型规约：" class="headerlink" title="3【参考】分层领域模型规约："></a>3【参考】分层领域模型规约：</h3><blockquote>
+<p>DO（Data Object）：与数据库表结构一一对应，通过 DAO 层向上传输数据源对象。</p>
+<p>DTO（Data Transfer Object）：数据传输对象，Service 和 Manager 向外传输的对象。</p>
+<p>BO（Business Object）：业务对象。可以由 Service 层输出的封装业务逻辑的对象。</p>
+<p>Query：数据查询对象，各层接收上层的查询请求。注：超过 2 个参数的查询封装，禁止 使用 Map 类来传输。</p>
+<p>VO（View Object）：显示层对象，通常是 Web 向模板渲染引擎层传输的对象。</p>
+</blockquote>
+<h2 id="二方库依赖"><a href="#二方库依赖" class="headerlink" title="二方库依赖"></a>二方库依赖</h2><blockquote>
+<p>二方库：公司内部发布到中央仓库，可供公司内部其它应用依赖的库（jar 包）。</p>
+<p>一方库：本工程内部子项目模块依赖的库（jar 包）。</p>
+<p>三方库：公司之外的开源库（jar 包）。</p>
+</blockquote>
+<p>比如公司内部统一使用一套工具类 java-support 就可以作为二方库，？？同时如果公司自行管理（或者重新 patch 过）的第三方库也可以成为二方库。而作为多模块项目中的某些模块仅仅是自己项目中使用，那么这个模块可以成为一方库。三方库就是诸如 open-saml，jackson 等非本公司开发维护的库，一般是放在 central repository 中的。</p>
+<h3 id="1【强制】定义-GAV-遵从以下规则"><a href="#1【强制】定义-GAV-遵从以下规则" class="headerlink" title="1【强制】定义 GAV 遵从以下规则"></a>1【强制】定义 GAV 遵从以下规则</h3><p>这一点可以说是对开发中帮助最大的，</p>
+<h4 id="1）-GroupID-格式：com-公司-BU-业务线-子业务线-，最多-4-级。"><a href="#1）-GroupID-格式：com-公司-BU-业务线-子业务线-，最多-4-级。" class="headerlink" title="1） GroupID 格式：com.{公司/BU }.业务线.[子业务线]，最多 4 级。"></a>1） GroupID 格式：com.{公司/BU }.业务线.[子业务线]，最多 4 级。</h4><p>（注：BU 是业务单元的缩写 Business Unit）</p>
+<blockquote>
+<p>说明：{公司/BU} 例如：alibaba/taobao/tmall/aliexpress 等 BU 一级 子业务线可选。<br>正例：com.taobao.jstorm 或 com.alibaba.dubbo.register</p>
+</blockquote>
+<h4 id="2）-ArtifactID-格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。"><a href="#2）-ArtifactID-格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。" class="headerlink" title="2） ArtifactID 格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。"></a>2） ArtifactID 格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。</h4><blockquote>
+<p>正例：dubbo-client / fastjson-api / jstorm-tool</p>
+</blockquote>
+<p>工具项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java-support</span><br></pre></td></tr></table></figure>
+<p>xxxx-xx 项目<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xxxx-xx-parent</span><br></pre></td></tr></table></figure></p>
+<h4 id="3）-Version：详细规定参考下方。"><a href="#3）-Version：详细规定参考下方。" class="headerlink" title="3） Version：详细规定参考下方。"></a>3） Version：详细规定参考下方。</h4><h3 id="2【强制】二方库版本号命名方式：主版本号-次版本号-修订号"><a href="#2【强制】二方库版本号命名方式：主版本号-次版本号-修订号" class="headerlink" title="2【强制】二方库版本号命名方式：主版本号.次版本号.修订号"></a>2【强制】二方库版本号命名方式：主版本号.次版本号.修订号</h3><blockquote>
+<ol>
+<li>主版本号：当做了不兼容的 API 修改，或者增加了能改变产品方向的新功能。 </li>
+<li>次版本号：当做了向下兼容的功能性新增（新增类、接口等）。 </li>
+<li>修订号：修复 bug，没有修改方法签名的功能加强，保持 API 兼容性。</li>
+</ol>
+<p>说明：注意：起始版本号必须为：1.0.0，而不是 0.0.1 正式发布的类库必须先去中央仓库进行查证，使版本号有延续性，正式版本号不允许覆盖升级。如当前版本：1.3.3，那么下一个合理的版本号：1.3.4 或 1.4.0 或 2.0.0</p>
+</blockquote>
+<p>这个版本控制应该是 <a href="http://semver.org/" target="_blank" rel="noopener">Semantic Versioning</a> 的一个简化说明。这里强制约束了<strong>初始版本号为1.0.0</strong>。</p>
+<p>Semantic Versioning 对<code>1.0.0</code> 版本有如下解释：</p>
+<blockquote>
+<p><a href="http://semver.org/#spec-item-5" target="_blank" rel="noopener">Version 1.0.0 defines the public API</a>. The way in which the version number is incremented after this release is dependent on this public API and how it changes.</p>
+<p><a href="http://semver.org/#how-do-i-know-when-to-release-100" target="_blank" rel="noopener">How do I know when to release 1.0.0?</a></p>
+<p>If your software is <strong>being used in production</strong>, it should probably already be 1.0.0.<br>If you have a stable API on which users have come to depend, you should be 1.0.0.<br>If you’re worrying a lot about backwards compatibility, you should probably already be 1.0.0.</p>
+</blockquote>
+<p>也就是说1.0.0应该是上线的第一个版本，如果开发阶段的版本号应该加入后缀，上述文档同样给予约束：</p>
+<blockquote>
+<p><a href="http://semver.org/#spec-item-9" target="_blank" rel="noopener">A pre-release version</a> MAY be denoted by appending a hyphen and a series of dot separated identifiers immediately following the patch version. Identifiers MUST comprise only <strong>ASCII alphanumerics and hyphen [0-9A-Za-z-]</strong>. Identifiers MUST <strong>NOT be empty</strong>. Numeric identifiers MUST <strong>NOT include leading zeroes</strong>(注：指的是不能有诸如 01，002 这样的编码，应该直接写成1和2). Pre-release versions have a <strong>lower precedence than the associated normal version</strong>. A pre-release version indicates that the version is unstable and might not satisfy the intended compatibility requirements as denoted by its associated normal version. Examples: <em>1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7, 1.0.0-x.7.z.92</em>.</p>
+</blockquote>
+<p>所以我认为项目开始开发后的版本号可以从 <code>1.0.0-0.0.1</code> 开始，逐步增加 <code>pre-version</code> 版本号，然后当即将发布时可以更改为 <code>1.0.0-alpha，1.0.0-alpha.1，1.0.0-beta，1.0.0-beta.1</code>。最后发布 <code>1.0.0</code> 版本。（注：需要探讨）</p>
+<h3 id="3【强制】线上应用不要依赖-SNAPSHOT-版本（安全包除外）"><a href="#3【强制】线上应用不要依赖-SNAPSHOT-版本（安全包除外）" class="headerlink" title="3【强制】线上应用不要依赖 SNAPSHOT 版本（安全包除外）"></a>3【强制】线上应用不要依赖 SNAPSHOT 版本（安全包除外）</h3><blockquote>
+<p>说明：不依赖 SNAPSHOT 版本是保证应用发布的幂等性。另外，也可以加快编译时的打包构建。</p>
+</blockquote>
+<p>通过搜索一些 maven 的文章逐渐了解了这个要求的含义。所谓幂等性（idempotent）是一个数学领域的词汇，现应用到很多计算机领域，这里主要是指应用在构建发布的时候，同一个版本号所构建的发布版必须是一致的，这也就要求其依赖是稳定的。而 SNAPSHOT 版本是不稳定的，会导致同样版本号的源码构建出的应用依赖了不同版本的库。有时间把幂等性的概念与应用单独学习。</p>
+<h3 id="4【强制】二方库的新增或升级，保持除功能点之外的其它-jar-包仲裁结果不变。如果有改变，-必须明确评估和验证，建议进行-dependency-resolve-前后信息比对，如果仲裁结果完全不一-致，那么通过-dependency-tree-命令，找出差异点，进行排除-jar-包。"><a href="#4【强制】二方库的新增或升级，保持除功能点之外的其它-jar-包仲裁结果不变。如果有改变，-必须明确评估和验证，建议进行-dependency-resolve-前后信息比对，如果仲裁结果完全不一-致，那么通过-dependency-tree-命令，找出差异点，进行排除-jar-包。" class="headerlink" title="4【强制】二方库的新增或升级，保持除功能点之外的其它 jar 包仲裁结果不变。如果有改变， 必须明确评估和验证，建议进行 dependency:resolve 前后信息比对，如果仲裁结果完全不一 致，那么通过 dependency:tree 命令，找出差异点，进行排除 jar 包。"></a>4【强制】二方库的新增或升级，保持除功能点之外的其它 jar 包仲裁结果不变。如果有改变， 必须明确评估和验证，建议进行 dependency:resolve 前后信息比对，如果仲裁结果完全不一 致，那么通过 dependency:tree 命令，找出差异点，进行<excludes>排除 jar 包。</excludes></h3><p>（注：这里的仲裁就是指主项目最终依赖包的选择，比如有两个二方库，一个二方库依赖了 <code>log-1.0.0</code> 放在前面, 另外一个二方库依赖了 <code>log-1.0.2</code> 放在后面，那么最终的仲裁结果是依赖了 <code>log-1.0.0</code>，因为对于 <code>maven</code> 中的间接依赖，哪个依赖在pom文件中定义的位置在前面，就采用在前面定义的那个依赖。）</p>
+<p>这一条实际上是针对于 <code>maven</code> 包依赖解析的使用约束。因为 <code>maven</code> 在进行<a href="http://zxy-920823.iteye.com/blog/2277646" target="_blank" rel="noopener">处理依赖传递中有着自己的规则</a>，所以一旦我们对现有二方库依赖进行增加或升级，那么这个二方库本身的依赖就有可能更改，进而传递更改主项目的依赖。所以我们需要在增加或升级二方库时确保其他的库不变，因为我们无法确定一旦这些库更改会不会造成问题。如果有冲突，我们就只能<code>&lt;excludes&gt;</code>排除冲突的 <code>jar</code> 包。</p>
+<p>当然这里也有可能新增加的功能点因为排除了相应的 <code>jar</code> 包导致出问题，那么只能想办法解决这个新加的功能点的问题，否则只能考虑整体升级出问题的依赖。</p>
+<h3 id="5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的-POJO-对象。"><a href="#5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的-POJO-对象。" class="headerlink" title="5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的 POJO 对象。"></a>5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的 POJO 对象。</h3><p>这也就是说二方库不能依赖自定义的枚举类型，这个设定的原因需要探究。</p>
+<h3 id="6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。"><a href="#6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。" class="headerlink" title="6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。"></a>6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。</h3><blockquote>
+<p>说明：依赖 springframework-core,-context,-beans，它们都是同一个版本，可以定义一个变量来保存版本：${spring.version}，定义依赖的时候，引用该版本。</p>
+</blockquote>
+<p>三方库群是不是一样要约束版本，比如 opensaml 3.x？这一点十分重要，这样可以保证依赖库群的正确性，同时也减少修改依赖时犯错误。</p>
+<h3 id="7【强制】禁止在子项目的-pom-依赖中出现相同的-GroupId，相同的-ArtifactId，但是不同的-Version。"><a href="#7【强制】禁止在子项目的-pom-依赖中出现相同的-GroupId，相同的-ArtifactId，但是不同的-Version。" class="headerlink" title="7【强制】禁止在子项目的 pom 依赖中出现相同的 GroupId，相同的 ArtifactId，但是不同的 Version。"></a>7【强制】禁止在子项目的 pom 依赖中出现相同的 GroupId，相同的 ArtifactId，但是不同的 Version。</h3><blockquote>
+<p>说明：在本地调试时会使用各子项目指定的版本号，但是合并成一个 war，只能有一个版本号 出现在最后的 lib 目录中。可能出现线下调试是正确的，发布到线上却出故障的问题。</p>
+</blockquote>
+<p>如果子项目依赖了相同的库，这些库的版本需要一致。</p>
+<h3 id="8【推荐】所有-pom-文件中的依赖声明放在语句块中，所有版本仲裁放在-语句块中。"><a href="#8【推荐】所有-pom-文件中的依赖声明放在语句块中，所有版本仲裁放在-语句块中。" class="headerlink" title="8【推荐】所有 pom 文件中的依赖声明放在语句块中，所有版本仲裁放在 语句块中。"></a>8【推荐】所有 pom 文件中的依赖声明放在<dependencies>语句块中，所有版本仲裁放在 <dependencymanagement>语句块中。</dependencymanagement></dependencies></h3><blockquote>
+<p>说明：<dependencymanagement>里只是声明版本，并不实现引入，因此子项目需要显式的声 明依赖，version 和 scope 都读取自父 pom。而<dependencies>所有声明在主 pom 的<dependencies>里的依赖都会自动引入，并默认被所有的子项目继承。</dependencies></dependencies></dependencymanagement></p>
+</blockquote>
+<p>dependencyManagement只会影响现有依赖的配置，但不会引入依赖。这个配置项常见于多模块的 maven 项目中。</p>
+<h3 id="9【推荐】二方库不要有配置项，最低限度不要再增"><a href="#9【推荐】二方库不要有配置项，最低限度不要再增" class="headerlink" title="9【推荐】二方库不要有配置项，最低限度不要再增"></a>9【推荐】二方库不要有配置项，最低限度不要再增</h3><h3 id="10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则："><a href="#10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则：" class="headerlink" title="10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则："></a>10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则：</h3><blockquote>
+<p>1）精简可控原则。移除一切不必要的 API 和依赖，只包含 Service API、必要的领域模型对象、Utils类、常量、枚举等。如果依赖其它二方库，尽量是 provided 引入，让二方库使用者去依赖具体版本号；无 log 具体实现，只依赖日志框架。<br>2）稳定可追溯原则。每个版本的变化应该被记录，二方库由谁维护，源码在哪里，都需要能方便查到。除非用户主动升级版本，否则公共二方库的行为不应该发生变化。</p>
+</blockquote>
+<p>如果使用多个二方库，势必存在依赖重复冲突等问题，所以尽可能的对二方库的依赖进行优化控制。</p>
+<h2 id="服务器"><a href="#服务器" class="headerlink" title="服务器"></a>服务器</h2><h3 id="1-【推荐】高并发服务器建议调小-TCP-协议的-time-wait-超时时间。"><a href="#1-【推荐】高并发服务器建议调小-TCP-协议的-time-wait-超时时间。" class="headerlink" title="1. 【推荐】高并发服务器建议调小 TCP 协议的 time_wait 超时时间。"></a>1. 【推荐】高并发服务器建议调小 TCP 协议的 <code>time_wait</code> 超时时间。</h3><blockquote>
+<p>说明：操作系统默认 240 秒后，才会关闭处于 <code>time_wait</code> 状态的连接，在高并发访问下，服 务器端会因为处于 <code>time_wait</code> 的连接数太多，可能无法建立新的连接，所以需要在服务器上 调小此等待值。 正例：在 linux 服务器上请通过变更<code>/etc/sysctl.conf</code> 文件去修改该缺省值（秒）： <code>net.ipv4.tcp_fin_timeout = 30</code></p>
+</blockquote>
+<h3 id="2-【推荐】调大服务器所支持的最大文件句柄数（File-Descriptor，简写为-fd）。"><a href="#2-【推荐】调大服务器所支持的最大文件句柄数（File-Descriptor，简写为-fd）。" class="headerlink" title="2. 【推荐】调大服务器所支持的最大文件句柄数（File Descriptor，简写为 fd）。"></a>2. 【推荐】调大服务器所支持的最大文件句柄数（File Descriptor，简写为 fd）。</h3><blockquote>
+<p>说明：主流操作系统的设计是将 <code>TCP/UDP</code> 连接采用与文件一样的方式去管理，即一个连接对 应于一个 fd。主流的 linux 服务器默认所支持最大 fd 数量为 1024，当并发连接数很大时很容易因为 fd 不足而出现“<code>open too many files</code>”错误，导致新的连接无法建立。 建议将 linux 服务器所支持的最大句柄数调高数倍（与服务器的内存数量相关）。</p>
+</blockquote>
+<h3 id="3-【推荐】给-JVM-设置-XX-HeapDumpOnOutOfMemoryError-参数，让-JVM-碰到-OOM-场景时输出-dump-信息。"><a href="#3-【推荐】给-JVM-设置-XX-HeapDumpOnOutOfMemoryError-参数，让-JVM-碰到-OOM-场景时输出-dump-信息。" class="headerlink" title="3. 【推荐】给 JVM 设置-XX:+HeapDumpOnOutOfMemoryError 参数，让 JVM 碰到 OOM 场景时输出 dump 信息。"></a>3. 【推荐】给 JVM 设置-XX:+HeapDumpOnOutOfMemoryError 参数，让 JVM 碰到 OOM 场景时输出 dump 信息。</h3><blockquote>
+<p>说明：OOM 的发生是有概率的，甚至有规律地相隔数月才出现一例，出现时的现场信息对查错 非常有价值。</p>
+</blockquote>
+<h3 id="4-【参考】服务器重定向问题"><a href="#4-【参考】服务器重定向问题" class="headerlink" title="4. 【参考】服务器重定向问题"></a>4. 【参考】服务器重定向问题</h3><blockquote>
+<p>服务器内部重定向使用forward；<br>外部重定向地址使用 URL 拼装工具类来生成，否则会带来 URL 维护不一致的问题和潜在的安全风险。</p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/ali/" rel="tag"># ali</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/18/x509-in-practice-2-digital-cert/" rel="next" title="X509证书从理论到实践之数字证书">
+                <i class="fa fa-chevron-left"></i> X509证书从理论到实践之数字证书
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/28/ali-java-dev-doc-note-inner/" rel="prev" title="阿里Java开发手册笔记(内部版)-工程结构">
+                阿里Java开发手册笔记(内部版)-工程结构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#应用分层"><span class="nav-number">1.</span> <span class="nav-text">应用分层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于-Web-层，也可以直接依赖于-Service-层，依此类推："><span class="nav-number">1.1.</span> <span class="nav-text">1【推荐】图中默认上层依赖于下层，箭头关系表示可直接依赖，如：开放接口层可以依赖于 Web 层，也可以直接依赖于 Service 层，依此类推：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2【参考】分层异常处理规约"><span class="nav-number">1.2.</span> <span class="nav-text">2【参考】分层异常处理规约</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3【参考】分层领域模型规约："><span class="nav-number">1.3.</span> <span class="nav-text">3【参考】分层领域模型规约：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二方库依赖"><span class="nav-number">2.</span> <span class="nav-text">二方库依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1【强制】定义-GAV-遵从以下规则"><span class="nav-number">2.1.</span> <span class="nav-text">1【强制】定义 GAV 遵从以下规则</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）-GroupID-格式：com-公司-BU-业务线-子业务线-，最多-4-级。"><span class="nav-number">2.1.1.</span> <span class="nav-text">1） GroupID 格式：com.{公司/BU }.业务线.[子业务线]，最多 4 级。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）-ArtifactID-格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。"><span class="nav-number">2.1.2.</span> <span class="nav-text">2） ArtifactID 格式：产品线名-模块名。语义不重复不遗漏，先到中央仓库去查证一下。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）-Version：详细规定参考下方。"><span class="nav-number">2.1.3.</span> <span class="nav-text">3） Version：详细规定参考下方。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2【强制】二方库版本号命名方式：主版本号-次版本号-修订号"><span class="nav-number">2.2.</span> <span class="nav-text">2【强制】二方库版本号命名方式：主版本号.次版本号.修订号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3【强制】线上应用不要依赖-SNAPSHOT-版本（安全包除外）"><span class="nav-number">2.3.</span> <span class="nav-text">3【强制】线上应用不要依赖 SNAPSHOT 版本（安全包除外）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4【强制】二方库的新增或升级，保持除功能点之外的其它-jar-包仲裁结果不变。如果有改变，-必须明确评估和验证，建议进行-dependency-resolve-前后信息比对，如果仲裁结果完全不一-致，那么通过-dependency-tree-命令，找出差异点，进行排除-jar-包。"><span class="nav-number">2.4.</span> <span class="nav-text">4【强制】二方库的新增或升级，保持除功能点之外的其它 jar 包仲裁结果不变。如果有改变， 必须明确评估和验证，建议进行 dependency:resolve 前后信息比对，如果仲裁结果完全不一 致，那么通过 dependency:tree 命令，找出差异点，进行排除 jar 包。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的-POJO-对象。"><span class="nav-number">2.5.</span> <span class="nav-text">5【强制】二方库里可以定义枚举类型，参数可以使用枚举类型，但是接口返回值不允许使用枚举类型或者包含枚举类型的 POJO 对象。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。"><span class="nav-number">2.6.</span> <span class="nav-text">6【强制】依赖于一个二方库群时，必须定义一个统一的版本变量，避免版本号不一致。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7【强制】禁止在子项目的-pom-依赖中出现相同的-GroupId，相同的-ArtifactId，但是不同的-Version。"><span class="nav-number">2.7.</span> <span class="nav-text">7【强制】禁止在子项目的 pom 依赖中出现相同的 GroupId，相同的 ArtifactId，但是不同的 Version。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8【推荐】所有-pom-文件中的依赖声明放在语句块中，所有版本仲裁放在-语句块中。"><span class="nav-number">2.8.</span> <span class="nav-text">8【推荐】所有 pom 文件中的依赖声明放在语句块中，所有版本仲裁放在 语句块中。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9【推荐】二方库不要有配置项，最低限度不要再增"><span class="nav-number">2.9.</span> <span class="nav-text">9【推荐】二方库不要有配置项，最低限度不要再增</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则："><span class="nav-number">2.10.</span> <span class="nav-text">10【参考】为避免应用二方库的依赖冲突问题，二方库发布者应当遵循以下原则：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器"><span class="nav-number">3.</span> <span class="nav-text">服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-【推荐】高并发服务器建议调小-TCP-协议的-time-wait-超时时间。"><span class="nav-number">3.1.</span> <span class="nav-text">1. 【推荐】高并发服务器建议调小 TCP 协议的 time_wait 超时时间。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-【推荐】调大服务器所支持的最大文件句柄数（File-Descriptor，简写为-fd）。"><span class="nav-number">3.2.</span> <span class="nav-text">2. 【推荐】调大服务器所支持的最大文件句柄数（File Descriptor，简写为 fd）。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-【推荐】给-JVM-设置-XX-HeapDumpOnOutOfMemoryError-参数，让-JVM-碰到-OOM-场景时输出-dump-信息。"><span class="nav-number">3.3.</span> <span class="nav-text">3. 【推荐】给 JVM 设置-XX:+HeapDumpOnOutOfMemoryError 参数，让 JVM 碰到 OOM 场景时输出 dump 信息。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-【参考】服务器重定向问题"><span class="nav-number">3.4.</span> <span class="nav-text">4. 【参考】服务器重定向问题</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/05/28/ali-java-dev-doc-note/';
+          this.page.identifier = '2017/05/28/ali-java-dev-doc-note/';
+          this.page.title = '阿里Java开发手册笔记-工程结构';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala,cats," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Abstract:  Scala 中有一个新的概念就是 implicit ，在阅读 Scala with Cats 这本书的第一章着重在介绍这个概念。本文记录在学习过程中个人的一些理解，从而能够帮助更好的在实际项目中应用。">
+<meta name="keywords" content="scala,cats">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala with Cats 学习笔记1-Type Class 的思考">
+<meta property="og:url" content="https://notes.mengxin.science/2019/06/15/scala-with-cats-type-class-thinking/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="Abstract:  Scala 中有一个新的概念就是 implicit ，在阅读 Scala with Cats 这本书的第一章着重在介绍这个概念。本文记录在学习过程中个人的一些理解，从而能够帮助更好的在实际项目中应用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala with Cats 学习笔记1-Type Class 的思考">
+<meta name="twitter:description" content="Abstract:  Scala 中有一个新的概念就是 implicit ，在阅读 Scala with Cats 这本书的第一章着重在介绍这个概念。本文记录在学习过程中个人的一些理解，从而能够帮助更好的在实际项目中应用。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2019/06/15/scala-with-cats-type-class-thinking/"/>
+
+
+
+
+
+  <title> Scala with Cats 学习笔记1-Type Class 的思考 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2019/06/15/scala-with-cats-type-class-thinking/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala with Cats 学习笔记1-Type Class 的思考
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-15T23:00:00+00:00">
+                2019-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Knowledge/" itemprop="url" rel="index">
+                    <span itemprop="name">Knowledge</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/06/15/scala-with-cats-type-class-thinking/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/06/15/scala-with-cats-type-class-thinking/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Abstract:  Scala 中有一个新的概念就是 <code>implicit</code> ，在阅读 <a href="https://books.underscore.io/scala-with-cats/scala-with-cats.html" target="_blank" rel="noopener">Scala with Cats</a> 这本书的第一章着重在介绍这个概念。本文记录在学习过程中个人的一些理解，从而能够帮助更好的在实际项目中应用。</p>
+<a id="more"></a>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>首先我们介绍一下这个  <code>implicit</code> 和 <code>Type Class</code> 的一个最典型应用场景：<strong>对象序列化</strong></p>
+<p>在编程中 <code>Object</code> 和 <code>JSON</code> 之间的转化是一项基本的需求，在 <code>Java</code> 中最常用的是使用 <code>Jackson</code> 通过注解在类上定义其序列化的要求，比如字段名称等等，然后在应用时通过注解自动的实现了对象和 <code>JSON</code> 的转化。</p>
+<p>在 <code>Scala</code> 中，我们通向希望能够达到这个目标，提前定义好序列化的方法，在需要的时候自动调用。</p>
+<p>下面介绍一下我们的需求：</p>
+<blockquote>
+<p>定义一个类，可以直接对实例对象转化为 JSON，比如 Person 对象，可以通过 <code>person.toJson</code> 或者是 <code>XXX.toJson(person)</code></p>
+</blockquote>
+<h1 id="对象转-JSON-实现"><a href="#对象转-JSON-实现" class="headerlink" title="对象转 JSON 实现"></a>对象转 <code>JSON</code> 实现</h1><p>序列化的过程无非是把不同类型的字段转化为字符串的过程。</p>
+<h2 id="1-创建抽象语法树"><a href="#1-创建抽象语法树" class="headerlink" title="1. 创建抽象语法树"></a>1. 创建抽象语法树</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Define a very simple JSON AST</span></span><br><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">Json</span></span></span><br><span class="line"><span class="class"><span class="title">final</span> <span class="title">case</span> <span class="title">class</span> <span class="title">JsObject</span>(<span class="params">get: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">Json</span>]</span>) <span class="keyword">extends</span> <span class="title">Json</span></span></span><br><span class="line"><span class="class"><span class="title">final</span> <span class="title">case</span> <span class="title">class</span> <span class="title">JsString</span>(<span class="params">get: <span class="type">String</span></span>) <span class="keyword">extends</span> <span class="title">Json</span></span></span><br><span class="line"><span class="class"><span class="title">final</span> <span class="title">case</span> <span class="title">class</span> <span class="title">JsNumber</span>(<span class="params">get: <span class="type">Double</span></span>) <span class="keyword">extends</span> <span class="title">Json</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">JsNull</span> <span class="keyword">extends</span> <span class="title">Json</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="2-创建-Type-Class"><a href="#2-创建-Type-Class" class="headerlink" title="2. 创建 Type Class"></a>2. 创建 <code>Type Class</code></h2><blockquote>
+<p>A type class is an interface or API that represents some functionality we want to implement. In Cats a type class is represented by a trait with at least one type parameter. </p>
+</blockquote>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The "serialize to JSON" behaviour is encoded in this trait</span></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">JsonWriter</span>[<span class="type">A</span>] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">write</span></span>(value: <span class="type">A</span>): <span class="type">Json</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个包含有一个方法的接口被称为 <code>Type Class</code>，为什么叫 <code>type</code>，参考这篇文章<a href="http://hongjiang.info/scala-type-classes-pattern/" target="_blank" rel="noopener">scala类型系统：26) type classes模式</a></p>
+<blockquote>
+<p>这个模式被称为type classes，源于haskell，我对haskell不熟悉，为什么用这么奇怪的一个名字？从这儿看到：在haskell里没有类似于java/scala里的class的概念，所以class这个术语可以随意使用，它的意思相当于”class of types”，可以理解为对某一系列类型的抽象(即高阶类型)。</p>
+<p>scala里的type classes模式主要通过隐式参数来实现，但需要注意的是，并不是所有的隐式参数都可以理解为type classes模式，隐式参数的类型必须是泛型的(高阶)，它表示某种抽象行为，这种行为的具体实现要由它的具体类型参数决定。</p>
+</blockquote>
+<h2 id="3-实现-Type-Class-的接口"><a href="#3-实现-Type-Class-的接口" class="headerlink" title="3. 实现 Type Class 的接口"></a>3. 实现 <code>Type Class</code> 的接口</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, email: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">JsonWriterInstances</span> </span>&#123;</span><br><span class="line">  <span class="keyword">implicit</span> <span class="keyword">val</span> stringWriter: <span class="type">JsonWriter</span>[<span class="type">String</span>] =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">JsonWriter</span>[<span class="type">String</span>] &#123;</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">write</span></span>(value: <span class="type">String</span>): <span class="type">Json</span> =</span><br><span class="line">        <span class="type">JsString</span>(value)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">implicit</span> <span class="keyword">val</span> personWriter: <span class="type">JsonWriter</span>[<span class="type">Person</span>] =</span><br><span class="line">    <span class="keyword">new</span> <span class="type">JsonWriter</span>[<span class="type">Person</span>] &#123;</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">write</span></span>(value: <span class="type">Person</span>): <span class="type">Json</span> =</span><br><span class="line">        <span class="type">JsObject</span>(<span class="type">Map</span>(</span><br><span class="line">          <span class="string">"name"</span> -&gt; <span class="type">JsString</span>(value.name),</span><br><span class="line">          <span class="string">"email"</span> -&gt; <span class="type">JsString</span>(value.email)</span><br><span class="line">        ))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// etc...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，我们定义 <code>trait</code> 的时候，类型是一个泛型，这里实现了两种类型的 <code>write</code> 方法，一种是基础的 <code>String</code>，一种是我们业务的 <code>Person</code> 类。</p>
+<p>这里我们使用 <code>implicit</code>，说明这个方法并不会直接被调用。</p>
+<h2 id="4-使用-Type-Class-的接口"><a href="#4-使用-Type-Class-的接口" class="headerlink" title="4. 使用 Type Class 的接口"></a>4. 使用 <code>Type Class</code> 的接口</h2><p>这里有两种方法，</p>
+<h3 id="使用静态方法-Interface-Objects"><a href="#使用静态方法-Interface-Objects" class="headerlink" title="使用静态方法 Interface Objects"></a>使用静态方法 <code>Interface Objects</code></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Json</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">toJson</span></span>[<span class="type">A</span>](value: <span class="type">A</span>)(<span class="keyword">implicit</span> w: <span class="type">JsonWriter</span>[<span class="type">A</span>]): <span class="type">Json</span> =</span><br><span class="line">    w.write(value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用接口文法-Interface-Syntax"><a href="#使用接口文法-Interface-Syntax" class="headerlink" title="使用接口文法 Interface Syntax"></a>使用接口文法 <code>Interface Syntax</code></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">JsonSyntax</span> </span>&#123;</span><br><span class="line">  <span class="keyword">implicit</span> <span class="class"><span class="keyword">class</span> <span class="title">JsonWriterOps</span>[<span class="type">A</span>](<span class="params">value: <span class="type">A</span></span>) </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">toJson</span></span>(<span class="keyword">implicit</span> w: <span class="type">JsonWriter</span>[<span class="type">A</span>]): <span class="type">Json</span> =</span><br><span class="line">      w.write(value)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5-应用"><a href="#5-应用" class="headerlink" title="5. 应用"></a>5. 应用</h2><h3 id="Interface-Objects"><a href="#Interface-Objects" class="headerlink" title="Interface Objects"></a><code>Interface Objects</code></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="type">JsonWriterInstances</span>._</span><br><span class="line"></span><br><span class="line"><span class="type">Json</span>.toJson(<span class="type">Person</span>(<span class="string">"Dave"</span>, <span class="string">"dave@example.com"</span>))</span><br><span class="line"><span class="comment">// 等价于</span></span><br><span class="line"><span class="comment">//Json.toJson(Person("Dave", "dave@example.com"))(personWriter)</span></span><br></pre></td></tr></table></figure>
+<h3 id="Interface-Syntax"><a href="#Interface-Syntax" class="headerlink" title="Interface Syntax"></a><code>Interface Syntax</code></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="type">JsonWriterInstances</span>._</span><br><span class="line"><span class="keyword">import</span> <span class="type">JsonSyntax</span>._</span><br><span class="line"></span><br><span class="line"><span class="type">Person</span>(<span class="string">"Dave"</span>, <span class="string">"dave@example.com"</span>).toJson</span><br></pre></td></tr></table></figure>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>当我们最后调用 <code>Json.toJson</code> 或者是  <code>.toJson</code> 的时候，因为其定义带有 <code>implicit w: JsonWriter[A]</code> 这个隐含参数，所以 Scala 就会尝试去寻找对应匹配类型的 <code>JsonWriter</code>，如果是 <code>String</code> 就会找到 <code>stringWriter</code>， 如果是 <code>Person</code> 就会找到 <code>personWriter</code>。然后在使用这个函数传入到  <code>Json.toJson</code> 或者是  <code>.toJson</code> 方法中，最后调用其 <code>write</code> 方法实现转换。</p>
+<p>总的来说，就是其他定义 <code>implicit</code> 方法，然后传入参数指定其为 <code>implicit</code>，最后 <code>Scala</code> 自动寻找匹配类型的隐含方法并应用。</p>
+<h1 id="Cats-Show-做了什么？"><a href="#Cats-Show-做了什么？" class="headerlink" title="Cats Show 做了什么？"></a>Cats Show 做了什么？</h1><p>我们阅读源码 <code>org.typelevel/cats-core_2.12/srcs/cats-core_2.12-1.4.0-sources.jar!/cats/Show.scala</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * A type class to provide textual representation. It is meant to be a</span></span><br><span class="line"><span class="comment"> * better "toString". Whereas toString exists for any Object,</span></span><br><span class="line"><span class="comment"> * regardless of whether or not the creator of the class explicitly</span></span><br><span class="line"><span class="comment"> * made a toString method, a Show instance will only exist if someone</span></span><br><span class="line"><span class="comment"> * explicitly provided one.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Show</span>[<span class="type">T</span>] <span class="keyword">extends</span> <span class="title">Show</span>.<span class="title">ContravariantShow</span>[<span class="type">T</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">trait</span> <span class="title">ContravariantShow</span>[-<span class="type">T</span>] <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">show</span></span>(t: <span class="type">T</span>): <span class="type">String</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的 <code>Show</code> 和上面的 <code>JsonWriter</code> 同样的角色，定义了 <code>show</code> 方法。</p>
+<p>对于 <code>Show</code> 的实现并不在这个文件中，但是 Cats 包含了一个 <code>package object instances</code> 这里面有很多基础类型的 <code>instance</code>， 比如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">StringInstances</span> <span class="keyword">extends</span> <span class="title">cats</span>.<span class="title">kernel</span>.<span class="title">instances</span>.<span class="title">StringInstances</span> </span>&#123;</span><br><span class="line">  <span class="keyword">implicit</span> <span class="keyword">val</span> catsStdShowForString: <span class="type">Show</span>[<span class="type">String</span>] =</span><br><span class="line">    <span class="type">Show</span>.fromToString[<span class="type">String</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接口定义：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Ops</span>[<span class="type">A</span>] </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">typeClassInstance</span></span>: <span class="type">Show</span>[<span class="type">A</span>]</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span></span>: <span class="type">A</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">show</span></span>: <span class="type">String</span> = typeClassInstance.show(self)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ToShowOps</span> </span>&#123;</span><br><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">toShow</span></span>[<span class="type">A</span>](target: <span class="type">A</span>)(<span class="keyword">implicit</span> tc: <span class="type">Show</span>[<span class="type">A</span>]): <span class="type">Ops</span>[<span class="type">A</span>] = <span class="keyword">new</span> <span class="type">Ops</span>[<span class="type">A</span>] &#123;</span><br><span class="line">  <span class="keyword">val</span> self = target</span><br><span class="line">  <span class="keyword">val</span> typeClassInstance = tc</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">ShowSyntax</span> <span class="keyword">extends</span> <span class="title">Show</span>.<span class="title">ToShowOps</span> </span>&#123;</span><br><span class="line">  <span class="keyword">implicit</span> <span class="keyword">final</span> <span class="function"><span class="keyword">def</span> <span class="title">showInterpolator</span></span>(sc: <span class="type">StringContext</span>): <span class="type">Show</span>.<span class="type">ShowInterpolator</span> = <span class="type">Show</span>.<span class="type">ShowInterpolator</span>(sc)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如何使用呢？只需要定义一个 我们需要类型的 instance，就可以直接使用了。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> catShow = <span class="type">Show</span>.show[<span class="type">Cat</span>] &#123; cat =&gt;</span><br><span class="line">    <span class="keyword">import</span> cats.instances.int._ <span class="comment">// for Show</span></span><br><span class="line">    <span class="keyword">import</span> cats.instances.string._ <span class="comment">// for Show</span></span><br><span class="line">    <span class="keyword">val</span> name = cat.name.show</span><br><span class="line">    <span class="keyword">val</span> age = cat.age.show</span><br><span class="line">    <span class="keyword">val</span> color = cat.color.show</span><br><span class="line">    <span class="string">s"<span class="subst">$name</span> is a <span class="subst">$age</span> year-old <span class="subst">$color</span> cat."</span></span><br><span class="line">  &#125;</span><br><span class="line">  println(<span class="type">Cat</span>(<span class="string">"Garfield"</span>, <span class="number">38</span>, <span class="string">"ginger and black"</span>).show)</span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Scala 的 <code>Type Class</code> 模式三部曲：</p>
+<ol>
+<li>Type Class Definition</li>
+<li>Type Class Instance</li>
+<li>Type Class Interface (Syntax/Objects)</li>
+</ol>
+<p>另外这段话说的很好：</p>
+<blockquote>
+<p>简单总结，type classes模式通过泛型来描述某种通用行为，对每个想要用到这种行为的具体类型，在现实时行为部分并不放在类型自身中，而是通过实现一个type class实例(对泛型具化)，最后在调用时(通过隐式参数)让编译器自动寻找行为的实现。</p>
+</blockquote>
+<p>我们可以那这 <code>Show</code> 思考一下，传统做法是什么呢？ 应该是定义一个统一的接口，接口中有一个 <code>show</code> 的方法，然后哪个类想实现 <code>show</code>，就实现这个接口。如果出现类型依赖，就要依赖其 <code>show</code> 的实现。(其实这就是 Java <code>Object</code> 类的 <code>toString</code>)</p>
+<p>虽然这样做并没有问题，但是 type class 模式进一步解耦合，类型天生并不绑定的其能力，能力是单独定义 （Type Class），一个类型如果需要这种能力，只需要单独创建其能力的实现（Instance），并由编译器自动绑定。</p>
+<p>有时间我们可以阅读以下 Play Framework 关于请求 Json 序列化过程的代码 （或者 Lagom Framework）里面大量使用了这种模式。</p>
+<h2 id="Gist"><a href="#Gist" class="headerlink" title="Gist"></a>Gist</h2><script src="https://gist.github.com/xmeng1/851522ba5b83450ed00114c3d58a60ae.js"></script>
+
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbNzM4NDc2ODhdfQ==
+-->
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+            <a href="/tags/cats/" rel="tag"># cats</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/14/Akka-HTTP-WebSocket-with-stream-actor-best-practise/" rel="next" title="Akka Http WebSocket with Stream and Actor 最佳实践">
+                <i class="fa fa-chevron-left"></i> Akka Http WebSocket with Stream and Actor 最佳实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/18/scala-with-cats-eq-implementation/" rel="prev" title="Scala with Cats 学习笔记2-Cat 的 Eq 实现">
+                Scala with Cats 学习笔记2-Cat 的 Eq 实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#应用场景"><span class="nav-number">1.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象转-JSON-实现"><span class="nav-number">2.</span> <span class="nav-text">对象转 JSON 实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-创建抽象语法树"><span class="nav-number">2.1.</span> <span class="nav-text">1. 创建抽象语法树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建-Type-Class"><span class="nav-number">2.2.</span> <span class="nav-text">2. 创建 Type Class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-实现-Type-Class-的接口"><span class="nav-number">2.3.</span> <span class="nav-text">3. 实现 Type Class 的接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用-Type-Class-的接口"><span class="nav-number">2.4.</span> <span class="nav-text">4. 使用 Type Class 的接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用静态方法-Interface-Objects"><span class="nav-number">2.4.1.</span> <span class="nav-text">使用静态方法 Interface Objects</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用接口文法-Interface-Syntax"><span class="nav-number">2.4.2.</span> <span class="nav-text">使用接口文法 Interface Syntax</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-应用"><span class="nav-number">2.5.</span> <span class="nav-text">5. 应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Interface-Objects"><span class="nav-number">2.5.1.</span> <span class="nav-text">Interface Objects</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Interface-Syntax"><span class="nav-number">2.5.2.</span> <span class="nav-text">Interface Syntax</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理"><span class="nav-number">3.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cats-Show-做了什么？"><span class="nav-number">4.</span> <span class="nav-text">Cats Show 做了什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gist"><span class="nav-number">5.1.</span> <span class="nav-text">Gist</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2019/06/15/scala-with-cats-type-class-thinking/';
+          this.page.identifier = '2019/06/15/scala-with-cats-type-class-thinking/';
+          this.page.title = 'Scala with Cats 学习笔记1-Type Class 的思考';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

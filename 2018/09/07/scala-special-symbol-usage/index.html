@@ -1,0 +1,1074 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala,symbol," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文汇总在 scala 中遇到各种符号操作符。">
+<meta name="keywords" content="scala,symbol">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala 特殊符号操作符汇总">
+<meta property="og:url" content="https://notes.mengxin.science/2018/09/07/scala-special-symbol-usage/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文汇总在 scala 中遇到各种符号操作符。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala 特殊符号操作符汇总">
+<meta name="twitter:description" content="摘要：本文汇总在 scala 中遇到各种符号操作符。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/09/07/scala-special-symbol-usage/"/>
+
+
+
+
+
+  <title> Scala 特殊符号操作符汇总 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/09/07/scala-special-symbol-usage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala 特殊符号操作符汇总
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-07T23:00:00+00:00">
+                2018-09-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/07/scala-special-symbol-usage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/09/07/scala-special-symbol-usage/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文汇总在 <code>scala</code> 中遇到各种符号操作符。</p>
+<a id="more"></a>
+<h2 id="模式匹配中使用"><a href="#模式匹配中使用" class="headerlink" title="模式匹配中使用 @"></a>模式匹配中使用 @</h2><p>这个 @ 的主要功能是在模式匹配中，匹配到一个模式后，但是在处理过程中，使用对象本身而不是匹配后的元素。</p>
+<h3 id="案例1：匹配-Some"><a href="#案例1：匹配-Some" class="headerlink" title="案例1：匹配 Some()"></a>案例1：匹配 <code>Some()</code></h3><p>参考该 <a href="https://stackoverflow.com/a/2359365/2000468" target="_blank" rel="noopener">Overflow 回答</a></p>
+<p>当我们匹配对象是否为 <code>Some(x)</code> 的时候，如果没有 <code>@</code> 那么最后我们在匹配中的值将是 <code>Some(x)</code> 中的 <code>x</code>， 而如果加入 <code>@</code>，那么最后匹配的将会是 <code>Some(x)</code> </p>
+<p>It enables one to bind a matched pattern to a variable. Consider the following, for instance:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> o: <span class="type">Option</span>[<span class="type">Int</span>] = <span class="type">Some</span>(<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p>You can easily extract the content:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">o <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="type">Some</span>(x) =&gt; println(x)</span><br><span class="line">  <span class="keyword">case</span> <span class="type">None</span> =&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>But what if you wanted not the content of Some, but the option itself? That would be accomplished with this:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">o <span class="keyword">match</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> x @ <span class="type">Some</span>(_) =&gt; println(x)</span><br><span class="line">  <span class="keyword">case</span> <span class="type">None</span> =&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Note that @ can be used at any level, not just at the top level of the matching.</p>
+<h3 id="案例2：API-匹配-Request"><a href="#案例2：API-匹配-Request" class="headerlink" title="案例2：API 匹配 Request"></a>案例2：API 匹配 Request</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">intent</span> </span>= &#123;</span><br><span class="line"> <span class="keyword">case</span> req @ <span class="type">GET</span>(<span class="type">Path</span>(<span class="type">Seg</span>(<span class="string">"api"</span> :: <span class="string">"user"</span> :: <span class="type">IntPathElement</span>(userId) :: <span class="type">Nil</span>))) =&gt;</span><br><span class="line">      <span class="keyword">val</span> f = (userManager ? <span class="type">FindUserById</span>(userId))</span><br><span class="line">      respond(f, req)</span><br><span class="line">      </span><br><span class="line"> <span class="keyword">case</span> req @ <span class="type">GET</span>(<span class="type">Path</span>(<span class="type">Seg</span>(<span class="string">"api"</span> :: <span class="string">"user"</span> :: <span class="type">Nil</span>))) &amp; <span class="type">Params</span>(<span class="type">EmailParam</span>(email)) =&gt;</span><br><span class="line">      <span class="keyword">val</span> f = (userManager ? <span class="type">FindUserByEmail</span>(email))</span><br><span class="line">      respond(f, req)  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在处理 <code>request</code> 请求的时候，需要匹配请求的路径，然后还需要直接使用 <code>requet</code>。</p>
+<h2 id="下划线-的使用场景"><a href="#下划线-的使用场景" class="headerlink" title="下划线 _ 的使用场景"></a>下划线 _ 的使用场景</h2><h3 id="import-通配符"><a href="#import-通配符" class="headerlink" title="import 通配符"></a>import 通配符</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span>._</span><br></pre></td></tr></table></figure>
+<h3 id="集合操作指代每一个元素"><a href="#集合操作指代每一个元素" class="headerlink" title="集合操作指代每一个元素"></a>集合操作指代每一个元素</h3><p>在所有的集合操作中都可以使用下划线指代集合内容。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Sample</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">main</span> </span>(args: <span class="type">Array</span>[<span class="type">String</span>])&#123;</span><br><span class="line">    <span class="keyword">val</span> newArry= (<span class="number">1</span> to <span class="number">10</span>).map(_*<span class="number">2</span>)</span><br><span class="line">   println(newArry)</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在一个 <code>Array</code> <code>a</code>中筛出偶数，并乘以2</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a.filter(_%<span class="number">2</span>==<span class="number">0</span>).map(<span class="number">2</span>*_)</span><br></pre></td></tr></table></figure>
+<h3 id="模式匹配使用"><a href="#模式匹配使用" class="headerlink" title="模式匹配使用"></a>模式匹配使用</h3><p>主要用于匹配通配的情形</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Some</span>(<span class="number">5</span>) <span class="keyword">match</span> &#123; <span class="keyword">case</span> <span class="type">Some</span>(_) =&gt; println(<span class="string">"Yes"</span>) &#125;</span><br><span class="line"><span class="keyword">match</span> &#123;</span><br><span class="line">     <span class="keyword">case</span> <span class="type">List</span>(<span class="number">1</span>,_,_) =&gt; <span class="string">" a list with three element and the first element is 1"</span></span><br><span class="line">     <span class="keyword">case</span> <span class="type">List</span>(_*)  =&gt; <span class="string">" a list with zero or more elements "</span></span><br><span class="line">     <span class="keyword">case</span> <span class="type">Map</span>[_,_] =&gt; <span class="string">" matches a map with any key type and any value type "</span></span><br><span class="line">     <span class="keyword">case</span> _ =&gt;</span><br><span class="line"> &#125;</span><br><span class="line"><span class="keyword">val</span> (a, _) = (<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">for</span> (_ &lt;- <span class="number">1</span> to <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<p>其他案例</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> m = <span class="type">Map</span>(<span class="number">1</span> -&gt; <span class="number">2</span>,<span class="number">2</span> -&gt; <span class="number">4</span>)</span><br><span class="line"><span class="keyword">for</span> ((k,_) &lt;- m) println(k) <span class="comment">//如果不需要所有部件， 则在不需要的部件使用_； 本例只取key,因此在value处用_</span></span><br></pre></td></tr></table></figure>
+<h3 id="变量初始化为-null"><a href="#变量初始化为-null" class="headerlink" title="变量初始化为 null"></a>变量初始化为 null</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Sample</span> </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> name:<span class="type">String</span>=_</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">main</span> </span>(args: <span class="type">Array</span>[<span class="type">String</span>])&#123;</span><br><span class="line">	  name=<span class="string">"hello world"</span></span><br><span class="line">	println(name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里，<code>name</code> 也可以声明为 <code>null</code>，例：<code>var name:String=null</code>。这里的下划线和 <code>null</code> 的作用是一样的。</p>
+<h3 id="参数序列处理"><a href="#参数序列处理" class="headerlink" title=":_* 参数序列处理"></a><code>:_*</code> 参数序列处理</h3><p><code>:_*</code> 作为一个整体，告诉编译器你希望将某个参数当作参数序列处理！</p>
+<p>例如，当函数接收的参数不定长的时候，假如你想输入一个队列，可以在一个队列后加入“<code>:_*</code>”，因此，这里的“1 to 5”也可以改写为：“Seq(1,2,3,4,5)”。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Sample</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">main</span> </span>(args: <span class="type">Array</span>[<span class="type">String</span>])=&#123;</span><br><span class="line">    <span class="keyword">val</span> result=sum(<span class="number">1</span> to <span class="number">5</span>:_*)</span><br><span class="line">     println(result)</span><br><span class="line">   &#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">sum</span></span>(parms:<span class="type">Int</span>*)=&#123;</span><br><span class="line">    <span class="keyword">var</span> result=<span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span>(parm &lt;- parms)result+=parm</span><br><span class="line">    result</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="元组访问成员"><a href="#元组访问成员" class="headerlink" title="元组访问成员"></a>元组访问成员</h3><p>在元组中，可以用方法<code>_1, _2, _3</code>访问组员。如 <code>a._2</code>。其中点操作符可以用空格替代，也就是 <code>a _2</code>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Sample</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">main</span> </span>(args: <span class="type">Array</span>[<span class="type">String</span>])=&#123;</span><br><span class="line">     <span class="keyword">val</span> value=(<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line">     print(value._1)</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="匿名函数-gt"><a href="#匿名函数-gt" class="headerlink" title="匿名函数 =&gt;"></a>匿名函数 =&gt;</h2><p>这个比较简单，因为 <code>Java8</code> 的 <code>Lambda</code> 已经广泛使用。</p>
+<p><code>=&gt;</code> 匿名函数（Anonymous Functions）： 表示创建一个函数实例。</p>
+<p>比如：<code>(x: Int) =&gt; x + 1</code>      </p>
+<p>和如下JAVA方法表示的含义一样：</p>
+<figure class="highlight irpf90"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="built_in">int</span> <span class="function"><span class="keyword">function</span><span class="params">(int x)</span></span>&#123;</span><br><span class="line"> <span class="keyword">return</span> x+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以这么理解：</p>
+<ol>
+<li>=&gt;左边 是输入参数，<code>:</code> 后面 <code>int</code> 是参数类型</li>
+<li>=&gt;右边 当作函数体, 类似匿名函数的 <code>{}</code></li>
+</ol>
+<h3 id="模式匹配中配合-case"><a href="#模式匹配中配合-case" class="headerlink" title="模式匹配中配合 case"></a>模式匹配中配合 case</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> bools = <span class="type">Seq</span>(<span class="literal">true</span>, <span class="literal">false</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (bool &lt;- bools) &#123;</span><br><span class="line">  bool <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="literal">true</span> =&gt; println(<span class="string">"Got heads"</span>)</span><br><span class="line">    <span class="keyword">case</span> <span class="literal">false</span> =&gt; println(<span class="string">"Got tails"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="集合遍历-lt"><a href="#集合遍历-lt" class="headerlink" title="集合遍历 &lt;-"></a>集合遍历 &lt;-</h2><p>简单说这是一个集合遍历的方法：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> list = <span class="type">Array</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line"><span class="keyword">for</span> (aa &lt;- list) &#123;</span><br><span class="line">  printf(aa+<span class="string">"   "</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是在 <code>for</code> 推导式中，这个符号表示<strong>生成器</strong>，其解释比循环更加复杂，是一个 <code>scala</code> 的语法糖，最后会被解释为一系列的容器操作：<code>map</code> 和 <code>flatMap</code> 等。参考另一篇详细介绍 <a href="https://notes.mengxin.science/2018/09/06/scala-for-comprehension-introduction-in-practice/">Scala <code>For</code> 推导式的文章</a>。</p>
+<h2 id="集合拼接-—-等操作"><a href="#集合拼接-—-等操作" class="headerlink" title="集合拼接 ++= —= 等操作"></a>集合拼接 ++= —= 等操作</h2><p>参考<a href="https://docs.scala-lang.org/zh-cn/overviews/collections/sets.html" target="_blank" rel="noopener">官方集合 Set 文档</a></p>
+<p>++= 用于拼接容器，而 += 用于拼接元素。</p>
+<p>WHAT IT IS    WHAT IT DOES</p>
+<p>加法：     </p>
+<ol>
+<li>xs += x    把元素 x 添加到集合 xs 中。该操作有副作用，它会返回左操作符，这里是 xs 自身。</li>
+<li>xs += (x, y, z)    添加指定的元素到集合 xs 中，并返回 xs 本身。（同样有副作用）</li>
+<li>xs ++= ys    添加集合 ys 中的所有元素到集合 xs 中，并返回 xs 本身。（表达式有副作用）</li>
+<li>xs add x    把元素 x 添加到集合 xs 中，如集合 xs 之前没有包含 x，该操作返回 true，否则返回 false。</li>
+</ol>
+<p>移除：     </p>
+<ol>
+<li>xs -= x    从集合 xs 中删除元素 x，并返回 xs 本身。（表达式有副作用）</li>
+<li>xs -= (x, y, z)    从集合 xs 中删除指定的元素，并返回 xs 本身。（表达式有副作用）</li>
+<li>xs —= ys    从集合 xs 中删除所有属于集合 ys 的元素，并返回 xs 本身。（表达式有副作用）</li>
+<li>xs remove x    从集合 xs 中删除元素 x 。如之前 xs 中包含了 x 元素，返回 true，否则返回 false。</li>
+<li>xs retain p    只保留集合 xs 中满足条件 p 的元素。</li>
+<li>xs.clear()    删除集合 xs 中的所有元素。</li>
+</ol>
+<p>更新：     </p>
+<ol>
+<li>xs(x) = b    （ 同 xs.update(x, b) ）参数 b 为布尔类型，如果值为 true 就把元素x加入集合 xs，否则从集合 xs 中删除 x。</li>
+</ol>
+<p>克隆：     </p>
+<ol>
+<li>xs.clone    产生一个与 xs 具有相同元素的可变集合。</li>
+</ol>
+<h2 id="冒号操作符"><a href="#冒号操作符" class="headerlink" title="冒号操作符"></a>冒号操作符</h2><h3 id="运算符"><a href="#运算符" class="headerlink" title=":::运算符"></a>:::运算符</h3><p>三个冒号表示List的连接操作，比如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a = <span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line"><span class="keyword">val</span> b = <span class="type">List</span>(<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line"><span class="keyword">val</span> c = a:::b <span class="comment">//c=List(1,2,3,4)</span></span><br></pre></td></tr></table></figure>
+<h3 id="两个冒号"><a href="#两个冒号" class="headerlink" title="::两个冒号"></a>::两个冒号</h3><p>两个冒号表示普通元素与List的连接操作，比如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a=<span class="number">1</span></span><br><span class="line"> <span class="keyword">val</span> b=<span class="type">List</span>(<span class="number">66</span>,<span class="number">88</span>)</span><br><span class="line"> <span class="keyword">val</span> c = <span class="number">1</span>::b <span class="comment">//c=List(1,66,88)</span></span><br></pre></td></tr></table></figure>
+<h2 id="元组操作-gt"><a href="#元组操作-gt" class="headerlink" title="元组操作 -&gt;"></a>元组操作 -&gt;</h2><p>scala中元组含义：</p>
+<p>元组是不同类型的值聚集线程的列表<br>通过将多个值使用小括号括起来，即表示元组</p>
+<p>scala中元组与数组区别</p>
+<p>数组中元素 数据类型必须一样，但是元组数据类型可以不同。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> first = (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>) <span class="comment">// 定义三元元组</span></span><br><span class="line"><span class="keyword">val</span> one = <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> two = <span class="number">2</span></span><br><span class="line"><span class="keyword">val</span> three = one -&gt; two</span><br><span class="line">println(three) <span class="comment">// 构造二元元组</span></span><br><span class="line">println(three._2) <span class="comment">// 访问二元元组中第二个值</span></span><br></pre></td></tr></table></figure>
+<h2 id="上下界约束符-lt-与-gt"><a href="#上下界约束符-lt-与-gt" class="headerlink" title="上下界约束符 &lt;: 与 &gt;:"></a>上下界约束符 &lt;: 与 &gt;:</h2><p>这对符号个人觉得是里面最好理解的了，这对符号用于写范型类/函数时约束范型类型。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">using</span></span>[<span class="type">A</span> &lt;: <span class="type">Closeable</span>, <span class="type">B</span>](closeable: <span class="type">A</span>) (getB: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">B</span> =</span><br><span class="line">  <span class="keyword">try</span> &#123; </span><br><span class="line">    getB(closeable)</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    closeable.close() </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>例子中 <code>A &lt;: Closeable(java.io.Cloaseable)</code> 的意思就是保证类型参数 <code>A</code> 是 <code>Closeable</code> 的子类（含本类）。<br>语法“<code>A &lt;: B</code>“定义了B为A的上界；同理相反的 <code>A &gt;: B</code> 的意思就是A是B的超类（含本类），定义了B为A的下界。<br>其实 <code>&lt;:</code> 和 <code>&gt;:</code> 就等价于java范型编程中的 <code>extends</code>，<code>super</code>。</p>
+<h2 id="协变与逆变符号-T，-T"><a href="#协变与逆变符号-T，-T" class="headerlink" title="协变与逆变符号+T， -T"></a>协变与逆变符号+T， -T</h2><p>“协变”是指能够使用与原始指定的派生类型相比，派生程度更大的类型。e.g. <code>String =&gt; AnyRef</code></p>
+<p>“逆变”则是指能够使用派生程度更小的类型。e.g. <code>AnyRef =&gt; String</code></p>
+<p>【+T】表示协变，【-T】表示逆变</p>
+<p>参考 《Scala 程序设计第2版》 2.13 抽象类型和参数化类型：</p>
+<p>Scala 支持参数化类型，与 Java 中的泛型十分类似。这两个术语，但 Scala 社区中多使用“参数化类型”， Java 社区中常用泛型一词。）在语法上， Java 使用尖括号（ <code>&lt;… &gt;</code>），而 Scala 使用方括号（ <code>[… ]</code>），因为在 Scala 中 <code>&lt;</code> 和 <code>&gt;</code> 常用作方法名。</p>
+<p>例如，字符串列表可以声明如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> strings: <span class="type">List</span>[<span class="type">String</span>] = <span class="type">List</span>(<span class="string">"one"</span>, <span class="string">"two"</span>, <span class="string">"three"</span>)</span><br></pre></td></tr></table></figure>
+<p>由于我们可以在集合 <code>List[A]</code> 中使用任何类型作为类型 A，这种特性被称为参数多态。在方法 List 的通用实现中，允许使用任何类型的实例作为 List 的元素。</p>
+<p>A 之前的 <code>+</code> 表示：如果 <code>B</code> 是 <code>A</code> 的子类，则 <code>List[B]</code> 也是 <code>List[A]</code> 的子类型，这被称为协类型。协类型很符合直觉，如果我们有一个函数 <code>f(list: List[Any])</code>，那么传递 <code>List[String]</code> 给这个函数，也应该能正常工作。</p>
+<p>如果类型参数前有 <code>-</code>，则表示另一种关系：如果 <code>B</code> 是 <code>A</code> 的子类型，且 <code>Foo[A]</code> 被声明为 <code>Foo[-A]</code>，则 <code>Foo[B]</code> 是 <code>Foo[A]</code> 的父类型（称为逆类型）。这一机制没那么符合直觉，我们将在参数化类型中与参数化类型的其他细节一起解释这一点。</p>
+<p>Scala 还支持另一种被称为“抽象类型”的抽象机制，它可以运用在许多参数化类型中，也能够解决设计上的问题。然而，尽管两种机制有所重合，但并不冗余，两种机制对不同的设计问题各有优势与不足。</p>
+<h2 id="view-bounds-视界-与-lt"><a href="#view-bounds-视界-与-lt" class="headerlink" title="view bounds(视界) 与 &lt;%"></a>view bounds(视界) 与 &lt;%</h2><p><code>&lt;%</code>的意思是“view bounds”(视界)，它比<code>&lt;:</code>适用的范围更广，除了所有的子类型，还允许隐式转换过去的类型</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">method</span> </span>[<span class="type">A</span> &lt;% <span class="type">B</span>](arglist): <span class="type">R</span> = ...</span><br></pre></td></tr></table></figure>
+<p>等价于</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">method</span> </span>[<span class="type">A</span>](arglist)(<span class="keyword">implicit</span> viewAB: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">R</span> = ...</span><br></pre></td></tr></table></figure>
+<p>表示 A 可以视为类型 B</p>
+<p>案例2：</p>
+<p>视界，就像类型边界，要求存在一个能够将某类型转换为指定类型的函数。你可以使用 &lt;% 指定类型限制，例如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Container</span>[<span class="type">A</span> &lt;% <span class="type">Int</span>] </span>&#123; <span class="function"><span class="keyword">def</span> <span class="title">addIt</span></span>(x: <span class="type">A</span>) = <span class="number">123</span> + x &#125;</span><br><span class="line">defined <span class="class"><span class="keyword">class</span> <span class="title">Container</span></span></span><br></pre></td></tr></table></figure>
+<p>这是说 A 必须“可被视作” Int 。让我们试试。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; (<span class="keyword">new</span> <span class="type">Container</span>[<span class="type">String</span>]).addIt(<span class="string">"123"</span>)</span><br><span class="line">res11: <span class="type">Int</span> = <span class="number">246</span></span><br><span class="line"></span><br><span class="line">scala&gt; (<span class="keyword">new</span> <span class="type">Container</span>[<span class="type">Int</span>]).addIt(<span class="number">123</span>) </span><br><span class="line">res12: <span class="type">Int</span> = <span class="number">246</span></span><br><span class="line"></span><br><span class="line">scala&gt; (<span class="keyword">new</span> <span class="type">Container</span>[<span class="type">Float</span>]).addIt(<span class="number">123.2</span>F)</span><br><span class="line">&lt;console&gt;:<span class="number">8</span>: error: could not find <span class="keyword">implicit</span> value <span class="keyword">for</span> evidence parameter of <span class="class"><span class="keyword">type</span> (<span class="params"><span class="type">Float</span></span>) <span class="title">=&gt;</span> <span class="title">Int</span></span></span><br><span class="line"><span class="class">       (<span class="params">new <span class="type">Container</span>[<span class="type">Float</span>]</span>).<span class="title">addIt</span>(<span class="params">123.2</span>)</span></span><br><span class="line"><span class="class">        <span class="title">^</span></span></span><br></pre></td></tr></table></figure>
+<p>&lt;% 除了方法使用之外，class声明类型参数时也可使用：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">A</span>[<span class="type">T</span> &lt;% <span class="type">Int</span>]</span></span><br><span class="line"><span class="class"><span class="title">defined</span> <span class="title">class</span> <span class="title">A</span></span></span><br></pre></td></tr></table></figure>
+<p>但无法对trait的类型参数使用 &lt;%，</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">trait</span> <span class="title">A</span>[<span class="type">T</span> &lt;% <span class="type">Int</span>]</span></span><br><span class="line"><span class="class"><span class="title">&lt;console&gt;</span></span>:<span class="number">1</span>: error: traits cannot have <span class="class"><span class="keyword">type</span> <span class="title">parameters</span> <span class="keyword">with</span> <span class="title">context</span> <span class="title">bounds</span> `</span>: ...' nor view bounds `&lt;% ...'</span><br></pre></td></tr></table></figure>
+<h2 id="广义类型约束符号-：-，-lt-lt-lt-lt"><a href="#广义类型约束符号-：-，-lt-lt-lt-lt" class="headerlink" title="广义类型约束符号 =：=， &lt;:&lt;,  &lt;%&lt;"></a>广义类型约束符号 =：=， &lt;:&lt;,  &lt;%&lt;</h2><p>方法可以通过隐式参数执行更复杂的类型限制。例如，List 支持对数字内容执行 sum，但对其他内容却不行。可是 Scala 的数字类型并不都共享一个超类，所以我们不能使用T &lt;: Number。相反，要使之能工作，Scala的math库对适当的类型T 定义了一个隐含的 <code>Numeric[T]</code>。 然后在 List 定义中使用它：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sum[<span class="type">B</span> &gt;: <span class="type">A</span>](<span class="keyword">implicit</span> num: <span class="type">Numeric</span>[<span class="type">B</span>]): <span class="type">B</span></span><br></pre></td></tr></table></figure>
+<p>如果你调用 <code>List(1,2).sum()</code>，你并不需要传入一个 num 参数；它是隐式设置的。但如果你调用 <code>List(&quot;whoop&quot;).sum()</code>，它会抱怨无法设置 num。</p>
+<p>在没有设定陌生的对象为 Numeric 的时候，方法可能会要求某种特定类型的“证据”。这时可以使用以下类型-关系运算符：</p>
+<p><code>A =:= B</code>   A 必须和 B相等<br><code>A &lt;:&lt; B</code>    A 必须是 B的子类<br><code>A &lt;%&lt; B</code>    A 必须可以被看做是 B</p>
+<p><strong>（如果你在尝试使用 &lt;:&lt; 或者 &lt;%&lt; 的时候出错了，那请注意这些符号在 Scala 2.10 中被移除了。Scala School 里的例子仅能在 Scala 2.9.x 下正常工作。你可以使用新版本的 Scala，但可能会遇到错误。）</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Container</span>[<span class="type">A</span>](<span class="params">value: <span class="type">A</span></span>) </span>&#123; <span class="function"><span class="keyword">def</span> <span class="title">addIt</span></span>(<span class="keyword">implicit</span> evidence: <span class="type">A</span> =:= <span class="type">Int</span>) = <span class="number">123</span> + value &#125;</span><br><span class="line">defined <span class="class"><span class="keyword">class</span> <span class="title">Container</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> (<span class="params">new <span class="type">Container</span>(123</span>)).<span class="title">addIt</span></span></span><br><span class="line"><span class="class"><span class="title">res11</span></span>: <span class="type">Int</span> = <span class="number">246</span></span><br><span class="line"></span><br><span class="line">scala&gt; (<span class="keyword">new</span> <span class="type">Container</span>(<span class="string">"123"</span>)).addIt</span><br><span class="line">&lt;console&gt;:<span class="number">10</span>: error: could not find <span class="keyword">implicit</span> value <span class="keyword">for</span> parameter evidence: =:=[java.lang.<span class="type">String</span>,<span class="type">Int</span>]</span><br><span class="line"><span class="comment">// 类似地，根据之前的隐式转换，我们可以将约束放松为可视性：</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">Container</span>[<span class="type">A</span>](<span class="params">value: <span class="type">A</span></span>) </span>&#123; <span class="function"><span class="keyword">def</span> <span class="title">addIt</span></span>(<span class="keyword">implicit</span> evidence: <span class="type">A</span> &lt;%&lt; <span class="type">Int</span>) = <span class="number">123</span> + value &#125;</span><br><span class="line">defined <span class="class"><span class="keyword">class</span> <span class="title">Container</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> (<span class="params">new <span class="type">Container</span>("123"</span>)).<span class="title">addIt</span></span></span><br><span class="line"><span class="class"><span class="title">res15</span></span>: <span class="type">Int</span> = <span class="number">246</span></span><br></pre></td></tr></table></figure>
+<h2 id="字符串插值-s-quot-c-quot"><a href="#字符串插值-s-quot-c-quot" class="headerlink" title="字符串插值 s&quot;$c&quot;"></a>字符串插值 <code>s&quot;$c&quot;</code></h2><p>参考官方文档：<a href="https://docs.scala-lang.org/zh-cn/overviews/core/string-interpolation.html" target="_blank" rel="noopener">字符串插值</a></p>
+<h3 id="s-字符串插值器"><a href="#s-字符串插值器" class="headerlink" title="s 字符串插值器"></a>s 字符串插值器</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> name=<span class="string">"James"</span></span><br><span class="line">println(<span class="string">s"Hello,<span class="subst">$name</span>"</span>) <span class="comment">//Hello,James 此例中，$name嵌套在一个将被s字符串插值器处理的字符串中。插值器知道在这个字符串的这个地方应该插入这个name变量的值，以使输出字符串为Hello,James。使用s插值器，在这个字符串中可以使用任何在处理范围内的名字。 </span></span><br><span class="line"></span><br><span class="line">println(<span class="string">s"1+1=<span class="subst">$&#123;1+1&#125;</span>"</span>) <span class="comment">//将会输出字符串1+1=2。任何表达式都可以嵌入到$&#123;&#125;中。</span></span><br></pre></td></tr></table></figure>
+<h3 id="f-插值器"><a href="#f-插值器" class="headerlink" title="f 插值器"></a>f 插值器</h3><p>在任何字符串字面前加上 f，就可以生成简单的格式化串，功能相似于其他语言中的 printf 函数。当使用 f 插值器的时候，所有的变量引用都应当后跟一个printf-style格式的字符串，如%d。看下面这个例子：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> height=<span class="number">1.9</span>d</span><br><span class="line"><span class="keyword">val</span> name=<span class="string">"James"</span></span><br><span class="line">println(<span class="string">f"<span class="subst">$name</span>%s is <span class="subst">$height</span>%2.2f meters tall"</span>)<span class="comment">//James is 1.90 meters tall f 插值器是类型安全的。如果试图向只支持 int 的格式化串传入一个double 值，编译器则会报错。例如：</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> height:<span class="type">Double</span>=<span class="number">1.9</span>d</span><br><span class="line"></span><br><span class="line">scala&gt;<span class="string">f"<span class="subst">$height</span>%4d"</span></span><br><span class="line">&lt;console&gt;:<span class="number">9</span>: error: <span class="class"><span class="keyword">type</span> <span class="title">mismatch</span></span>;</span><br><span class="line"> found : <span class="type">Double</span></span><br><span class="line"> required: <span class="type">Int</span></span><br><span class="line">           <span class="string">f"<span class="subst">$height</span>%4d"</span></span><br><span class="line">              ^ f 插值器利用了java中的字符串数据格式。这种以%开头的格式在</span><br></pre></td></tr></table></figure>
+<h3 id="raw-插值器"><a href="#raw-插值器" class="headerlink" title="raw 插值器"></a>raw 插值器</h3><p>除了对字面值中的字符不做编码外，raw 插值器与 s 插值器在功能上是相同的。如下是个被处理过的字符串：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">scala&gt;<span class="string">s"a\nb"</span></span><br><span class="line">res0:<span class="type">String</span>=</span><br><span class="line">a</span><br><span class="line">b </span><br><span class="line"><span class="comment">// 这里，s 插值器用回车代替了\n。而raw插值器却不会如此处理。</span></span><br><span class="line"></span><br><span class="line">scala&gt;<span class="string">raw"a\nb"</span></span><br><span class="line">res1:<span class="type">String</span>=a\nb </span><br><span class="line"><span class="comment">// 当不想输入\n被转换为回车的时候，raw 插值器是非常实用的。</span></span><br></pre></td></tr></table></figure>
+<h2 id="Akka-相关特殊字符"><a href="#Akka-相关特殊字符" class="headerlink" title="Akka 相关特殊字符"></a>Akka 相关特殊字符</h2><h3 id="send"><a href="#send" class="headerlink" title="send !"></a>send !</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="type">ArticleBody</span>(uri, body) =&gt; <span class="comment">//If we get the parsed article back, then we've just parsed it</span></span><br><span class="line">	cacheActor ! <span class="type">SetRequest</span>(uri, body) <span class="comment">//Cache it as we just</span></span><br><span class="line">	parsed it</span><br><span class="line">	senderRef ! body</span><br><span class="line">	context.stop(self)</span><br></pre></td></tr></table></figure>
+<h3 id="ask"><a href="#ask" class="headerlink" title="ask ?"></a>ask ?</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> future = pongActor ? <span class="string">"unknown"</span></span><br></pre></td></tr></table></figure>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://my.oschina.net/leejun2005/blog/405305" target="_blank" rel="noopener">浅谈 Scala 中下划线的用途</a></p>
+<p><a href="https://www.zhihu.com/question/21622725" target="_blank" rel="noopener">Scala中的下划线到底有多少种应用场景</a></p>
+<p><a href="https://blog.csdn.net/i6448038/article/details/50017427" target="_blank" rel="noopener">细数Scala下划线“_”的用法</a></p>
+<p><a href="https://www.zybuluo.com/boothsun/note/1014438#%E9%80%9A%E9%85%8D%E7%AC%A6" target="_blank" rel="noopener">scala中常用特殊符号</a></p>
+<p><a href="https://blog.csdn.net/lhui798/article/details/50206939" target="_blank" rel="noopener">【Scala一】Scala各种符号的含义</a></p>
+<p><a href="https://www.jianshu.com/p/b98ae80f8ba0" target="_blank" rel="noopener">Scala各种常见的符号小结</a></p>
+<p><a href="https://blog.csdn.net/bobozhengsir/article/details/13023023" target="_blank" rel="noopener">Scala中符号语法糖</a></p>
+<p><a href="https://my.oschina.net/sunyouling/blog/1523461" target="_blank" rel="noopener">scala一些符号含义总结</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+            <a href="/tags/symbol/" rel="tag"># symbol</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/06/scala-for-comprehension-introduction-in-practice/" rel="next" title="Scala For 推导式介绍及最佳实践">
+                <i class="fa fa-chevron-left"></i> Scala For 推导式介绍及最佳实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/08/vim-movement-key-explaination/" rel="prev" title="vim movement key explaination">
+                vim movement key explaination <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#模式匹配中使用"><span class="nav-number">1.</span> <span class="nav-text">模式匹配中使用 @</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例1：匹配-Some"><span class="nav-number">1.1.</span> <span class="nav-text">案例1：匹配 Some()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例2：API-匹配-Request"><span class="nav-number">1.2.</span> <span class="nav-text">案例2：API 匹配 Request</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下划线-的使用场景"><span class="nav-number">2.</span> <span class="nav-text">下划线 _ 的使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#import-通配符"><span class="nav-number">2.1.</span> <span class="nav-text">import 通配符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集合操作指代每一个元素"><span class="nav-number">2.2.</span> <span class="nav-text">集合操作指代每一个元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模式匹配使用"><span class="nav-number">2.3.</span> <span class="nav-text">模式匹配使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量初始化为-null"><span class="nav-number">2.4.</span> <span class="nav-text">变量初始化为 null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数序列处理"><span class="nav-number">2.5.</span> <span class="nav-text">:_* 参数序列处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#元组访问成员"><span class="nav-number">2.6.</span> <span class="nav-text">元组访问成员</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匿名函数-gt"><span class="nav-number">3.</span> <span class="nav-text">匿名函数 =&gt;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模式匹配中配合-case"><span class="nav-number">3.1.</span> <span class="nav-text">模式匹配中配合 case</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集合遍历-lt"><span class="nav-number">4.</span> <span class="nav-text">集合遍历 &lt;-</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集合拼接-—-等操作"><span class="nav-number">5.</span> <span class="nav-text">集合拼接 ++= —= 等操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冒号操作符"><span class="nav-number">6.</span> <span class="nav-text">冒号操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#运算符"><span class="nav-number">6.1.</span> <span class="nav-text">:::运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两个冒号"><span class="nav-number">6.2.</span> <span class="nav-text">::两个冒号</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元组操作-gt"><span class="nav-number">7.</span> <span class="nav-text">元组操作 -&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上下界约束符-lt-与-gt"><span class="nav-number">8.</span> <span class="nav-text">上下界约束符 &lt;: 与 &gt;:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协变与逆变符号-T，-T"><span class="nav-number">9.</span> <span class="nav-text">协变与逆变符号+T， -T</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#view-bounds-视界-与-lt"><span class="nav-number">10.</span> <span class="nav-text">view bounds(视界) 与 &lt;%</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#广义类型约束符号-：-，-lt-lt-lt-lt"><span class="nav-number">11.</span> <span class="nav-text">广义类型约束符号 =：=， &lt;:&lt;,  &lt;%&lt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串插值-s-quot-c-quot"><span class="nav-number">12.</span> <span class="nav-text">字符串插值 s&quot;$c&quot;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#s-字符串插值器"><span class="nav-number">12.1.</span> <span class="nav-text">s 字符串插值器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#f-插值器"><span class="nav-number">12.2.</span> <span class="nav-text">f 插值器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#raw-插值器"><span class="nav-number">12.3.</span> <span class="nav-text">raw 插值器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Akka-相关特殊字符"><span class="nav-number">13.</span> <span class="nav-text">Akka 相关特殊字符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#send"><span class="nav-number">13.1.</span> <span class="nav-text">send !</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ask"><span class="nav-number">13.2.</span> <span class="nav-text">ask ?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">14.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/09/07/scala-special-symbol-usage/';
+          this.page.identifier = '2018/09/07/scala-special-symbol-usage/';
+          this.page.title = 'Scala 特殊符号操作符汇总';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

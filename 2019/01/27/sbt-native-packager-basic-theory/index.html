@@ -1,0 +1,1045 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sbt,sbt-native-packager," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文根据 sbt-native-packager 官方文档详细介绍其基本理论基础，重点在理解一些基础知识，便于理解复杂的配置，并且可以灵活自定义打包。参考文档">
+<meta name="keywords" content="sbt,sbt-native-packager">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sbt-native-packager 基础理论基础">
+<meta property="og:url" content="https://notes.mengxin.science/2019/01/27/sbt-native-packager-basic-theory/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文根据 sbt-native-packager 官方文档详细介绍其基本理论基础，重点在理解一些基础知识，便于理解复杂的配置，并且可以灵活自定义打包。参考文档">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sbt-native-packager 基础理论基础">
+<meta name="twitter:description" content="摘要：本文根据 sbt-native-packager 官方文档详细介绍其基本理论基础，重点在理解一些基础知识，便于理解复杂的配置，并且可以灵活自定义打包。参考文档">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2019/01/27/sbt-native-packager-basic-theory/"/>
+
+
+
+
+
+  <title> sbt-native-packager 基础理论基础 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2019/01/27/sbt-native-packager-basic-theory/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                sbt-native-packager 基础理论基础
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-27T00:00:00+00:00">
+                2019-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/27/sbt-native-packager-basic-theory/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/01/27/sbt-native-packager-basic-theory/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文根据 <code>sbt-native-packager</code> 官方文档详细介绍其基本理论基础，重点在理解一些基础知识，便于理解复杂的配置，并且可以灵活自定义打包。参考<a href="https://www.scala-sbt.org/sbt-native-packager/introduction.html" target="_blank" rel="noopener">文档</a></p>
+<a id="more"></a>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p><code>sbt-native-packager</code> 的初衷是：</p>
+<blockquote>
+<p>“Code once, deploy anywhere”</p>
+</blockquote>
+<p>也就是一次编码，在所有地方部署，可见其功能能够是比较强大，但是功能强大带来的问题是设计必须巧妙，能够兼容各种环境，所以如果希望灵活的使用该插件，就需要对其基本原理有较为深刻的理解，才能将其应用到各种环境中。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>SBT native packager允许您以原始格式构建应用程序包，并为常见配置(如简单Java应用程序或服务器应用程序)提供不同的模型（archetypes）。</p>
+<p>本节将介绍 native packager 概述及其核心概念。</p>
+<h2 id="Goals-目标"><a href="#Goals-目标" class="headerlink" title="Goals 目标"></a>Goals 目标</h2><p>首先我们需要了解该插件的目标，这样我们才能合理的使用它：</p>
+<blockquote>
+<ol>
+<li>Native formats should build on their respective platform<br>This allows native packager to support a wide range of formats as the packaging plugin serves as a wrapper around the actual packaging tool. However, alternative packaging plugins maybe provided if a java/scala implementation exists. As an example debian packages should always build on debian systems, however native packager provides an additional plugin that integrates JDeb for a platform independent packaging strategy.</li>
+</ol>
+</blockquote>
+<p>原生格式应该构建与对应的平台，比如 debian 的安装包就应该在 debian 系统下构建。</p>
+<blockquote>
+<ol>
+<li>Provide archetypes for zero configuration builds<br>While packaging plugins provide the how a package is created, archetypes provide the configuration for what gets packaged. Archetypes configure your build to create a package for a certain purpose. While an archetype may not support all packaging formats, it should work without configuration for the supported formats.</li>
+</ol>
+</blockquote>
+<p>能够提供零配置的 archetypes。</p>
+<blockquote>
+<ol>
+<li>Enforce best-practices<br>There is no single way to create a package. Native packager tries to create packages following best practices, e.g. for file names, installation paths or script layouts.</li>
+</ol>
+</blockquote>
+<p>提供打包的最佳实践</p>
+<h2 id="Scope-范围"><a href="#Scope-范围" class="headerlink" title="Scope 范围"></a>Scope 范围</h2><blockquote>
+<p>While native packager provides a wide range of formats and archetype configurations, its scope is relatively narrow. Native packager only takes care of packaging, the act of putting a list of mappings (source file to install target path) into a distinct package format (zip, rpm, etc.).</p>
+</blockquote>
+<p>实际上该打包工具的核心功能很简单：打包，也就是将一系列的文件打包到对应的格式中。</p>
+<p>我们还要知道哪些事情该插件是不负责的：</p>
+<ol>
+<li>程序生命周期管理</li>
+<li>部署配置</li>
+</ol>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><h3 id="职责分离"><a href="#职责分离" class="headerlink" title="职责分离"></a>职责分离</h3><p>这里有两种插件</p>
+<ol>
+<li>format plugins： 如何创建 package （how）</li>
+<li>archetype plugins：将哪些内容放入 package 中 （what）</li>
+</ol>
+<h3 id="mappings-映射"><a href="#mappings-映射" class="headerlink" title="mappings 映射"></a>mappings 映射</h3><p>这个概念是用于表示如何将构建的文件组织到目标系统中。</p>
+<blockquote>
+<p>Mappings are a Seq[(File, String)], which translates to “a list of tuples, where each tuple defines a source file that gets mapped to a path on the target system”.</p>
+</blockquote>
+<p>例如：<code>Seq[(File, String)]</code>，表示一个 tuples 的序列，每个 tuple 定义一组源文件映射到目标系统的路径。</p>
+<p>该理念是核心，需要重点理解。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mappings: <span class="type">TaskKey</span>[<span class="type">Seq</span>[(<span class="type">File</span>, <span class="type">String</span>)]]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The file part of the tuple must be available during the packaging phase. The String part represents the path inside the installation directory.</p>
+</blockquote>
+<ol>
+<li>其中 file 部分是只需要被打包的文件，需要在打包阶段已经生成完毕</li>
+<li>其中 String 部分表示安装目录的路径</li>
+</ol>
+<p>进一步理解 mappings，我们可以通过  <code>Universal Plugin</code> 来学习。</p>
+<h1 id="Universal-Plugin"><a href="#Universal-Plugin" class="headerlink" title="Universal Plugin"></a>Universal Plugin</h1><blockquote>
+<p>The Universal Plugin creates a generic, or “universal” distribution package. This is called “universal packaging.” Universal packaging just takes a plain mappings configuration and generates various package files in the output format specified. Because it creates a distribution that is not tied to any particular platform it may require manual labor (more work from your users) to correctly install and set up.</p>
+</blockquote>
+<p>简单的说就是将项目打包为扩平台的 JVM 程序，用户需要在不同平台上手动执行命令来运行，比如在 Windows 上需要执行 bat 脚本，Linux 上需要执行 sh 脚本。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>参考  <a href="https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#getting-started-with-universal-packaging" target="_blank" rel="noopener">Getting Started with Universal Packaging</a></p>
+<blockquote>
+<p>By default, all files found in the  <code>src/universal</code>  directory are included in the distribution. So, the first step in creating a distribution is to place files in this directory and organize them as you’d like in them to be in the distributed package. If your output format is a zip file, for example, although the distribution will consist of just one zip file, the files and directories within that zip file will reflect the same organization and structure as  <code>src/universal</code>.</p>
+<p>To add files generated by the build task to a distribution, simply add a  <em>mapping</em>  to the  <code>mappings  in  Universal</code>  setting. Let’s look at an example where we add the packaged jar of a project to the lib folder of a distribution:</p>
+</blockquote>
+<p>我们需要通过 <code>mapping</code> 来想目标目录添加文件</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mappings in <span class="type">Universal</span> &lt;+= (packageBin in <span class="type">Compile</span>) map &#123; jar =&gt;</span><br><span class="line">  jar -&gt; (<span class="string">"lib/"</span> + jar.getName)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>解释：</p>
+<ol>
+<li>依赖于 <code>Compile</code> 中的 <code>packageBin</code>，因为这个 <code>task</code> 会在 <code>target</code> 目录下生成 <code>jar</code>，这些 <code>jar</code> 是打包必备的核心内容。</li>
+<li>创建一个 <code>mapping</code> 是一个（<code>Tuple2[File, String]</code>），表示添加的文件和目标路径的字符串。</li>
+</ol>
+<p>进一步理解 <code>(packageBin in Compile)</code> 会返回一个 <code>jar</code> 的序列，然后通过 map 操作，将每个 <code>jar</code> 映射为一个 <code>Tuple2</code>， 两个元素分别是 <code>jar</code> 文件本身，后一个元素是一个字符串，表示打包后目标路径，及 <code>(&quot;lib/&quot; + jar.getName)</code>，也就是放置于 <code>lib</code> 目录下，文件名就是 <code>jar</code> 的名字。</p>
+<h1 id="关于-Mapping-的各种方法总结"><a href="#关于-Mapping-的各种方法总结" class="headerlink" title="关于 Mapping 的各种方法总结"></a>关于 Mapping 的各种方法总结</h1><h2 id="关于-setting-的操作符"><a href="#关于-setting-的操作符" class="headerlink" title="关于 setting 的操作符"></a>关于 setting 的操作符</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">+=</span></span>[<span class="type">U</span>](v: <span class="type">U</span>)(<span class="keyword">implicit</span> a: <span class="type">Append</span>.<span class="type">Value</span>[<span class="type">T</span>, <span class="type">U</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">    macro std.<span class="type">TaskMacro</span>.taskAppend1Impl[<span class="type">T</span>, <span class="type">U</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">++=</span></span>[<span class="type">U</span>](vs: <span class="type">U</span>)(<span class="keyword">implicit</span> a: <span class="type">Append</span>.<span class="type">Values</span>[<span class="type">T</span>, <span class="type">U</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">  macro std.<span class="type">TaskMacro</span>.taskAppendNImpl[<span class="type">T</span>, <span class="type">U</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">&lt;+=</span></span>[<span class="type">V</span>](v: <span class="type">Initialize</span>[<span class="type">Task</span>[<span class="type">V</span>]])(<span class="keyword">implicit</span> a: <span class="type">Append</span>.<span class="type">Value</span>[<span class="type">T</span>, <span class="type">V</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">  macro std.<span class="type">TaskMacro</span>.fakeTaskAppend1Position[<span class="type">T</span>, <span class="type">V</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">&lt;++=</span></span>[<span class="type">V</span>](vs: <span class="type">Initialize</span>[<span class="type">Task</span>[<span class="type">V</span>]])(<span class="keyword">implicit</span> a: <span class="type">Append</span>.<span class="type">Values</span>[<span class="type">T</span>, <span class="type">V</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">  macro std.<span class="type">TaskMacro</span>.fakeTaskAppendNPosition[<span class="type">T</span>, <span class="type">V</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="function"><span class="keyword">def</span> <span class="title">-=</span></span>[<span class="type">U</span>](v: <span class="type">U</span>)(<span class="keyword">implicit</span> r: <span class="type">Remove</span>.<span class="type">Value</span>[<span class="type">T</span>, <span class="type">U</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">  macro std.<span class="type">TaskMacro</span>.taskRemove1Impl[<span class="type">T</span>, <span class="type">U</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="function"><span class="keyword">def</span> <span class="title">--=</span></span>[<span class="type">U</span>](vs: <span class="type">U</span>)(<span class="keyword">implicit</span> r: <span class="type">Remove</span>.<span class="type">Values</span>[<span class="type">T</span>, <span class="type">U</span>]): <span class="type">Setting</span>[<span class="type">Task</span>[<span class="type">T</span>]] =</span><br><span class="line">  macro std.<span class="type">TaskMacro</span>.taskRemoveNImpl[<span class="type">T</span>, <span class="type">U</span>]</span><br></pre></td></tr></table></figure>
+<p>see <a href="https://www.scala-sbt.org/0.12.4/docs/Getting-Started/More-About-Settings.html#appending-to-previous-values-and" target="_blank" rel="noopener">https://www.scala-sbt.org/0.12.4/docs/Getting-Started/More-About-Settings.html#appending-to-previous-values-and</a></p>
+<p>see <a href="https://stackoverflow.com/a/23693921/2000468" target="_blank" rel="noopener">https://stackoverflow.com/a/23693921/2000468</a></p>
+<blockquote>
+<p>You cannot find documentation, because as @JacekLaskowski correctly pointed out all operators except for +=, ++= and := are deprecated.</p>
+<p>You can however find the Documentation if you switch to older version of sbt.</p>
+<p>If you however are stuck to older version, this is their meaning (via documentation):</p>
+<p>+= and ++= append to previous value, where first appends single element and next appends a  Seq<br>~= transforms value, e.g. you want to use value stored in a setting to get a new setting.<br>&lt;&lt;= depends on another key, for example if you call organization &lt;&lt;= name, then organization value is equal to name value. You can depend on multiple values, e.g. organization &lt;&lt;= (name, version) { (n, v) =&gt; /<em> do something with values </em>/ }<br>&lt;+= and &lt;++= are appending with dependencies, like the append, but you can use another’s setting value to compute new value<br>Said that, @JacekLaskowski is right, and if you are using sbt 13.x or greater you should not have to use those operators in favours of macros.</p>
+</blockquote>
+<p>使用方法案例</p>
+<p>:= will replace the previous value<br>+= will append a single element to the sequence.<br>++= will concatenate another sequence.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sourceDirectories in <span class="type">Compile</span> += <span class="keyword">new</span> <span class="type">File</span>(<span class="string">"source"</span>)</span><br><span class="line">sourceDirectories in <span class="type">Compile</span> += file(<span class="string">"source"</span>)</span><br><span class="line"></span><br><span class="line">sourceDirectories in <span class="type">Compile</span> ++= <span class="type">Seq</span>(file(<span class="string">"sources1"</span>), file(<span class="string">"sources2"</span>))</span><br><span class="line"></span><br><span class="line">sourceDirectories in <span class="type">Compile</span> := <span class="type">Seq</span>(file(<span class="string">"sources1"</span>), file(<span class="string">"sources2"</span>))</span><br></pre></td></tr></table></figure>
+<p>~= applies a function to the setting’s previous value, producing a new value of the same type. 也就是将之前的值经过一些处理得到新的值，再赋值。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// filter out src/main/scala</span></span><br><span class="line">sourceDirectories in <span class="type">Compile</span> ~= &#123; srcDirs =&gt; srcDirs filter(!_.getAbsolutePath.endsWith(<span class="string">"src/main/scala"</span>)) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// srcDirs is old value of the `sourceDirectories in Compile`</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// make the project name upper case</span></span><br><span class="line">name ~= &#123; _.toUpperCase &#125;</span><br></pre></td></tr></table></figure>
+<p>Unlike &lt;&lt;= of course, &lt;+= and &lt;++= will append to the previous value of the key on the left, rather than replacing it.</p>
+<p>For example, say you have a coverage report named after the project, and you want to add it to the files removed by clean:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cleanFiles &lt;+= (name) &#123; n =&gt; file(<span class="string">"coverage-report-"</span> + n + <span class="string">".txt"</span>) &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="关于路径的获取方法"><a href="#关于路径的获取方法" class="headerlink" title="关于路径的获取方法"></a>关于路径的获取方法</h2><p>参考链接 ：<a href="https://www.scala-sbt.org/sbt-native-packager/formats/universal.html#mapping-examples" target="_blank" rel="noopener">Mapping Examples</a></p>
+<blockquote>
+<p>SBT provides the IO and Path APIs, which help make defining custom mappings easy. The files will appear in the generate universal zip, but also in your debian/rpm/msi/dmg builds as described above in the conventions.</p>
+</blockquote>
+<p><a href="https://www.scala-sbt.org/0.13.1/docs/Detailed-Topics/Paths.html" target="_blank" rel="noopener">https://www.scala-sbt.org/0.13.1/docs/Detailed-Topics/Paths.html</a></p>
+<blockquote>
+<p>The packageBin in Compile dependency is only needed if your files get generated during the packageBin command or before. For static files you can remove it.</p>
+</blockquote>
+<p>注意这里是一个旧的文档</p>
+<p>这里需要实际案例测试各个功能。</p>
+<h2 id="案例解析"><a href="#案例解析" class="headerlink" title="案例解析"></a>案例解析</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mappings in <span class="type">Universal</span> &lt;+= (packageBin in <span class="type">Compile</span>) map &#123; jar =&gt;</span><br><span class="line">  jar -&gt; (<span class="string">"lib/"</span> + jar.getName)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// mappings in Universal 已经有值，在其基础上在 packageBin in Compile，然后再进行一个 map 操作。</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mappings in <span class="type">Windows</span> ++= &#123;</span><br><span class="line"><span class="comment">//  file("src/main/resources/wix/service.bat") -&gt; "bin/service.bat"</span></span><br><span class="line">  <span class="keyword">val</span> scriptsDir = <span class="keyword">new</span> java.io.<span class="type">File</span>(<span class="string">"src/main/resources/wix"</span>)</span><br><span class="line">  scriptsDir.listFiles.toSeq.map &#123; f =&gt;</span><br><span class="line">    f -&gt; (<span class="string">"bin/"</span> + f.getName)</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//  file("src/main/resources/wix/*") -&gt; "bin/"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sbt/" rel="tag"># sbt</a>
+          
+            <a href="/tags/sbt-native-packager/" rel="tag"># sbt-native-packager</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/01/jhipster-study-default-authentication-method/" rel="next" title="JHipster Study Default Authentication Method">
+                <i class="fa fa-chevron-left"></i> JHipster Study Default Authentication Method
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/17/python-machine-learning-note-1/" rel="prev" title="Python机器学习笔记1">
+                Python机器学习笔记1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Goals-目标"><span class="nav-number">2.1.</span> <span class="nav-text">Goals 目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scope-范围"><span class="nav-number">2.2.</span> <span class="nav-text">Scope 范围</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心概念"><span class="nav-number">2.3.</span> <span class="nav-text">核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#职责分离"><span class="nav-number">2.3.1.</span> <span class="nav-text">职责分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mappings-映射"><span class="nav-number">2.3.2.</span> <span class="nav-text">mappings 映射</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Universal-Plugin"><span class="nav-number">3.</span> <span class="nav-text">Universal Plugin</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">3.1.</span> <span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于-Mapping-的各种方法总结"><span class="nav-number">4.</span> <span class="nav-text">关于 Mapping 的各种方法总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于-setting-的操作符"><span class="nav-number">4.1.</span> <span class="nav-text">关于 setting 的操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于路径的获取方法"><span class="nav-number">4.2.</span> <span class="nav-text">关于路径的获取方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例解析"><span class="nav-number">4.3.</span> <span class="nav-text">案例解析</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2019/01/27/sbt-native-packager-basic-theory/';
+          this.page.identifier = '2019/01/27/sbt-native-packager-basic-theory/';
+          this.page.title = 'sbt-native-packager 基础理论基础';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

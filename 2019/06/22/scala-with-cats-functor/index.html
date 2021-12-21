@@ -1,0 +1,1020 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala,cats," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Abstract:  继续阅读 Scala with Cats， 开始学习 Functor。前面的 Monoid 和 SemiGroup 封装的是一种合并或者相加的能力，Functor 就是封装的一种进行连续操作的能力。与 Monoid 和 SemiGroup 紧密联系的操作是 fold，而 Functor 就是 map 或者是 flatMap。">
+<meta name="keywords" content="scala,cats">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala with Cats 学习笔记4-Functor">
+<meta property="og:url" content="https://notes.mengxin.science/2019/06/22/scala-with-cats-functor/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="Abstract:  继续阅读 Scala with Cats， 开始学习 Functor。前面的 Monoid 和 SemiGroup 封装的是一种合并或者相加的能力，Functor 就是封装的一种进行连续操作的能力。与 Monoid 和 SemiGroup 紧密联系的操作是 fold，而 Functor 就是 map 或者是 flatMap。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images/20190624063008.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala with Cats 学习笔记4-Functor">
+<meta name="twitter:description" content="Abstract:  继续阅读 Scala with Cats， 开始学习 Functor。前面的 Monoid 和 SemiGroup 封装的是一种合并或者相加的能力，Functor 就是封装的一种进行连续操作的能力。与 Monoid 和 SemiGroup 紧密联系的操作是 fold，而 Functor 就是 map 或者是 flatMap。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images/20190624063008.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2019/06/22/scala-with-cats-functor/"/>
+
+
+
+
+
+  <title> Scala with Cats 学习笔记4-Functor | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2019/06/22/scala-with-cats-functor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala with Cats 学习笔记4-Functor
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-22T23:00:00+00:00">
+                2019-06-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Knowledge/" itemprop="url" rel="index">
+                    <span itemprop="name">Knowledge</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/06/22/scala-with-cats-functor/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/06/22/scala-with-cats-functor/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Abstract:  继续阅读 <a href="https://books.underscore.io/scala-with-cats/scala-with-cats.html" target="_blank" rel="noopener">Scala with Cats</a>， 开始学习 <code>Functor</code>。前面的 <code>Monoid</code> 和 <code>SemiGroup</code> 封装的是一种合并或者相加的能力，<code>Functor</code> 就是封装的一种进行连续操作的能力。与 <code>Monoid</code> 和 <code>SemiGroup</code> 紧密联系的操作是 <code>fold</code>，而 <code>Functor</code> 就是 <code>map</code> 或者是 <code>flatMap</code>。</p>
+<a id="more"></a>
+<h1 id="数学背景"><a href="#数学背景" class="headerlink" title="数学背景"></a>数学背景</h1><h2 id="直观理解"><a href="#直观理解" class="headerlink" title="直观理解"></a>直观理解</h2><p> 如果不严格的讲，所有的带有 <code>map</code> 操作的都可以称之为 <code>Functor</code>，所以我们熟悉的 <code>List</code>，<code>Option</code>，<code>Either</code> 都是 <code>Functor</code>。<br>比如 <code>List</code>，通过 <code>map</code> 操作，我们针对其中的元素进行一个链式操作，每个 <code>map</code> 操作后，仍然返回的是一个 <code>List</code>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).</span><br><span class="line">  map(n =&gt; n + <span class="number">1</span>).</span><br><span class="line">  map(n =&gt; n * <span class="number">2</span>).</span><br><span class="line">  map(n =&gt; n + <span class="string">"!"</span>)</span><br></pre></td></tr></table></figure>
+<p>除了这些数据类型定义以外，对于一元方程来说也是 <code>Functor</code>。</p>
+<ul>
+<li>start with  <code>X =&gt; A</code>;</li>
+<li>supply a function  <code>A =&gt; B</code>;</li>
+<li>get back  <code>X =&gt; B</code>.</li>
+</ul>
+<blockquote>
+<p>How does this relate to our general pattern of sequencing operations? If we think about it, function composition <em>is</em> sequencing. We start with a function that performs a single operation and every time we use <code>map</code> we append another operation to the chain. Calling <code>map</code> doesn’t actually <em>run</em> any of the operations, but if we can pass an argument to the final function all of the operations are run in sequence.</p>
+</blockquote>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><blockquote>
+<p>Every example we’ve looked at so far is a functor: a class that encapsulates sequencing computations. Formally, a functor is a type <code>F[A]</code> with an operation <code>map</code> with type <code>(A =&gt; B) =&gt; F[B]</code>.</p>
+</blockquote>
+<p>Functor ：是一个类（类型），这个类封装了一种能力，这种能力是进行连续运算。</p>
+<p>数学定义： Functor 是一个 <code>F[A]</code> 类型和一个 <code>map</code> 操作，这个 <code>map</code>操作的类型定义为 <code>(A =&gt; B) =&gt; F[B]</code>。</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images/20190624063008.png" alt="Type chart: generalised functor map"></p>
+<h1 id="Cat-Functor-定义"><a href="#Cat-Functor-定义" class="headerlink" title="Cat Functor 定义"></a>Cat Functor 定义</h1><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cats</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.language.higherKinds</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Functor</span>[<span class="type">F</span>[_]] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](fa: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Functor</code> 的  <code>Scala</code> 定义十分简单，是一个带有类型参数的 <code>trait</code>，同时包含一个方法 <code>map</code>，<code>map</code> 方法定义两个类型参数 <code>A</code> 和 <code>B</code>，其中输入的参数是<strong>类型 A</strong> 的<strong>函数 F</strong>，而输出的是<strong>类型 B</strong> 的<strong>函数 F</strong>。</p>
+<p>这里 <code>Functor[F[_]]</code> 是一个高阶类型。</p>
+<h2 id="Functor-规范"><a href="#Functor-规范" class="headerlink" title="Functor 规范"></a>Functor 规范</h2><ol>
+<li>如果传入的是 <code>identity</code> 函数，那么等价于啥都没做。</li>
+<li>交换操作的顺序结果应该是一致的。</li>
+</ol>
+<blockquote>
+<p><em>Identity</em>: calling  <code>map</code>  with the identity function is the same as doing nothing:</p>
+</blockquote>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fa.map(a =&gt; a) == fa</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><em>Composition</em>:  <code>mapping</code>  with two functions  <code>f</code>  and  <code>g</code>  is the same as  <code>mapping</code>  with  <code>f</code>  and then  <code>mapping</code>  with  <code>g</code>:</p>
+</blockquote>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fa.map(g(f(_))) == fa.map(f).map(g)</span><br></pre></td></tr></table></figure>
+<h2 id="高阶类型（Higher-Kinds）和类型构造函数（Type-Constructors）"><a href="#高阶类型（Higher-Kinds）和类型构造函数（Type-Constructors）" class="headerlink" title="高阶类型（Higher Kinds）和类型构造函数（Type Constructors）"></a>高阶类型（Higher Kinds）和类型构造函数（Type Constructors）</h2><p><code>Kinds</code> 可以理解为<strong>类型的类型</strong>，直观的看就是在类型中定义的<strong>空缺的孔</strong>，或者理解为<strong>参数</strong>。通过在类型中是否有<strong>参数</strong> 把类型分为<strong>常规类型</strong>和<strong>类型构造器</strong>。</p>
+<p>比如： <code>List</code> 就是一个带有一个参数的类型构造器，我们可以传入一个类型作为参数，从而将这个 <code>List</code> 转化为<strong>常规类型</strong>，如 <code>List[Int]</code> 和 <code>List[A]</code>。这里虽然 <code>List[A]</code> 中 <code>A</code> 可以是任意类型，但是仍然是一个确定的参数，所以它是泛型，而不是类型构造器，<code>List</code> 本身才是构造器。</p>
+<blockquote>
+<p>List    // type constructor, takes one parameter<br>List[A] // type, produced using a type parameter</p>
+</blockquote>
+<p>我们可以用函数和值来对等的了解上面类型的概念：</p>
+<blockquote>
+<p>math.abs    // function, takes one parameter<br>math.abs(x) // value,  produced using a value parameter</p>
+</blockquote>
+<ol>
+<li><strong>类型构造器</strong> 类似于 <strong>函数</strong></li>
+<li><strong>类型</strong> 类似于 <strong>值</strong></li>
+</ol>
+<p>Scala 使用下划线来定义<strong>类型构造器</strong>：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Declare F using underscores:</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">myMethod</span></span>[<span class="type">F</span>[_]] = &#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Reference F without underscores:</span></span><br><span class="line">  <span class="keyword">val</span> functor = <span class="type">Functor</span>.apply[<span class="type">F</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>基于这个<strong>类型构造器</strong>，我们可以看到 <code>Cats</code>定义的 <code>Functor</code> 允许我们创建单一参数类型的<strong>类型构造器</strong> 的实例。这个实例就会具有 <code>map</code> 的能力。</p>
+<blockquote>
+<p>the Cats definition of Functor allows us to create instances for any single-parameter type constructor, such as List, Option, Future, or a type alias such as MyFunc.</p>
+</blockquote>
+<h1 id="Cats-Functors-使用"><a href="#Cats-Functors-使用" class="headerlink" title="Cats Functors 使用"></a>Cats Functors 使用</h1><h2 id="基础类型"><a href="#基础类型" class="headerlink" title="基础类型"></a>基础类型</h2><p>这个用法仅仅作为理解使用，因为很多类型已经具有了 <code>map</code> 操作，使用 <code>Functor</code> 并没有太多意义。下面的例子使用的 <code>Object</code> 工厂方法进行 <code>map</code> 操作。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.language.higherKinds</span><br><span class="line"><span class="keyword">import</span> cats.<span class="type">Functor</span></span><br><span class="line"><span class="keyword">import</span> cats.instances.list._   <span class="comment">// for Functor</span></span><br><span class="line"><span class="keyword">import</span> cats.instances.option._ <span class="comment">// for Functor</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> list1 = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="comment">// list1: List[Int] = List(1, 2, 3)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里 list1 作为一个参数存入了 Functor 的 map 方法</span></span><br><span class="line"><span class="keyword">val</span> list2 = <span class="type">Functor</span>[<span class="type">List</span>].map(list1)(_ * <span class="number">2</span>)</span><br><span class="line"><span class="comment">// list2: List[Int] = List(2, 4, 6)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> option1 = <span class="type">Option</span>(<span class="number">123</span>)</span><br><span class="line"><span class="comment">// option1: Option[Int] = Some(123)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> option2 = <span class="type">Functor</span>[<span class="type">Option</span>].map(option1)(_.toString)</span><br><span class="line"><span class="comment">// option2: Option[String] = Some(123)</span></span><br></pre></td></tr></table></figure>
+<h2 id="Lift-方法"><a href="#Lift-方法" class="headerlink" title="Lift 方法"></a>Lift 方法</h2><blockquote>
+<p>Functor also provides the <code>lift</code> method, which converts a function of type <code>A =&gt; B</code> to one that operates over a functor and has type <code>F[A] =&gt; F[B]</code>:</p>
+</blockquote>
+<p>这个方法称为提升，顾名思义，将原来的函数提升一个层次，提升一个阶，直观上看就是再包一层函数。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> func = (x: <span class="type">Int</span>) =&gt; x + <span class="number">1</span></span><br><span class="line"><span class="comment">// func: Int =&gt; Int = &lt;function1&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> liftedFunc = <span class="type">Functor</span>[<span class="type">Option</span>].lift(func)</span><br><span class="line"><span class="comment">// liftedFunc: Option[Int] =&gt; Option[Int] = cats.Functor$$Lambda$11699/1322391447@434fec26</span></span><br><span class="line"></span><br><span class="line">liftedFunc(<span class="type">Option</span>(<span class="number">1</span>))</span><br><span class="line"><span class="comment">// res0: Option[Int] = Some(2)</span></span><br></pre></td></tr></table></figure>
+<p>原函数是一个<em>整型</em>映射到<em>整型加一</em>，通过带有 <code>Option</code> 类型参数的 <code>lift</code> 操作，编程了 <em>Option(整型)</em>  映射到 <em>Option(整型+1)</em> 的函数。</p>
+<h2 id="Syntax"><a href="#Syntax" class="headerlink" title="Syntax"></a>Syntax</h2><p>使用 Cats，仍然推荐使用 Syntax，代码简洁。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cats.instances.function._ <span class="comment">// for Functor</span></span><br><span class="line"><span class="keyword">import</span> cats.syntax.functor._     <span class="comment">// for map</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> func1 = (a: <span class="type">Int</span>) =&gt; a + <span class="number">1</span></span><br><span class="line"><span class="keyword">val</span> func2 = (a: <span class="type">Int</span>) =&gt; a * <span class="number">2</span></span><br><span class="line"><span class="keyword">val</span> func3 = (a: <span class="type">Int</span>) =&gt; a + <span class="string">"!"</span></span><br><span class="line"><span class="keyword">val</span> func4 = func1.map(func2).map(func3)</span><br><span class="line"></span><br><span class="line">func4(<span class="number">123</span>)</span><br></pre></td></tr></table></figure>
+<p>和 <code>Monoid</code> 不同，这里没有定义操作符 （如 <code>|+|</code>），而是直接使用  <code>map</code>。这里一定要区分开那些是类型原生的  <code>map</code> 方法，那些是 <code>Functor</code> 提供的 <code>map</code>。</p>
+<h2 id="自定义-Functor-实例"><a href="#自定义-Functor-实例" class="headerlink" title="自定义 Functor 实例"></a>自定义 Functor 实例</h2><p>参考 Type Class 模式，我们同样可以自定义任意类型的 <code>Functor</code>，只需要实现其 <code>map</code> 操作。比如我们自己定义一个 <code>Future</code> 的 <code>Functor</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scala.concurrent.&#123;<span class="type">Future</span>, <span class="type">ExecutionContext</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">futureFunctor</span></span></span><br><span class="line"><span class="function">    </span>(<span class="keyword">implicit</span> ec: <span class="type">ExecutionContext</span>): <span class="type">Functor</span>[<span class="type">Future</span>] =</span><br><span class="line">  <span class="keyword">new</span> <span class="type">Functor</span>[<span class="type">Future</span>] &#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](value: <span class="type">Future</span>[<span class="type">A</span>])(func: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">Future</span>[<span class="type">B</span>] =</span><br><span class="line">      value.map(func)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="案例：-二叉树"><a href="#案例：-二叉树" class="headerlink" title="案例： 二叉树"></a>案例： 二叉树</h1><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">trait</span> <span class="title">Tree</span>[+<span class="type">A</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">final</span> <span class="title">case</span> <span class="title">class</span> <span class="title">Branch</span>[<span class="type">A</span>](<span class="params">left: <span class="type">Tree</span>[<span class="type">A</span>], right: <span class="type">Tree</span>[<span class="type">A</span>]</span>)</span></span><br><span class="line"><span class="class">  <span class="keyword">extends</span> <span class="title">Tree</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">final</span> <span class="title">case</span> <span class="title">class</span> <span class="title">Leaf</span>[<span class="type">A</span>](<span class="params">value: <span class="type">A</span></span>) <span class="keyword">extends</span> <span class="title">Tree</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">import</span> <span class="title">cats</span>.<span class="title">Functor</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">implicit</span> <span class="title">val</span> <span class="title">treeFunctor</span></span>: <span class="type">Functor</span>[<span class="type">Tree</span>] =</span><br><span class="line">  <span class="keyword">new</span> <span class="type">Functor</span>[<span class="type">Tree</span>] &#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](tree: <span class="type">Tree</span>[<span class="type">A</span>])(func: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">Tree</span>[<span class="type">B</span>] =</span><br><span class="line">      tree <span class="keyword">match</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="type">Branch</span>(left, right) =&gt;</span><br><span class="line">          <span class="type">Branch</span>(map(left)(func), map(right)(func))</span><br><span class="line">        <span class="keyword">case</span> <span class="type">Leaf</span>(value) =&gt;</span><br><span class="line">          <span class="type">Leaf</span>(func(value))</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Tree</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">branch</span></span>[<span class="type">A</span>](left: <span class="type">Tree</span>[<span class="type">A</span>], right: <span class="type">Tree</span>[<span class="type">A</span>]): <span class="type">Tree</span>[<span class="type">A</span>] =</span><br><span class="line">    <span class="type">Branch</span>(left, right)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">leaf</span></span>[<span class="type">A</span>](value: <span class="type">A</span>): <span class="type">Tree</span>[<span class="type">A</span>] =</span><br><span class="line">    <span class="type">Leaf</span>(value)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Branch</span>(<span class="type">Leaf</span>(<span class="number">10</span>), <span class="type">Leaf</span>(<span class="number">20</span>)).map(_ * <span class="number">2</span>)</span><br><span class="line"><span class="type">Tree</span>.leaf(<span class="number">100</span>).map(_ * <span class="number">2</span>)</span><br><span class="line"><span class="comment">// res10: wrapper.Tree[Int] = Leaf(200)</span></span><br><span class="line"><span class="type">Tree</span>.branch(<span class="type">Tree</span>.leaf(<span class="number">10</span>), <span class="type">Tree</span>.leaf(<span class="number">20</span>)).map(_ * <span class="number">2</span>)</span><br><span class="line"><span class="comment">// res11: wrapper.Tree[Int] = Branch(Leaf(20),Leaf(40))</span></span><br></pre></td></tr></table></figure>
+<h1 id="逆变和不变"><a href="#逆变和不变" class="headerlink" title="逆变和不变"></a>逆变和不变</h1><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Functor 表现的是一系列连续的操作。主要有三种类型</p>
+<ol>
+<li>常规协变 Functor</li>
+<li>逆变 Functor</li>
+<li>不变 Functor</li>
+</ol>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTMwNjI2Nzk2OSwxODE1MDg3NDk3XX0=
+-->
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+            <a href="/tags/cats/" rel="tag"># cats</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/20/scala-with-cats-monoids-semigroups/" rel="next" title="Scala with Cats 学习笔记3-Monoids和Semigroups">
+                <i class="fa fa-chevron-left"></i> Scala with Cats 学习笔记3-Monoids和Semigroups
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/01/ngixn-proxy-letsencrypt-docker-nexus-repo-cn/" rel="prev" title="使用 Nginx-proxy + Let's Encrypt + Docker 部署 Nexus Repository">
+                使用 Nginx-proxy + Let's Encrypt + Docker 部署 Nexus Repository <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数学背景"><span class="nav-number">1.</span> <span class="nav-text">数学背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#直观理解"><span class="nav-number">1.1.</span> <span class="nav-text">直观理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义"><span class="nav-number">1.2.</span> <span class="nav-text">定义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cat-Functor-定义"><span class="nav-number">2.</span> <span class="nav-text">Cat Functor 定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Functor-规范"><span class="nav-number">2.1.</span> <span class="nav-text">Functor 规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高阶类型（Higher-Kinds）和类型构造函数（Type-Constructors）"><span class="nav-number">2.2.</span> <span class="nav-text">高阶类型（Higher Kinds）和类型构造函数（Type Constructors）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cats-Functors-使用"><span class="nav-number">3.</span> <span class="nav-text">Cats Functors 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础类型"><span class="nav-number">3.1.</span> <span class="nav-text">基础类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lift-方法"><span class="nav-number">3.2.</span> <span class="nav-text">Lift 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Syntax"><span class="nav-number">3.3.</span> <span class="nav-text">Syntax</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义-Functor-实例"><span class="nav-number">3.4.</span> <span class="nav-text">自定义 Functor 实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例：-二叉树"><span class="nav-number">4.</span> <span class="nav-text">案例： 二叉树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#逆变和不变"><span class="nav-number">5.</span> <span class="nav-text">逆变和不变</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2019/06/22/scala-with-cats-functor/';
+          this.page.identifier = '2019/06/22/scala-with-cats-functor/';
+          this.page.title = 'Scala with Cats 学习笔记4-Functor';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

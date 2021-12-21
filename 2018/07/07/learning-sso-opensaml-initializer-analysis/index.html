@@ -1,0 +1,1049 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="OpenSAML,SSO," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文详细介绍 OpenSAML 初始化过程，通过源码以及相关理论知识理解初始化过程的原理。并且理论联系实践，将初始化分析应用于使用和扩展中。">
+<meta name="keywords" content="OpenSAML,SSO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟我学SSO-OpenSAML初始化源码分析">
+<meta property="og:url" content="https://notes.mengxin.science/2018/07/07/learning-sso-opensaml-initializer-analysis/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文详细介绍 OpenSAML 初始化过程，通过源码以及相关理论知识理解初始化过程的原理。并且理论联系实践，将初始化分析应用于使用和扩展中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201874-opensaml-initializer-impls.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201871-diffrent-package-SPI-different.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201878-opensaml-ConfigurationPropertiesSource.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201878-AbstractSAMLObjectBuilder.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟我学SSO-OpenSAML初始化源码分析">
+<meta name="twitter:description" content="摘要：本文详细介绍 OpenSAML 初始化过程，通过源码以及相关理论知识理解初始化过程的原理。并且理论联系实践，将初始化分析应用于使用和扩展中。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/201874-opensaml-initializer-impls.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/07/07/learning-sso-opensaml-initializer-analysis/"/>
+
+
+
+
+
+  <title> 跟我学SSO-OpenSAML初始化源码分析 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/07/07/learning-sso-opensaml-initializer-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟我学SSO-OpenSAML初始化源码分析
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-07T23:00:00+00:00">
+                2018-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/07/learning-sso-opensaml-initializer-analysis/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/07/learning-sso-opensaml-initializer-analysis/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文详细介绍 <code>OpenSAML</code> 初始化过程，通过源码以及相关理论知识理解初始化过程的原理。并且理论联系实践，将初始化分析应用于使用和扩展中。</p>
+<a id="more"></a>
+<p>2018 July 8th First version</p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>对于 <code>OpenSAML</code> 开源软件包从 V2 到 V3，都始终保持着初始化的操作。这个动作是使用 <code>OpenSAML</code> 的基础，只有执行了该操作才能够访问 <code>OpenSAML</code> 提供的根据标准预定义的构造器（Builder），XML序列化工具（Marshal）和反序列化工具 （UnMarshal）。 使用中，初始化过程十分简单，只需要一个静态方法就可以：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">InitializationService.initialize();</span><br></pre></td></tr></table></figure>
+<p>但这个静态方法背后做了很多工作，<code>OpenSAML</code> 依赖于很多的配置文件的集合，同时也预定义了很多默认的配置文件，这些文件都是根据众多的标准来实现的。默认的配置一般适用于大多数的标准情形，但是 <code>OpenSAML</code> 同样提供扩展机制，使用者可以自由添加订制的配置。但是无论如何，这个初始化工作（包括默认的配置和自定义的配置）必须在使用 <code>OpenSAML</code> 之前完成。</p>
+<p>如果这个操作忘记执行，那么在尝试使用 <code>OpenSAML</code> 的时候，将会抛出异常 <code>NullPointerException</code>。初次使用<code>OpenSAML</code> 需要时刻注意。通过研究<code>OpenSAML</code> 的单元测试可以发现，它使用 <code>OpenSAMLInitBaseTestCase</code> 基类和 <code>TestNG</code> 的 <code>@BeforeSuite</code> 来保证每个测试集合执行之前，初始化工作都是被执行的。^[A Guide to OpenSAML V3 (P27) PARTII Chapter 2 The OpenSAML Initialization process ]</p>
+<h1 id="SPI-原理简介"><a href="#SPI-原理简介" class="headerlink" title="SPI 原理简介"></a>SPI 原理简介</h1><p>在开始进行源码分析之前，首先简要介绍 <code>SPI</code> 的原理。</p>
+<p>SPI 全称为 (<code>Service Provider Interface</code>) ,是JDK内置的一种服务提供发现机制， 目前有不少框架用它来做服务的扩展发现， 简单来说，它就是一种动态替换发现的机制， 举个例子来说， 有个接口，想运行时动态的给它添加实现，你只需要添加一个实现。</p>
+<p>请参考另外<a href="TODO">一篇博文</a>，根据 <code>JDK</code> 官方的文档介绍如何使用 <code>SPI</code>。</p>
+<p><code>OpemSAML</code> 从第二版开始就是使用 <code>SPI</code> 来加载配置文件的，这个加载过程也是<code>OpenSAML</code> 初始化过程的重要的一部分。</p>
+<p>可以参考 <a href="https://wiki.shibboleth.net/confluence/display/OS30/Initialization+and+Configuration" target="_blank" rel="noopener">OpemSAML 官方wiki原文</a>，以及这篇<a href="TODO">简要的翻译和分析</a>。</p>
+<h1 id="初始化过程分析"><a href="#初始化过程分析" class="headerlink" title="初始化过程分析"></a>初始化过程分析</h1><p>首先一切从 <code>InitializationService.initialize();</code> 该方法开始。</p>
+<h2 id="SPI-加载-Initializer-实现类"><a href="#SPI-加载-Initializer-实现类" class="headerlink" title="SPI 加载 Initializer 实现类"></a><code>SPI</code> 加载 <code>Initializer</code> 实现类</h2><p>该静态方法就是使用 <code>SPI</code> 加载 <code>Initializer</code> 的实现类，我们首先来看 <code>Initializer</code> 接口，这个接口就是 <code>SPI</code> 中的 <code>I</code>，也就是 <code>Interface</code>。通过下图可以看到该接口的所有实现类：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201874-opensaml-initializer-impls.png" alt="OpenSAML Initializer"></p>
+<h3 id="SPI-加载代码"><a href="#SPI-加载代码" class="headerlink" title="SPI 加载代码"></a><code>SPI</code> 加载代码</h3><p>这些实现类将通过 <code>SPI</code> 机制加载进来，同时 <code>Initializer</code> 只有一个方法，那就是<code>init()</code>，在实现类加载进来后，就依次执行该方法，具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ServiceLoader&lt;Initializer&gt; serviceLoader = getServiceLoader();</span><br><span class="line"><span class="keyword">final</span> Iterator&lt;Initializer&gt; iter = serviceLoader.iterator();</span><br><span class="line"><span class="keyword">while</span> (iter.hasNext()) &#123;</span><br><span class="line">	<span class="keyword">final</span> Initializer initializer  = iter.next();</span><br><span class="line">	log.debug(<span class="string">"Initializing module initializer implementation: &#123;&#125;"</span>, initializer.getClass().getName());</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		initializer.init();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> InitializationException e) &#123;</span><br><span class="line">		log.error(<span class="string">"Error initializing module"</span>, e);</span><br><span class="line">		<span class="keyword">throw</span> e;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SPI-加载配置"><a href="#SPI-加载配置" class="headerlink" title="SPI 加载配置"></a><code>SPI</code> 加载配置</h3><p>SPI 另外一个关键的配置就是需要在资源文件夹中配置需要加载的实现类的全名。路径为： <code>resources/META-INF.services</code>。 我们可以在 <code>opensaml-core</code> 中找到该文件 <code>resources/META-INF/services/org.opensaml.core.config.Initializer</code>。文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org.opensaml.core.xml.config.XMLObjectProviderInitializer</span><br><span class="line">org.opensaml.core.xml.config.GlobalParserPoolInitializer</span><br><span class="line">org.opensaml.core.metrics.impl.MetricRegistryInitializer</span><br></pre></td></tr></table></figure>
+<p>这时候就有一个问题，前面我们看到 <code>Initializer</code> 有那么多实现类，这里为什么只有3个？ 这里由于 <code>OpenSAML</code> Version 3 将整个工具包进行了逻辑上的分割，这里可以参考另一篇文章 <a href="TODO">OpenSAML整体概述</a>。然后每个独立模块都有自己独立的<code>SPI</code>配置文件，这样使用者是需要加载自己依赖的模块的配置。</p>
+<p>上面看到的三个实现类的配置是在 <code>core</code> 模块中配置的，我们可以再看一下另一个重要 <code>saml</code> 模块中的配置文件 <code>\java-opensaml\opensaml-saml-impl\src\main\resources\META-INF\services\org.opensaml.core.config.Initializer</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">org.opensaml.saml.config.impl.XMLObjectProviderInitializer</span><br><span class="line">org.opensaml.saml.config.impl.SAMLConfigurationInitializer</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201871-diffrent-package-SPI-different.png" alt="enter description here"></p>
+<p>另外我们还需要注意一点，<code>SPI</code> 的配置是可以累加的，比如我们可以看到 <code>core</code> 模块中为了测试 <code>SPI</code> 机制，同样也定义了一个配置文件: <code>\java-opensaml\opensaml-core\src\test\resources\META-INF\services\org.opensaml.core.config.Initializer</code>。通过执行测试用例 <code>InitializationServiceTest</code>，发现这些配置的实现类也同样会被加载 （一共加载了4个实现类），所以这里 <code>SPI</code> 的配置是可以在包内叠加的。</p>
+<h2 id="配置资源加载机制"><a href="#配置资源加载机制" class="headerlink" title="配置资源加载机制"></a>配置资源加载机制</h2><p>理解了 <code>SPI</code> 机制之后，我们就可以具体分析接口的具体实现类的加载过程了。这个实现类基本在每一个包对应的实现包（后缀为<code>impl</code>）都有，我们选取两个对照的来介绍：一个为 <code>core</code> 包里的 <code>org.opensaml.core.xml.config.XMLObjectProviderInitializer</code>， 另一个选取核心的 <code>saml</code> 包里的 <code>org.opensaml.saml.config.impl.XMLObjectProviderInitializer</code>。理解了这两个类的加载过程，基本就理解了整个 <code>OpenSAML</code> 加载的原理。</p>
+<h3 id="类结构分析"><a href="#类结构分析" class="headerlink" title="类结构分析"></a>类结构分析</h3><p>这里所有的实现类都继承了一个抽象类<code>AbstractXMLObjectProviderInitializer</code>，而且所有实现类都覆盖了抽象类的 <code>protected String[] getConfigResources()</code>，而基本没有覆盖其他方法。也就是说，不同的实现类对应加载不同的资源配置文件，而初始化的过程是统一，也就是处理资源配置文件的过程是一致，都是在抽象类中的 <code>init()</code> 方法中完成。</p>
+<p>对于配置文件是什么，目前只需要知道它是一个 <code>xml</code> 文件，用于定义不同的 <code>XML</code> 对象的构造、序列化、反序列等所对应的实体类。</p>
+<h3 id="init-函数分析"><a href="#init-函数分析" class="headerlink" title="init()函数分析"></a>init()函数分析</h3><p>这个函数是<code>OpenSAML</code> 初始化时候的必经之路，官方 <code>JavaDoc</code>:</p>
+<blockquote>
+<p>Perform the initialization process encompassed by the implementation</p>
+</blockquote>
+<p>下面是具体的源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> InitializationException </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">final</span> XMLConfigurator configurator = <span class="keyword">new</span> XMLConfigurator();</span><br><span class="line">		<span class="comment">// Checkstyle: FinalLocalVariable OFF</span></span><br><span class="line">		<span class="keyword">for</span> (String resource : getConfigResources()) &#123;</span><br><span class="line">		<span class="comment">// Checkstyle: FinalLocalVariable ON</span></span><br><span class="line">			<span class="comment">// When using ClassLoader.getResourceAsStream() (as below), resource names should *not*</span></span><br><span class="line">			<span class="comment">// begin with leading "/".  They are always absolute.</span></span><br><span class="line">			<span class="comment">// This differs from Class.getResourceAsStream(), where absolute names must begin with /, otherwise</span></span><br><span class="line">			<span class="comment">// are treated as relative.</span></span><br><span class="line">			<span class="comment">// Checkstyle: ModifiedControlVariable OFF</span></span><br><span class="line">			<span class="keyword">if</span> (resource.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">				resource = resource.substring(<span class="number">1</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// Checkstyle: ModifiedControlVariable ON</span></span><br><span class="line">			log.debug(<span class="string">"Loading XMLObject provider configuration from resource '&#123;&#125;'"</span>, resource);</span><br><span class="line">			<span class="keyword">final</span> InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);</span><br><span class="line">			<span class="keyword">if</span> (is != <span class="keyword">null</span>) &#123;</span><br><span class="line">				configurator.load(is);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> XMLConfigurationException(<span class="string">"Resource not found"</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> XMLConfigurationException e) &#123;</span><br><span class="line">		log.error(<span class="string">"Problem loading configuration resource"</span>, e);</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> InitializationException(<span class="string">"Problem loading configuration resource"</span>, e);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过这部分源码我们可以看到，初始化过程主要有两步：</p>
+<ol>
+<li>创建一个 <code>XMLConfigurator</code> 的实例, <code>configurator</code></li>
+<li>遍历读取资源文件，并以<code>InputStream</code> 形式传入 <code>configurator.load()</code>，完成资源加载。</li>
+</ol>
+<p>这里根据注释还能学习到一个知识：<code>Class.getResourceAsStream()</code> 和 <code>ClassLoader.getResourceAsStream()</code> 的不同，前者的路径需要在文件前加前缀 <code>/</code>，而后者是不能加的。所以这里使用<code>ClassLoader</code>，如果检测到资源文件名的第一个字符是 <code>/</code> 就移除。这也给我们一个启示，在加载资源文件的时候，可以对传入的文件名进行一些预处理，提高兼容性。（之前总是因为忘记加 <code>/</code>，导致找不到资源）</p>
+<p>下面我们详细介绍这两个步骤都做了什么。</p>
+<h3 id="XMLConfigurator-实例化过程"><a href="#XMLConfigurator-实例化过程" class="headerlink" title="XMLConfigurator 实例化过程"></a>XMLConfigurator 实例化过程</h3><p>虽然代码直接简单的 <code>new</code> 了一个 <code>XMLConfigurator</code> 对象实例，但是其构造方法还是比较复杂的，全部的源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">XMLConfigurator</span><span class="params">()</span> <span class="keyword">throws</span> XMLConfigurationException </span>&#123;</span><br><span class="line">	parserPool = <span class="keyword">new</span> BasicParserPool();</span><br><span class="line">	<span class="keyword">final</span> SchemaFactory factory = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);</span><br><span class="line">	<span class="keyword">final</span> Source schemaSource =</span><br><span class="line">			<span class="keyword">new</span> StreamSource(XMLConfigurator.class.getResourceAsStream(XMLTOOLING_SCHEMA_LOCATION));</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		configurationSchema = factory.newSchema(schemaSource);</span><br><span class="line"></span><br><span class="line">		parserPool.setIgnoreComments(<span class="keyword">true</span>);</span><br><span class="line">		parserPool.setIgnoreElementContentWhitespace(<span class="keyword">true</span>);</span><br><span class="line">		parserPool.setSchema(configurationSchema);</span><br><span class="line">		parserPool.initialize();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> SAXException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> XMLConfigurationException(<span class="string">"Unable to read XMLTooling configuration schema"</span>, e);</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> ComponentInitializationException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> XMLConfigurationException(<span class="string">"Unable to initialize parser pool"</span>, e);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">synchronized</span> (ConfigurationService.class) &#123;</span><br><span class="line">		XMLObjectProviderRegistry reg = ConfigurationService.get(XMLObjectProviderRegistry.class);</span><br><span class="line">		<span class="keyword">if</span> (reg == <span class="keyword">null</span>) &#123;</span><br><span class="line">			log.debug(<span class="string">"XMLObjectProviderRegistry did not exist in ConfigurationService, will be created"</span>);</span><br><span class="line">			reg = <span class="keyword">new</span> XMLObjectProviderRegistry();</span><br><span class="line">			ConfigurationService.register(XMLObjectProviderRegistry.class, reg);</span><br><span class="line">		&#125;</span><br><span class="line">		registry = reg;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="XML-的解析验证器初始化"><a href="#XML-的解析验证器初始化" class="headerlink" title="XML 的解析验证器初始化"></a>XML 的解析验证器初始化</h4><p>首先是实例化 <code>BasicParserPool</code> 对象，并赋值给私有的成员变量。该对象是用于读取和验证资源文件的配置的，实际上就是最终的 <code>XML</code> 文件的解析器和验证器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parserPool = <span class="keyword">new</span> BasicParserPool();</span><br></pre></td></tr></table></figure>
+<p>然后是通过工厂方法来创建用于验证器使用的验证模式 <code>Schema</code> 的实力 <code>configurationSchema</code>，在 <code>XML</code> 的世界里，标准十分重要，任何一个标签都需要标准化定义。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> SchemaFactory factory = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);</span><br><span class="line">        <span class="keyword">final</span> Source schemaSource =</span><br><span class="line">                <span class="keyword">new</span> StreamSource</span><br><span class="line">					(XMLConfigurator.class.getResourceAsStream(XMLTOOLING_SCHEMA_LOCATION));</span><br><span class="line">configurationSchema = factory.newSchema(schemaSource);</span><br></pre></td></tr></table></figure>
+<p>该验证模式需要配置到 <code>BasicParserPool</code> 中，然后初始化 <code>BasicParserPool</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">parserPool.setIgnoreComments(<span class="keyword">true</span>);</span><br><span class="line">parserPool.setIgnoreElementContentWhitespace(<span class="keyword">true</span>);</span><br><span class="line">parserPool.setSchema(configurationSchema);</span><br><span class="line">parserPool.initialize();</span><br></pre></td></tr></table></figure>
+<h4 id="XMLObjectProviderRegistry-初始化"><a href="#XMLObjectProviderRegistry-初始化" class="headerlink" title="XMLObjectProviderRegistry 初始化"></a>XMLObjectProviderRegistry 初始化</h4><p>这里就是 <code>XMLConfigurator</code> 初始化关键步骤，通过这一步我们就能知道追溯到初始化配置的最终存储的位置，直觉上这里肯定有个一个全局的静态变量储存这些信息。下面我们来一探究竟。</p>
+<h5 id="读取-XMLObjectProviderRegistry"><a href="#读取-XMLObjectProviderRegistry" class="headerlink" title="读取 XMLObjectProviderRegistry"></a>读取 XMLObjectProviderRegistry</h5><p>首先就是读取当前的 <code>XMLObjectProviderRegistry</code>，对于这个读取过程，可以通过 <code>InitializationServiceTest.java</code> 单元测试用例来学习。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XMLObjectProviderRegistry reg = ConfigurationService.get(XMLObjectProviderRegistry.class);</span><br></pre></td></tr></table></figure>
+<p>这里引入了 <code>ConfigurationService</code>，</p>
+<blockquote>
+<p>A service which provides for the registration, retrieval and deregistration of objects related to library module configuration.<br>The service uses an internally-managed instance of Configuration to handle the registration, retrieval and deregistration of the configuration objects under its management.<br>The service first attempts to use the Java Services API to resolve the instance of Configuration to use. If multiple implementations of Configuration are registered via the Services API mechanism, the first one returned by the ServiceLoader iterator is used. If no Configuration implementation is declared or resolvable using the Services API, then it uses the default implementation MapBasedConfiguration.<br>The Configuration instance to use may also be set externally via setConfiguration(Configuration). This may be useful where an application-specific means such as Spring is used to configure the environment. This overrides the resolution process described above.</p>
+</blockquote>
+<p>这个 <code>get</code> 方法的相关源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Object&gt; <span class="function">T <span class="title">get</span><span class="params">(@Nonnull <span class="keyword">final</span> Class&lt;T&gt; configClass)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> String partitionName = getPartitionName();</span><br><span class="line">	<span class="keyword">return</span> getConfiguration().get(configClass, partitionName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nonnull</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> Configuration <span class="title">getConfiguration</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (configuration == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">synchronized</span> (ConfigurationService.class) &#123;</span><br><span class="line">			<span class="keyword">final</span> ServiceLoader&lt;Configuration&gt; loader = ServiceLoader.load(Configuration.class);</span><br><span class="line">			<span class="keyword">final</span> Iterator&lt;Configuration&gt; iter = loader.iterator();</span><br><span class="line">			<span class="keyword">if</span> (iter.hasNext()) &#123;</span><br><span class="line">				configuration = iter.next();</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="comment">// Default impl</span></span><br><span class="line">				configuration = <span class="keyword">new</span> MapBasedConfiguration();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> configuration;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nonnull</span> <span class="meta">@NotEmpty</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> String <span class="title">getPartitionName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> Logger log = getLogger();</span><br><span class="line">	<span class="keyword">final</span> Properties configProperties = getConfigurationProperties();</span><br><span class="line">	String partitionName = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">if</span> (configProperties != <span class="keyword">null</span>) &#123;</span><br><span class="line">		partitionName = configProperties.getProperty(PROPERTY_PARTITION_NAME, DEFAULT_PARTITION_NAME);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		partitionName = DEFAULT_PARTITION_NAME;</span><br><span class="line">	&#125;</span><br><span class="line">	log.trace(<span class="string">"Resolved effective configuration partition name '&#123;&#125;'"</span>, partitionName);</span><br><span class="line">	<span class="keyword">return</span> partitionName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>ConfigurationService</code> 类十分重要，该类就是最终配置的存储位置：静态变量 <code>Configuration configuration</code>。<code>Configuration</code> 是一个接口，<code>OpenSAML</code> 中只有一个实现，那就是 <code>MapBasedConfiguration</code>，顾名思义，使用<code>Map</code> 结构来存储配置。使用接口的好处是可以扩展，比如使用其他结构来存储配置信息。</p>
+<p>在 <code>MapBasedConfiguration</code> 类中，有一个成员变量是 <code>Map&lt;String, Map&lt;String, Object&gt;&gt; storage</code>，表明了配置的存储结构有两层，第一层成为 <code>partition</code>， 第二层为具体的配置类。所以获取对应的配置的方法为 <code>get(final Class&lt;T&gt; configClass, final String partitionName)</code>。</p>
+<p>我们首先对 <code>partition</code> 进行简要的说明，这个 <code>partition</code> 是如何定义的呢？</p>
+<p>在 <code>ConfigurationService</code> 类中，有一个 <code>getPartitionName()</code> 的方法，这个方法首先获取一个 <code>configProperties</code>，该对象是 <code>Properties</code> 类型，然后从这个 <code>HashTable</code> 中找到 <code>PROPERTY_PARTITION_NAME</code> 键对应的值，如果没有就是默认值： <code>DEFAULT_PARTITION_NAME</code> （就是 <code>default</code>）。而这个 <code>configProperties</code> 是通过方法 <code>getConfigurationProperties()</code> 方法获得，该方法通过 <code>SPI</code> 机制，获取 <code>ConfigurationPropertiesSource</code> 接口的实现类，然后从中获取配置。注意这里是和前面的 <code>Initializer</code> 接口不同的另外一个接口。在 <code>OpenSAML</code> 中这个接口的实现类不同，只有这几个：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201878-opensaml-ConfigurationPropertiesSource.png" alt="ConfigurationPropertiesSource"></p>
+<p>所以基本在我们使用的类中，这个 <code>partition</code> 都是 <code>default</code>，所以后面的分析我们将所有的 <code>partition</code> 都假设就是 <code>default</code>。</p>
+<p>理解了 <code>partition</code> 个概念后，这个 <code>ConfigurationService.get(XMLObjectProviderRegistry.class)</code> 方法就很好理解了，首先找找 <code>partition</code> 的名字，一般情况就会返回 <code>default</code>，然后先获取 <code>getConfiguration()</code>，在获取以类名为键对应的值。 这里会首先利用 <code>SPI</code> 机制检查当前是否已经有 <code>Configuration</code> 的实现类，如果有就直接用，如果没有就直接创建一个 <code>MapBasedConfiguration</code>  的实例，说明这里我们完全可以通过 <code>SPI</code> 我们预先加载一个自定义实现的配置。然后就会在这个 <code>Configuration</code> 实现类的存储中尝试逐层查找，显示找 <code>partition</code> 对应的 <code>Map</code>，如果找不到就初始化一个，然后再在这个 <code>Map</code> 中查找以输入类的类名为键的值，如果没有就直接返回<code>null</code>。</p>
+<p>至此就完成读取现有 <code>XMLObjectProviderRegistry</code> 的逻辑，如果存在就直接返回，如果没有还需要创建。</p>
+<h5 id="创建-XMLObjectProviderRegistry"><a href="#创建-XMLObjectProviderRegistry" class="headerlink" title="创建 XMLObjectProviderRegistry"></a>创建 XMLObjectProviderRegistry</h5><p>这个步骤很简单，就是<code>new</code> 一个 <code>XMLObjectProviderRegistry</code> 实例，然后通过 <code>ConfigurationService.register</code> 方法将实例存放到对应的存储的 <code>Map</code> 中。</p>
+<p>最后将 <code>XMLConfigurator</code> 的成员变量 <code>registry</code> 设置为前面读取或创建的额 <code>XMLObjectProviderRegistry</code> 实例。</p>
+<h6 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h6><p>我们需要注意，这里最终存储这配置信息的是 <code>ConfigurationService</code> 的私有静态变量 <code>Configuration configuration</code>，而这个接口的基本实现就是内部使用 <code>Map</code> 来存储。 在 <code>XMLConfigurator</code> 类中的成员变量 <code>registry</code> 只是前面的一个引用。</p>
+<p>通过 <code>XMLConfigurator</code> 的构造函数，我们就完成了 <code>XMLObjectProviderRegistry</code> 的获取或创建，并且将其引用赋值给 <code>XMLConfigurator</code> 成员变量，这样 <code>XMLConfigurator</code> 就可以自由的操作文件，这也是该类名字的由来：配置器。配置器只维护配置过程，并不维护具体的配置的存储。</p>
+<h3 id="XMLConfigurator-Load-方法详解"><a href="#XMLConfigurator-Load-方法详解" class="headerlink" title="XMLConfigurator Load 方法详解"></a>XMLConfigurator Load 方法详解</h3><p>我们将思绪拉回到外层抽象 <code>Initializer</code> 的实现类 <code>AbstractXMLObjectProviderInitializer</code> 的初始化函数 <code>init()</code>中。由于这里每个函数都深入的进行讲解，所以时刻对当前的函数深入的级别保持清醒。</p>
+<p>此时我们已经将配置器 <code>configurator</code> 准备好，下面的工作的就是依次读取配置文件，然后利用配置器的 <code>load()</code> 方法将配置文件写入到配置器所维护的配置存储中 （也就是前面说的存储在 <code>ConfigurationService</code> 的 静态变量 <code>XMLConfigurator</code> 中的 <code>Map</code>，其键名为 <code>XMLObjectProviderRegistry.call</code>）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);</span><br><span class="line"><span class="keyword">if</span> (is != <span class="keyword">null</span>) &#123;</span><br><span class="line">	configurator.load(is);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个 <code>load</code> 方法被重载了多次，主要是将输入的数据进行的处理，过程都很简单，下面是重载之间调用的顺序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="meta">@Nonnull</span> <span class="keyword">final</span> InputStream configurationStream)</span><br><span class="line"><span class="comment">// InputStream 通过  parserPool.parse 转换为 Document， 也就将文件内容读入到标准对象</span></span><br><span class="line">load(<span class="meta">@Nonnull</span> <span class="keyword">final</span> Document configuration)</span><br><span class="line"><span class="comment">// Document 转化为根节点的 Element，并且通过 validateConfiguration 方法验证</span></span><br><span class="line">load(<span class="meta">@Nonnull</span> <span class="keyword">final</span> Element configurationRoot)</span><br><span class="line"><span class="comment">// 处理根节点的 Element</span></span><br></pre></td></tr></table></figure>
+<p>这里有两个配置资源需要加载， 对象提供器 <code>ObjectProviders</code> 和ID属性 <code>IDAttributes</code> ，都是通过 Hard Code 的名字直接从 <code>Element</code> 中查找出来的（<code>getElementsByTagNameNS</code>）。</p>
+<h4 id="initializeObjectProviders"><a href="#initializeObjectProviders" class="headerlink" title="initializeObjectProviders"></a>initializeObjectProviders</h4><p>该方法源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeObjectProviders</span><span class="params">(<span class="keyword">final</span> Element objectProviders)</span> <span class="keyword">throws</span> XMLConfigurationException </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> NodeList providerList = objectProviders.getElementsByTagNameNS(XMLTOOLING_CONFIG_NS, <span class="string">"ObjectProvider"</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; providerList.getLength(); i++) &#123;</span><br><span class="line">		<span class="keyword">final</span> Element objectProvider = (Element) providerList.item(i);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Get the element name of type this object provider is for</span></span><br><span class="line">		<span class="keyword">final</span> Attr qNameAttrib = objectProvider.getAttributeNodeNS(<span class="keyword">null</span>, <span class="string">"qualifiedName"</span>);</span><br><span class="line">		<span class="keyword">final</span> QName objectProviderName = AttributeSupport.getAttributeValueAsQName(qNameAttrib);</span><br><span class="line"></span><br><span class="line">		log.debug(<span class="string">"Initializing object provider &#123;&#125;"</span>, objectProviderName);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			Element configuration =</span><br><span class="line">					(Element) objectProvider.getElementsByTagNameNS(XMLTOOLING_CONFIG_NS, <span class="string">"BuilderClass"</span>).item(<span class="number">0</span>);</span><br><span class="line">			<span class="keyword">final</span> XMLObjectBuilder&lt;?&gt; builder = (XMLObjectBuilder&lt;?&gt;) createClassInstance(configuration);</span><br><span class="line"></span><br><span class="line">			configuration = (Element) objectProvider</span><br><span class="line">					.getElementsByTagNameNS(XMLTOOLING_CONFIG_NS, <span class="string">"MarshallingClass"</span>).item(<span class="number">0</span>);</span><br><span class="line">			<span class="keyword">final</span> Marshaller marshaller = (Marshaller) createClassInstance(configuration);</span><br><span class="line"></span><br><span class="line">			configuration = (Element) objectProvider</span><br><span class="line">					.getElementsByTagNameNS(XMLTOOLING_CONFIG_NS, <span class="string">"UnmarshallingClass"</span>).item(<span class="number">0</span>);</span><br><span class="line">			<span class="keyword">final</span> Unmarshaller unmarshaller = (Unmarshaller) createClassInstance(configuration);</span><br><span class="line"></span><br><span class="line">			getRegistry().registerObjectProvider(objectProviderName, builder, marshaller, unmarshaller);</span><br><span class="line"></span><br><span class="line">			log.debug(<span class="string">"&#123;&#125; initialized and configuration cached"</span>, objectProviderName);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> XMLConfigurationException e) &#123;</span><br><span class="line">			log.error(<span class="string">"Error initializing object provier &#123;&#125;"</span>, objectProvider, e);</span><br><span class="line">			<span class="comment">// clean up any parts of the object provider that might have been registered before the failure</span></span><br><span class="line">			getRegistry().deregisterObjectProvider(objectProviderName);</span><br><span class="line">			<span class="keyword">throw</span> e;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>理解该方法，需要对照这真正的配置文件来看，我们选取一个 <code>saml</code> 的配置来说明 <code>saml2-protocol-config.xml</code>，一下就是其中某一个 <code>ObjecProvider</code> 的配置:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- AuthnRequest provider --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ObjectProvider</span> <span class="attr">qualifiedName</span>=<span class="string">"saml2p:AuthnRequest"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">BuilderClass</span> <span class="attr">className</span>=<span class="string">"org.opensaml.saml.saml2.core.impl.AuthnRequestBuilder"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">MarshallingClass</span> <span class="attr">className</span>=<span class="string">"org.opensaml.saml.saml2.core.impl.AuthnRequestMarshaller"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">UnmarshallingClass</span> <span class="attr">className</span>=<span class="string">"org.opensaml.saml.saml2.core.impl.AuthnRequestUnmarshaller"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">ObjectProvider</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>通过配置我们看到这里主要4个信息：</p>
+<ol>
+<li>qualifiedName</li>
+<li>BuilderClass 对应的 类的全路径</li>
+<li>MarshallingClass 对应的 类的全路径</li>
+<li>UnmarshallingClass 对应的 类的全路径</li>
+</ol>
+<p>这样前面 <code>initializeObjectProviders</code> 方法就是将配置文件中类似于上面的这种配置单元读取出来，然后通过 <code>getRegistry().registerObjectProvider(objectProviderName, builder, marshaller, unmarshaller);</code> 完成注册。</p>
+<p>注册过程也十分简单，只要理解了前面关于 <code>XMLObjectProviderRegistry</code> 的获取和创建的过程，这里的注册就是向 <code>XMLObjectProviderRegistry</code> 中填入对应的值即可，这里需要注意 <code>XMLObjectProviderRegistry</code> 同样也是用 Map 存储 <code>QName</code> 信息，也就是说不同的 <code>ObjectProvider</code> 需要配置不同的 <code>QName</code>，然后对于 <code>Builder</code>，<code>Marshaller</code> 和 <code>UnMarshaller</code> 是使用 <code>Factory</code> 来存储，<code>Factory</code> 内部也是使用 <code>Map</code> 来存储具体的实现类，他们的 <code>key</code> 都是 <code>QName</code>。（<code>QName</code> 就是 <code>QualifiedName</code> 的缩写，<code>XML</code> 中十分重要的一个概念）。</p>
+<h4 id="initializeIDAttributes"><a href="#initializeIDAttributes" class="headerlink" title="initializeIDAttributes"></a>initializeIDAttributes</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeIDAttributes</span><span class="params">(<span class="keyword">final</span> Element idAttributesElement)</span> <span class="keyword">throws</span> XMLConfigurationException </span>&#123;</span><br><span class="line">	Element idAttributeElement;</span><br><span class="line">	QName attributeQName;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">final</span> NodeList idAttributeList =</span><br><span class="line">			idAttributesElement.getElementsByTagNameNS(XMLTOOLING_CONFIG_NS, <span class="string">"IDAttribute"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; idAttributeList.getLength(); i++) &#123;</span><br><span class="line">		idAttributeElement = (Element) idAttributeList.item(i);</span><br><span class="line">		attributeQName = ElementSupport.getElementContentAsQName(idAttributeElement);</span><br><span class="line">		<span class="keyword">if</span> (attributeQName == <span class="keyword">null</span>) &#123;</span><br><span class="line">			log.debug(<span class="string">"IDAttribute element was empty, no registration performed"</span>);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			getRegistry().registerIDAttribute(attributeQName);</span><br><span class="line">			log.debug(<span class="string">"IDAttribute &#123;&#125; has been registered"</span>, attributeQName);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和前面的 <code>ObjectProvider</code> 类似，使用 <code>getRegistry().registerIDAttribute(attributeQName);</code> 完成注册。</p>
+<h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><h2 id="初始化的结果"><a href="#初始化的结果" class="headerlink" title="初始化的结果"></a>初始化的结果</h2><p>至此，整个 <code>OpenSAML</code> 的初始化就完成。初始化完成之后的结构就是：</p>
+<p>在 <code>ConfigurationService</code> 类的静态成员变量 <code>Configuration</code> 中，默认使用 <code>MapBasedConfiguration</code>，有一个两层 <code>Map</code> 的存储 <code>Map&lt;String, Map&lt;String, Object&gt;&gt; storage</code>，外层是 <code>partition</code> 名，一般情况就是  <code>default</code>，对应的就是 <code>partiton</code> 的存储。这个存储是以类名为键，类的实例为值。这里就是 <code>XMLObjectProviderRegistry.class</code> 为键，<code>XMLObjectProviderRegistry</code> 的实例为值。这个实例就是最终存储这所有的配置的地方，首先 <code>XMLObjectProviderRegistry</code> 中有一个 <code>Map</code>，存放着 <code>QName</code> 的索引表 <code>configuredObjectProviders</code>，另外还存放着三个重要的工厂类的实例：<code>XMLObjectBuilderFactory</code>， <code>MarshallerFactory</code>， <code>UnmarshallerFactory</code>。 以及一个<code>Set</code> 用于存放ID属性名称。 三个工厂方法中又分别存放这一个 <code>Map</code>， 使用<code>QName</code>索引对应的 <code>Builder</code>，<code>Marshaller</code>，<code>Unmarshaller</code> 对应的实习类。</p>
+<p>至此我们就可以使用 <code>OpenSAML</code> 预置的这些配置和资源了。</p>
+<h2 id="直接使用方法"><a href="#直接使用方法" class="headerlink" title="直接使用方法"></a>直接使用方法</h2><p><code>OpenSAML</code> 的基础使用无非就是<strong>构造，序列化和反序列化</strong>对象，所以只要拿到对象的对应的<code>Builder</code>，<code>Marshaller</code> 和 <code>Unmarshaller</code> 使用起来就十分方便，那么该如何获取对象对应的这三个实现类内？</p>
+<p>这里 <code>OpenSAML</code> 提供了一个帮助类 <code>XMLObjectProviderRegistrySupport</code>，该类就是用于获取配置文件的。有了配置文件，我们只需要知道需要处理的 <code>XML</code> 对象的 <code>QName</code> 就可以获取对应的“三大件”了。</p>
+<p>另外这里还需要注意，如果我们尝试搜索某个具体的 <code>Builder</code> 比如 <code>AuthnRequestBuilder</code> 的使用情况，发现只在配置文件中引用了，这很奇怪，因为如果要测试这个 <code>Builder</code> 肯定应该有地方获取了这个类的实例。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201878-AbstractSAMLObjectBuilder.png" alt="AbstractSAMLObjectBuilder"></p>
+<p>这时候如果我们查看一下类的结构，可以发现这里定义了好几层抽象，所以在使用中利用 Java 的泛型，配合抽象 <code>SAMLObjectBuilder</code> 和 <code>SAMLObject</code> 的类型来实例。</p>
+<p>比如我们需要构造一个 <code>AuthnRequest</code> 对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SAMLObjectBuilder&lt;AuthnRequest&gt; responseBuilder = (SAMLObjectBuilder&lt;AuthnRequest&gt;) = XMLObjectProviderRegistrySupport.getBuilderFactory()</span><br><span class="line">                .getBuilder(AuthnRequest.DEFAULT_ELEMENT_NAME);</span><br><span class="line">AuthnRequest samlMessage = responseBuilder.buildObject();</span><br><span class="line">samlMessage.setID(<span class="string">"foo"</span>);</span><br><span class="line">samlMessage.setVersion(SAMLVersion.VERSION_20);</span><br><span class="line">samlMessage.setIssueInstant(<span class="keyword">new</span> DateTime(<span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+<h1 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h1><p>理解初始化过程对于正确使用 <code>OpenSAML</code> 十分重要，而且还能为扩展 <code>OpenSAML</code>提供很好的帮助，比如需要一个 <code>ObjectProvider</code> 没有在 <code>OpenSAML</code> 中内置，那么我们就需要自己初始化注册，理解了这个机制，对于这种扩展就轻而易举了。 </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OpenSAML/" rel="tag"># OpenSAML</a>
+          
+            <a href="/tags/SSO/" rel="tag"># SSO</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/06/circleci-latex-configuration-note/" rel="next" title="CircleCI 配置 Latex 备忘录">
+                <i class="fa fa-chevron-left"></i> CircleCI 配置 Latex 备忘录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/07/how-to-calculate-the-loan-repayment/" rel="prev" title="How to calculate the loan repayment?">
+                How to calculate the loan repayment? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SPI-原理简介"><span class="nav-number">2.</span> <span class="nav-text">SPI 原理简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始化过程分析"><span class="nav-number">3.</span> <span class="nav-text">初始化过程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SPI-加载-Initializer-实现类"><span class="nav-number">3.1.</span> <span class="nav-text">SPI 加载 Initializer 实现类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SPI-加载代码"><span class="nav-number">3.1.1.</span> <span class="nav-text">SPI 加载代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SPI-加载配置"><span class="nav-number">3.1.2.</span> <span class="nav-text">SPI 加载配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置资源加载机制"><span class="nav-number">3.2.</span> <span class="nav-text">配置资源加载机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类结构分析"><span class="nav-number">3.2.1.</span> <span class="nav-text">类结构分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#init-函数分析"><span class="nav-number">3.2.2.</span> <span class="nav-text">init()函数分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XMLConfigurator-实例化过程"><span class="nav-number">3.2.3.</span> <span class="nav-text">XMLConfigurator 实例化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#XML-的解析验证器初始化"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">XML 的解析验证器初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XMLObjectProviderRegistry-初始化"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">XMLObjectProviderRegistry 初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#读取-XMLObjectProviderRegistry"><span class="nav-number">3.2.3.2.1.</span> <span class="nav-text">读取 XMLObjectProviderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#创建-XMLObjectProviderRegistry"><span class="nav-number">3.2.3.2.2.</span> <span class="nav-text">创建 XMLObjectProviderRegistry</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#总结"><span class="nav-number">3.2.3.2.2.1.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XMLConfigurator-Load-方法详解"><span class="nav-number">3.2.4.</span> <span class="nav-text">XMLConfigurator Load 方法详解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#initializeObjectProviders"><span class="nav-number">3.2.4.1.</span> <span class="nav-text">initializeObjectProviders</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#initializeIDAttributes"><span class="nav-number">3.2.4.2.</span> <span class="nav-text">initializeIDAttributes</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用案例"><span class="nav-number">4.</span> <span class="nav-text">使用案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化的结果"><span class="nav-number">4.1.</span> <span class="nav-text">初始化的结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直接使用方法"><span class="nav-number">4.2.</span> <span class="nav-text">直接使用方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结-1"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/07/07/learning-sso-opensaml-initializer-analysis/';
+          this.page.identifier = '2018/07/07/learning-sso-opensaml-initializer-analysis/';
+          this.page.title = '跟我学SSO-OpenSAML初始化源码分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

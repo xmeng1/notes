@@ -1,0 +1,1059 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo,Github,Travis-CI," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="概述折腾了不少博客系统，但是发现到现在位置还是一直再用 Evernote 记笔记，偶尔总结一下再转发到博客上，总是觉得发博客的过程比较繁琐，所以一直没有坚持记录。 想一想折腾过 WordPress 免费服务器超慢，需要花钱买服务器，所以逐渐放弃了。之后开始使用 Jekyll 在Github上构建了一组网站，网站免费而且稳定，但是总是想不起来更新（实际上懒..）。前一段时间弄过一个 HubPress">
+<meta name="keywords" content="Hexo,Github,Travis-CI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo个人博客完全指南 (2017最新零基础手册)">
+<meta property="og:url" content="https://notes.mengxin.science/2017/05/05/hexo-blog-github-ci/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="概述折腾了不少博客系统，但是发现到现在位置还是一直再用 Evernote 记笔记，偶尔总结一下再转发到博客上，总是觉得发博客的过程比较繁琐，所以一直没有坚持记录。 想一想折腾过 WordPress 免费服务器超慢，需要花钱买服务器，所以逐渐放弃了。之后开始使用 Jekyll 在Github上构建了一组网站，网站免费而且稳定，但是总是想不起来更新（实际上懒..）。前一段时间弄过一个 HubPress">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-freenom-my-domain.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-freenom-ns-config.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-add-site.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-verify-record.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-choose-free.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-ns-check.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/cloudflare-ns-config-success.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/cloudflare-record-config.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/hexo-travis-config.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo个人博客完全指南 (2017最新零基础手册)">
+<meta name="twitter:description" content="概述折腾了不少博客系统，但是发现到现在位置还是一直再用 Evernote 记笔记，偶尔总结一下再转发到博客上，总是觉得发博客的过程比较繁琐，所以一直没有坚持记录。 想一想折腾过 WordPress 免费服务器超慢，需要花钱买服务器，所以逐渐放弃了。之后开始使用 Jekyll 在Github上构建了一组网站，网站免费而且稳定，但是总是想不起来更新（实际上懒..）。前一段时间弄过一个 HubPress">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/blog-freenom-my-domain.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/05/05/hexo-blog-github-ci/"/>
+
+
+
+
+
+  <title> Hexo个人博客完全指南 (2017最新零基础手册) | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/05/05/hexo-blog-github-ci/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Hexo个人博客完全指南 (2017最新零基础手册)
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T23:00:00+00:00">
+                2017-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/05/hexo-blog-github-ci/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/05/hexo-blog-github-ci/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>折腾了不少博客系统，但是发现到现在位置还是一直再用 <code>Evernote</code> 记笔记，偶尔总结一下再转发到博客上，总是觉得发博客的过程比较繁琐，所以一直没有坚持记录。</p>
+<p>想一想折腾过 <code>WordPress</code> 免费服务器超慢，需要花钱买服务器，所以逐渐放弃了。之后开始使用 <code>Jekyll</code> 在Github上构建了一组网站，网站免费而且稳定，但是总是想不起来更新（实际上懒..）。前一段时间弄过一个 <a href="http://hubpress.io/" target="_blank" rel="noopener">HubPress</a>，这个的好处是可以在线后台更新，略微方便了很多，但是有一个问题，速度很慢，通过抓包分析，每次提交做了好多事情，所以更新的很少，而且只是点滴内容。最近发现了 Hexo， 虽然这个已经不是什么新东西了，但是使用 Travis CI 自动构建好像也是近一段时间才流行起来，而且随着CI的加强，构建也更加方便简单。下面我就从头开始介绍如何完全免费构建一个Hexo博客，并且支持自动构建。</p>
+<ol>
+<li>网站结构设计</li>
+<li>获取 <code>tk</code> 免费域名</li>
+<li>获取 <code>cloudflare</code> 免费DNS解析及简单的CDN</li>
+<li>本机环境配置 （如果不需要本机调试查看，该步骤可以省略）</li>
+<li>Hexo 获取及主题安装配置 （如果需要可以提供一份基本纯净的配置好的系统）</li>
+<li>Gihub Repository 部署策略</li>
+<li>Travis CI 配置</li>
+</ol>
+<a id="more"></a>
+<h2 id="详细步骤"><a href="#详细步骤" class="headerlink" title="详细步骤"></a>详细步骤</h2><h3 id="网站结构设计"><a href="#网站结构设计" class="headerlink" title="网站结构设计"></a>网站结构设计</h3><p>建立网站前可以思考一下我们的博客应该是什么样子的。可以域名直达博客，也可以域名进入主页，然后子域名进入博客等等。对于我希望自己有两种语言的博客：英语和中文，所以我选择如下结构的博客：</p>
+<p>mengxin.tk -&gt; 主页，简单HTML静态网页<br>notes.mengxin.tk -&gt; 中文博客，Hexo系统<br>blog.mengxin.tk -&gt; 英文博客，Hexo系统<br>xxx.mengxin.tk -&gt; 其他项目主页，任意系统以及链接跳转</p>
+<p>如果你希望简单一点，可以直让主域名指向博客即可，当然如何设计结构对于后面 <code>Github</code> 的 <code>Repository</code> 有一定的影响，毕竟我们的网页实际上是部署在 <code>Github</code> 上的。</p>
+<h3 id="注册tk免费域名"><a href="#注册tk免费域名" class="headerlink" title="注册tk免费域名"></a>注册<code>tk</code>免费域名</h3><p>这步这不是必须的，你可以使用 <code>Github</code> 的原生域名 <code>xxx.github.io</code>，然后子域名使用子路径 <code>xxx.github.io/notes</code> 等等。当然你也可以花钱注册任意域名，我们这里主要是为了介绍后面的 <code>CNAME</code> 配置，所以介绍如何注册免费域名。（这里没有任何广告，毕竟免费）虽然 <code>tk</code> 域名的索引率不高，但好歹也算是顶级域名，不花钱先凑活用吧。</p>
+<p>域名注册很简单，登陆 <a href="http://www.freenom.com/" target="_blank" rel="noopener">Freenom</a>主页，网页支持中文，先检查一下你的域名是否可用，如果可用就开始填注册信息，使用邮箱验证后就可以开始下单，选择12个月免费，直接下单就可以了。这里超过12个月的都是收费的，但是12个月后可以免费续。如果你还能坚持12个月，那就去买个高级的域名吧！</p>
+<p>注册完之后，就可以在 <strong>我的域名</strong> 中看到刚刚注册域名啦，如下图所示：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-freenom-my-domain.png" alt="freenom-my-domain" title="blog-freenom-my-domain"></p>
+<p>然后我们需要配置该域名的 DNS nameserver，因为我们会用<code>cloudflare</code>来配置我们域名的DNS， 这里我们选择 <code>cloudflare</code> 的免费 nameserver。ns1和ns2如下，其他ns删除留空</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ns1：NS1</span><br><span class="line">ns2：NS2</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-freenom-ns-config.png" alt="freenom-nameserver" title="blog-freenom-ns-config"></p>
+<p>到这个页面大家可以先保留，这两个NS名称我们等会配置完 <code>cloudflare</code> 再回来填写再保存。</p>
+<h3 id="配置cloudflare免费DNS解析"><a href="#配置cloudflare免费DNS解析" class="headerlink" title="配置cloudflare免费DNS解析"></a>配置<code>cloudflare</code>免费DNS解析</h3><p><code>cloudflare</code>是一家专业的网站加速公司，其中包含多种产品，比如DNS解析及加速，网页优化，CDN，以及SSL。这里我们只是用其免费产品即可。</p>
+<p>首先注册账号，然后添加网站 （Add Site），添加完网站后需呀进行扫描然后可以继续配置。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-add-site.png" alt="cloudflare-add-site" title="blog-cloudflare-add-site"></p>
+<p>下一步是验证已有的DNS记录，可以忽略直接下一步</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-verify-record.png" alt="cloudflare-verify-recored" title="blog-cloudflare-verify-record"></p>
+<p>然后是就是选择套餐，我们就选择免费的即可，目前功能足够啦。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-choose-free.png" alt="cloudflare-free-plan" title="blog-cloudflare-choose-free"></p>
+<p>接下来这一步比较重要，主要检查当前域名的 <code>nameserver</code> 名称以及需要配置的<code>nameserver</code>。还记得上一步的域名<code>nameserver</code>的配置我们还没有填完吧，这时候我们就可以把这两个需要配置的 NS 填入域名的 NS 配置页中（图中标明的NS1和NS2）。也就是告诉域名服务器我们要用<code>cloudflare</code>的DNS解析服务啦。然后点击 continue 进入下一步。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/blog-cloudflare-ns-check.png" alt="cloudflare-ns-name" title="blog-cloudflare-ns-check"></p>
+<p>如果我们域名服务的 NS server已经设好（一般需要等待一段时间，实测很快就能生效了，我们将会看到配置成功的界面，表示 <code>cloudflare</code> 也识别了域名服务，并且确定域名服务器配置了<code>cloudflare</code>的NS。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/cloudflare-ns-config-success.png" alt="cloudflare-ns-config-success" title="cloudflare-ns-config-success"></p>
+<p>最后我们只需要在 <code>cloudflare</code> 配置网站的记录即可，这里可以参考我的配置，当然你也可以任意配置。我把A记录指向了 Github 的IP， 然后把 <code>www</code> 以及二级域名都指向根域名 <code>@</code>。配置如下图所示：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/cloudflare-record-config.png" alt="cloudflare-recored-config" title="cloudflare-record-config"></p>
+<p>至此，基本域名配置完成了，这时候访问 你的<code>tk</code>域名回显示 Github 的 404 页面。因为我们还没有部署 Github Page。下面我们开始博客的配置。</p>
+<h3 id="本机环境配置"><a href="#本机环境配置" class="headerlink" title="本机环境配置"></a>本机环境配置</h3><p>（如果不需要本机调试查看，该步骤可以省略）</p>
+<p>本机配置环境相当简单，只需要你正确装了 <code>nodejs</code>， 具体版本不能太低，一般用当前稳定版和最新版都可以。另外推荐使用<code>nvm</code>安装<code>nodejs</code>，方便管理版本。装好<code>node</code>之后只需要一个命令装好Hexo就可以了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo npm install hexo-cli -g</span><br></pre></td></tr></table></figure>
+<p>之后我们就可以使用 <code>hexo</code> 命令了。</p>
+<h3 id="Hexo-获取及主题安装配置"><a href="#Hexo-获取及主题安装配置" class="headerlink" title="Hexo 获取及主题安装配置"></a>Hexo 获取及主题安装配置</h3><p>如果正确配置好本地开发环境，我们就可以使用 <code>Hexo</code> 来进行 Hexo 的安装和测试了。（如果你没有配好本地环境，文章最后会提供一份基本纯净的配置好的系统，不过强烈建议自己搭建）</p>
+<h4 id="Hexo-初始化博客"><a href="#Hexo-初始化博客" class="headerlink" title="Hexo 初始化博客"></a>Hexo 初始化博客</h4><p>通过 Hexo 命令行工具很快就能创建一个 Hexo 的博客：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//进入你的博客文件夹，比如 blog-hexo</span><br><span class="line">hexo init</span><br><span class="line">//这个命令会在文件夹中初始化一个hexo博客，并且安装所需要的依赖。</span><br><span class="line">//当然也可以后面指定一个文件夹名称，这样博客就会创建在这个子文件夹中</span><br><span class="line">hexo server</span><br><span class="line">//这个命令之后我们就可以访问 http://localhost:4200 查看Hexo博客了</span><br></pre></td></tr></table></figure>
+<h4 id="下载主题并安装"><a href="#下载主题并安装" class="headerlink" title="下载主题并安装"></a>下载主题并安装</h4><p>主题的下载推荐进入 Github 项目的 <code>release</code> 来下载 <code>release</code> 的版本。这样文件不会带有 <code>git</code> 信息，否则我们会发现后面如果我们用<code>git</code> 管理我们的 <code>blog-hexo</code>，里面会有一个主题的 submodule， 个人感觉 submodule 在 git 里面用的人不多，可能会带来麻烦。</p>
+<p>下载 <a href="https://github.com/iissnan/hexo-theme-next/archive/v5.1.1.zip" target="_blank" rel="noopener">Next最新release的主题包</a>（当前5.1.1, 2017 Mar 24）然后把内容解压到刚才 <code>blog-hexo</code> 中 <code>themes</code> 目录中， 并重命名文件夹为 <code>next</code>。</p>
+<p>然后关键是在 <strong><code>blog-hexo</code>文件夹</strong> 中的 <code>_config.yml</code> 将 <code>theme</code> 设为 <code>next</code>（和刚才修改的文件夹名称一致）</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># theme: landscape</span></span><br><span class="line"><span class="attr">theme:</span> <span class="string">next</span></span><br></pre></td></tr></table></figure>
+<p>这时候该主题就算是安装成功了。</p>
+<h4 id="主题的基本配置"><a href="#主题的基本配置" class="headerlink" title="主题的基本配置"></a>主题的基本配置</h4><p>这里说明一下，hexo有两种配置文件，一种是外层的配置，一种是主题的配置。大家不要混淆。下面我使用</p>
+<p><code>HexoConfig</code>: 表示外面的 _config.yml<br><code>ThemeConfig</code>: 表示里面的 _config.yml</p>
+<p>这里简单的介绍一下如何配置主题，具体配置方法参考<a href="http://theme-next.iissnan.com/" target="_blank" rel="noopener">主题官方手册</a>，或者<a href="https://github.com/iissnan/hexo-theme-next/wiki" target="_blank" rel="noopener">Github上的wiki</a>，两者互为补充。</p>
+<ol>
+<li>主题语言， 设置 HexoConfig <code>language: zh-Hans</code></li>
+<li>主题的样式，有三种，需要设置 ThemeConfig <code>scheme: Pisces</code> </li>
+</ol>
+<h3 id="Gihub-Repository-部署策略"><a href="#Gihub-Repository-部署策略" class="headerlink" title="Gihub Repository 部署策略"></a>Gihub Repository 部署策略</h3><p>其实之前Hexo博客及主题网上已经有很多配置的方法的博文介绍，我这里只是做了一些概要的总结。总之并不难，基本按照步骤一步一步即可。下面我来介绍一下如果在Github上部署网站。</p>
+<p>这一步首先需要规划网站的结构，这里简单说明一下Github Page，比较关键的是我们需要知道，如果你的 Repository 的名字你的 用户名加上 <code>.github.io</code>， 那么这个 Repository 的 master 分支将会直接被渲染成页面。但是如果你的 Repository 是其他名字，需要创建 gh-pages 分支来渲染页面。所以我的<code>Repository</code>的构建策略如下：</p>
+<ol>
+<li>xmeng1.github.io ：master分支，为主页面的代码</li>
+<li>notes：gh-pages分支，为中文博客</li>
+<li>blog：gh-pages分支，为英文博客</li>
+</ol>
+<p>所以我们的静态博客文件需要部署到上述的 <code>Repository</code> 以及对应的分支。</p>
+<h3 id="Travis-CI-配置"><a href="#Travis-CI-配置" class="headerlink" title="Travis CI 配置"></a>Travis CI 配置</h3><p>下面这一节最为重要，也是实现博客自动更新的关键。</p>
+<p>我们知道Hexo本身只是一个静态博客生成器，一般的流程是：</p>
+<ol>
+<li>第一步： 撰写MD博客文件</li>
+<li>第二步： Hexo g 生成博客静态文件 </li>
+<li>第三步： 将静态文件push到Github的Repository</li>
+</ol>
+<p>显然每次更新文章都这样做将会很麻烦，而且需要配置本地环境。这里我们将会把上面那个过程的后两步使用 Travis CI 来完成。也就是说我们把CI理解为在本地进行的操作放到了云端。</p>
+<h4 id="创建博客源码Repo"><a href="#创建博客源码Repo" class="headerlink" title="创建博客源码Repo"></a>创建博客源码Repo</h4><p>我们之前已经创建好博客静态文件的 <code>Repository</code>，但是如果我们用CI，需要创建一个博客源代码的<code>Repository</code>，如下所示，这些代码仓库可以使公开或者私有都没有关系：</p>
+<ol>
+<li>notes-hexo master 对应 notes</li>
+<li>blog-hexo master 对应 blog</li>
+</ol>
+<p>然后我们把之前的博客源码上传至对应的博客源码仓库。</p>
+<h4 id="添加Travis配置文件"><a href="#添加Travis配置文件" class="headerlink" title="添加Travis配置文件"></a>添加Travis配置文件</h4><p>一般只有仓库中就了 <code>tarvis</code> 的配置文件，才能触发CI进行操作，所以我们创建该文件<code>.travis.yml</code>与仓库的根目录下，一下以notes-hexo为例子。</p>
+<ol>
+<li>安装依赖</li>
+<li>生成静态文件</li>
+<li>配置git，并commit代码</li>
+<li>强制向我们的静态仓储提交代码</li>
+</ol>
+<p>这里面有两点非常重要</p>
+<ol>
+<li><code>echo &quot;notes.mengxin.tk&quot; &gt; CNAME</code> 我们知道如果我们需要使用自定义的域名，我们需要在仓库里添加一个<code>CNAME</code>文件，内容就是定义的域名，而每次强制提交代码，代码都会覆盖，所以我们需要每次都生成一个这个文件</li>
+<li>其中的 <code>GH_TOKEN</code> 和<code>GH_REF</code> 安全起见使用travis的环境变量来配置，下一节会展示如何配置这两个变量。</li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="attr">node_js:</span> <span class="string">stable</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Travis-CI Caching</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line"><span class="attr">  directories:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">node_modules</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># S: Build Lifecycle</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line"></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">hexo</span> <span class="string">cl</span>  <span class="comment">#清除</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">hexo</span> <span class="string">g</span>  <span class="comment">#生成</span></span><br><span class="line"></span><br><span class="line"><span class="attr">after_script:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">cd</span> <span class="string">./public</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">git</span> <span class="string">init</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">echo</span> <span class="string">"notes.mengxin.tk"</span> <span class="string">&gt; CNAME</span></span><br><span class="line"><span class="string">  - git config user.name "xmeng1"</span></span><br><span class="line"><span class="string">  - git config user.email "xmeng1@outlook.com"</span></span><br><span class="line"><span class="string">  - git add .</span></span><br><span class="line"><span class="string">  - git commit -m "Update notes"</span></span><br><span class="line"><span class="string">  - git push --force --quiet "https://$&#123;GH_TOKEN&#125;@$&#123;GH_REF&#125;" master:gh-pages</span></span><br><span class="line"><span class="string"># E: Build LifeCycle</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span><span class="attr">branches:</span></span><br><span class="line"><span class="attr">  only:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+<h4 id="配置Travis"><a href="#配置Travis" class="headerlink" title="配置Travis"></a>配置Travis</h4><p>Travis的配置很简单，注意如果你是 private 的仓库，需要进入<a href="https://travis-ci.com" target="_blank" rel="noopener">com网站</a>来配置，其他 public 的仓库，则使用<a href="https://travis-ci.org/" target="_blank" rel="noopener">org网站</a>，具体配置见下图，主要是开启自动构建以及只有travis配置文件才进行构建的选项，以及增加构建参数，记得参数需要进行保密，不能再日志中明文可见。</p>
+<p><code>GH_TOKEN</code> 是静态博客仓库所在的账号的develop token，这个一定要保密。<br><code>GH_REF</code> 是静态博客仓库的git地址，这个其实没必要保密</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/hexo-travis-config.png" alt="hexo-travis-config" title="hexo-travis-config"></p>
+<h4 id="Push代码"><a href="#Push代码" class="headerlink" title="Push代码"></a>Push代码</h4><p>最后一旦我们push了新的代码到 <code>notes-hexo</code>，CI将会自动构建生成静态博客代码并把代码推送到你的<code>notes</code>仓库，然后添加一个<code>CNAME</code>文件，最终网站将会正确显示。</p>
+<h2 id="如何撰写一篇日志"><a href="#如何撰写一篇日志" class="headerlink" title="如何撰写一篇日志"></a>如何撰写一篇日志</h2><p>最后博客配置完成，如何撰写博客呢？ 我这里有几种方案供大家选择：</p>
+<h3 id="本地修改并推送"><a href="#本地修改并推送" class="headerlink" title="本地修改并推送"></a>本地修改并推送</h3><p>这种方法最简单，只需要用hexo命令或者直接在 <code>_post</code> 文件夹中创建markdown文件，编辑并推送即可。但是不方便，需要本地有<code>git</code>以及完整的仓库代码。</p>
+<h3 id="Github直接创建文件"><a href="#Github直接创建文件" class="headerlink" title="Github直接创建文件"></a>Github直接创建文件</h3><p>现在Github支持直接在网站上创建文件，这种方法相当方便，可以随时随地的写博客，但是鉴于github的markdown编辑并不是很好用，所以可能不太好写复杂的博客。</p>
+<h3 id="使用-stackedit-io"><a href="#使用-stackedit-io" class="headerlink" title="使用 stackedit.io"></a>使用 stackedit.io</h3><p><code>stackedit.io</code>对于经常写markdown的人不陌生，开源免费的markdown编辑器，最关键的是它支持向github推送，所以用这个编辑器推送既方便又有强大的markdown编辑功能，可以说是目前在线编辑博客的最佳方案。</p>
+<h3 id="使用-小书匠编辑器"><a href="#使用-小书匠编辑器" class="headerlink" title="使用 小书匠编辑器"></a>使用 小书匠编辑器</h3><p>当然如果你偏爱客户端编辑并且习惯在本地进行撰写博客，小书匠编辑器将是你的不二选择，同样是免费的编辑器，同时又全平台客户端。另外功能丰富基本覆盖了所有目前你需要的功能。我个人认为有几个功能最好用</p>
+<ol>
+<li>图床功能，该功能可以直接把博客的图片放到图床上了</li>
+<li>多平台保存，我目前常用的就是Github和evernote，github上发布，evernote留作备份</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+            <a href="/tags/Github/" rel="tag"># Github</a>
+          
+            <a href="/tags/Travis-CI/" rel="tag"># Travis-CI</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/04/google-cloud-next/" rel="next" title="Google-Cloud-Next观后感">
+                <i class="fa fa-chevron-left"></i> Google-Cloud-Next观后感
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/06/Typescript-Index-Signature/" rel="prev" title="Typescript Index Signature">
+                Typescript Index Signature <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#详细步骤"><span class="nav-number">2.</span> <span class="nav-text">详细步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网站结构设计"><span class="nav-number">2.1.</span> <span class="nav-text">网站结构设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册tk免费域名"><span class="nav-number">2.2.</span> <span class="nav-text">注册tk免费域名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置cloudflare免费DNS解析"><span class="nav-number">2.3.</span> <span class="nav-text">配置cloudflare免费DNS解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本机环境配置"><span class="nav-number">2.4.</span> <span class="nav-text">本机环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hexo-获取及主题安装配置"><span class="nav-number">2.5.</span> <span class="nav-text">Hexo 获取及主题安装配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hexo-初始化博客"><span class="nav-number">2.5.1.</span> <span class="nav-text">Hexo 初始化博客</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载主题并安装"><span class="nav-number">2.5.2.</span> <span class="nav-text">下载主题并安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主题的基本配置"><span class="nav-number">2.5.3.</span> <span class="nav-text">主题的基本配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gihub-Repository-部署策略"><span class="nav-number">2.6.</span> <span class="nav-text">Gihub Repository 部署策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Travis-CI-配置"><span class="nav-number">2.7.</span> <span class="nav-text">Travis CI 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建博客源码Repo"><span class="nav-number">2.7.1.</span> <span class="nav-text">创建博客源码Repo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加Travis配置文件"><span class="nav-number">2.7.2.</span> <span class="nav-text">添加Travis配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置Travis"><span class="nav-number">2.7.3.</span> <span class="nav-text">配置Travis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Push代码"><span class="nav-number">2.7.4.</span> <span class="nav-text">Push代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何撰写一篇日志"><span class="nav-number">3.</span> <span class="nav-text">如何撰写一篇日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地修改并推送"><span class="nav-number">3.1.</span> <span class="nav-text">本地修改并推送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Github直接创建文件"><span class="nav-number">3.2.</span> <span class="nav-text">Github直接创建文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-stackedit-io"><span class="nav-number">3.3.</span> <span class="nav-text">使用 stackedit.io</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-小书匠编辑器"><span class="nav-number">3.4.</span> <span class="nav-text">使用 小书匠编辑器</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/05/05/hexo-blog-github-ci/';
+          this.page.identifier = '2017/05/05/hexo-blog-github-ci/';
+          this.page.title = 'Hexo个人博客完全指南 (2017最新零基础手册)';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

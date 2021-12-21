@@ -1,0 +1,1015 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog,Devops," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：如果希望开发支持多租户（Multiple Tenant）的通配子域名的软件，需要在本地搭建相应的环境，本文介绍如何搭建这样的环境。">
+<meta name="keywords" content="blog,Devops">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多租户通配子域名开发环境搭建">
+<meta property="og:url" content="https://notes.mengxin.science/2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：如果希望开发支持多租户（Multiple Tenant）的通配子域名的软件，需要在本地搭建相应的环境，本文介绍如何搭建这样的环境。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/test.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-23_08-47-38.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="多租户通配子域名开发环境搭建">
+<meta name="twitter:description" content="摘要：如果希望开发支持多租户（Multiple Tenant）的通配子域名的软件，需要在本地搭建相应的环境，本文介绍如何搭建这样的环境。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/test.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/"/>
+
+
+
+
+
+  <title> 多租户通配子域名开发环境搭建 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                多租户通配子域名开发环境搭建
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T00:00:00+00:00">
+                2018-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工作笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">工作笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：如果希望开发支持多租户（Multiple Tenant）的通配子域名的软件，需要在本地搭建相应的环境，本文介绍如何搭建这样的环境。</p>
+<span itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject"><img itemprop="url image" src="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/test.png" class="full-image" alt="alt" title="title"><meta itemprop="width" content="auto"><meta itemprop="height" content="auto"></span>
+<a id="more"></a>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过本文，我们将搭建多租户通配子域名开发环境，该环境的功能如下：</p>
+<ol>
+<li>可以正确的解析任意子域名访问</li>
+<li>可以正确的解析子域名所对应的服务</li>
+<li>可以正确的显示 SSL 证书</li>
+</ol>
+<p>本文所用的技术</p>
+<ol>
+<li>dnsmasq 本地 DNS 解析服务</li>
+<li>nginx 反向代理</li>
+<li>ng serve 的选项</li>
+</ol>
+<p>假设我们需要设定的域名为 <code>mengxin.science</code>， 其统配子域名为 <code>*.mengxin.science</code>。</p>
+<h2 id="dnsmasq-配置-DNS"><a href="#dnsmasq-配置-DNS" class="headerlink" title="dnsmasq 配置 DNS"></a>dnsmasq 配置 DNS</h2><p>我们都知道，在本地调试的时候，如果希望指定域名，一般都会使用 <code>/etc/hosts</code> 来指定域名对应的解析 IP（一般为本地）。但是这个 <code>hosts</code> 文件并不支持子域名通配。也就是说我们无法使用该文件达到解析所有的 <code>*.mengxin.scienc</code> 到本地 IP。</p>
+<p>这时候我们需要一个本地的 DNS 服务来达到这个目标，也就是 <code>dnsmasq</code>。作为一个 DNS server， <code>dnsmasq</code> 有很多功能，我们这里只介绍必要的配置。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>安装大家完全可以官方获得手册，本人使用 Fedora，所以直接用 <code>dnf</code> 安装，可以参考该<a href="https://www.techrepublic.com/article/how-to-configure-dnsmasq-on-fedora-desktop-and-server/" target="_blank" rel="noopener">文章</a>。</p>
+<h4 id="step-1"><a href="#step-1" class="headerlink" title="step 1"></a>step 1</h4><p>安装</p>
+<pre><code>sudo dnf install dnsmasq
+</code></pre><h4 id="step-2"><a href="#step-2" class="headerlink" title="step 2"></a>step 2</h4><p>配置用户和用户组来操作 <code>dnsmasq</code></p>
+<pre><code>sudo groupadd -r dnsmasq
+sudo useradd -r -g dnsmasq dnsmasq
+</code></pre><h3 id="dnsmasq-配置"><a href="#dnsmasq-配置" class="headerlink" title="dnsmasq 配置"></a><code>dnsmasq</code> 配置</h3><p>我们需要的配置很简单，实际上只需要一条记录配置统配域名的 DNS A 记录（A record）就行了。</p>
+<p>dnsmasq 的配置和 nginx 类似，有一个默认的<strong>主</strong>配置文件 <code>/etc/dnsmasq.conf</code>，同时还可以创建自定义<strong>子</strong>配置文件，因为在主配置文件中包含了相应文件夹下的所有配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Include all files in /etc/dnsmasq.d except RPM backup files</span><br><span class="line">conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig</span><br></pre></td></tr></table></figure>
+<p>所有我们只需要在 <code>/etc/dnsmasq.d</code> 目录下创建一个我们自己的配置文件即可，例如 <code>dev.conf</code>。该文件我们配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">address=/mengxin.science/192.168.XXX.XXX</span><br></pre></td></tr></table></figure>
+<p>其中后面的 IP 地址为你需要指定的地址，也可以是本地地址。</p>
+<p>配置结束后我们可以使用一下命令来测试配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dnsmasq --test</span><br></pre></td></tr></table></figure>
+<h3 id="让-dnsmasq-生效"><a href="#让-dnsmasq-生效" class="headerlink" title="让 dnsmasq 生效"></a>让 dnsmasq 生效</h3><p>在配置中发现总是不能生效，因为还没有告诉你的操作系统如何使用这个本地的 DNS，所以我们需要配置我们解析网址的 DNS 服务器，其配置文件为 <code>resolve.conf</code>。向该文件中增加条目：<code>nameserver 127.0.0.1</code>，结果如下：</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Generated by NetworkManager</span></span><br><span class="line"><span class="string">search </span><span class="string">XXX.</span><span class="string">com</span></span><br><span class="line"><span class="string">nameserver </span><span class="string">127.</span>0.0.1 </span><br><span class="line"><span class="string">nameserver </span><span class="string">192.</span><span class="string">168.</span><span class="string">XXX.</span><span class="string">XXX</span></span><br><span class="line"><span class="string">nameserver </span>8.8.8.8</span><br></pre></td></tr></table></figure>
+<p>该列表为所有可用的 DNS 解析服务器。</p>
+<p>修改了这个文件可以需要重启一下 <code>networkManager</code></p>
+<pre><code>sudo service network-manager restart
+</code></pre><h3 id="管理-dnsmasq-服务"><a href="#管理-dnsmasq-服务" class="headerlink" title="管理 dnsmasq 服务"></a>管理 dnsmasq 服务</h3><p>我们可以使用 <code>service</code> 来管理，也可以用 <code>systemctl</code>。</p>
+<h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><pre><code>sudo systemctl start dnsmasq
+</code></pre><h4 id="重启服务"><a href="#重启服务" class="headerlink" title="重启服务"></a>重启服务</h4><pre><code>sudo systemctl restart dnsmasq
+</code></pre><h4 id="停止服务"><a href="#停止服务" class="headerlink" title="停止服务"></a>停止服务</h4><pre><code>sudo systemctl stop dnsmasq
+</code></pre><h2 id="Nginx-配置反向代理"><a href="#Nginx-配置反向代理" class="headerlink" title="Nginx 配置反向代理"></a>Nginx 配置反向代理</h2><p>至此我们已经成功的解析的统配的 <code>*.mengxin.science</code> 到指定的 IP 地址。下面我们就要来将统配的子域名反向代理到争取的服务端口。</p>
+<p>假设我们开发环境分为前端后后端：</p>
+<ol>
+<li>前端端口为 <code>3000</code>， 访问路径为  localhost:3000</li>
+<li>后端端口为 <code>8081</code>， 访问路径为  localhost:8081/rest</li>
+</ol>
+<p>则我们需要将 </p>
+<ol>
+<li><code>*.mengxin.science</code>  -&gt; localhost:3000</li>
+<li><code>*.mengxin.science/rest</code>  -&gt; localhost:8081/rest</li>
+</ol>
+<h3 id="SSL-证书"><a href="#SSL-证书" class="headerlink" title="SSL 证书"></a>SSL 证书</h3><p>既然我们需要统配子域名，那么我们就需要一个统配的证书 （同时兼容统配和子域名为空的情形），这个证书的特点是其 issuer to 为一个统配的域名，比如 *.google.co.uk。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-23_08-47-38.png" alt="enter description here" title="2018-01-23_08-47-38"></p>
+<h3 id="nginx-配置"><a href="#nginx-配置" class="headerlink" title="nginx 配置"></a>nginx 配置</h3><p>和 <code>dnsmasq</code> 一样，我们只需要配置增加一个配置文件在 <code>/etc/nginx/conf.d</code> 目录下即可，比如 <code>dev.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">	listen              443 ssl;</span><br><span class="line">	server_name         .dualshield-cloud.deepnetsecurity.com;</span><br><span class="line">	ssl_certificate     /etc/nginx/star.mengxin.science.crt;</span><br><span class="line">	ssl_certificate_key /etc/nginx/star.mengxin.science.key;</span><br><span class="line">	ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">	ssl_ciphers         HIGH:!aNULL:!MD5;</span><br><span class="line">	location ^~ /rest/ &#123;</span><br><span class="line">		proxy_pass http://localhost:8081;</span><br><span class="line">		proxy_set_header Host $http_host;</span><br><span class="line">		#proxy_set_header Host mengxin.science;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	location /&#123;</span><br><span class="line">		proxy_pass https://localhost:3000;</span><br><span class="line">		proxy_http_version 1.1;</span><br><span class="line">		proxy_set_header Host $host;</span><br><span class="line">		#proxy_set_header Host mengxin.science;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中有两点需要注意</p>
+<ol>
+<li><code>server_name</code> 如果前面不加 * 表示统配两种情形：任意的子域名和子域名为空</li>
+<li>如果你的开发程序不能接受在请求头部信息的任意的 Host，那么可以将头部设为可接受的内容，比如顶级域名。</li>
+</ol>
+<h2 id="前端-Angular-服务启动配置"><a href="#前端-Angular-服务启动配置" class="headerlink" title="前端 Angular 服务启动配置"></a>前端 Angular 服务启动配置</h2><p>前面我们说到关于头部的 Host 信息的问题，在前端开发 Angular （2+），我们使用 ng serve 命令的时候，是可以忽略 Host 检查的，其参数为<code>--disable-host-check</code>，所以在开发的时候加上这个选项，任意子域名的反向代理，即使不配置头部也可以正确的导向前端的服务。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>至此我们完成了目标：</p>
+<ol>
+<li>可以正确的解析任意子域名访问</li>
+<li>可以正确的解析子域名所对应的服务</li>
+<li>可以正确的显示 SSL 证书</li>
+</ol>
+<p>至于子域名到达服务后，那么就需要程序本身来进行处理，比如 <code>servlet</code> 在 <code>filter</code> 中可以提取 子域名。<code>js</code> 也可以将路径中的子域名提取出来。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+            <a href="/tags/Devops/" rel="tag"># Devops</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/22/How-to-use-swagger-generator-generate-SDK/" rel="next" title="How to use swagger generator generate SDK">
+                <i class="fa fa-chevron-left"></i> How to use swagger generator generate SDK
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/24/Hexo-Next-Theme-Google-Translation-Support/" rel="prev" title="如何向Hexo的Next主题添加谷歌翻译">
+                如何向Hexo的Next主题添加谷歌翻译 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dnsmasq-配置-DNS"><span class="nav-number">2.</span> <span class="nav-text">dnsmasq 配置 DNS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#step-1"><span class="nav-number">2.1.1.</span> <span class="nav-text">step 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#step-2"><span class="nav-number">2.1.2.</span> <span class="nav-text">step 2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dnsmasq-配置"><span class="nav-number">2.2.</span> <span class="nav-text">dnsmasq 配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让-dnsmasq-生效"><span class="nav-number">2.3.</span> <span class="nav-text">让 dnsmasq 生效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#管理-dnsmasq-服务"><span class="nav-number">2.4.</span> <span class="nav-text">管理 dnsmasq 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动服务"><span class="nav-number">2.5.</span> <span class="nav-text">启动服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#重启服务"><span class="nav-number">2.5.1.</span> <span class="nav-text">重启服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#停止服务"><span class="nav-number">2.5.2.</span> <span class="nav-text">停止服务</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-配置反向代理"><span class="nav-number">3.</span> <span class="nav-text">Nginx 配置反向代理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-证书"><span class="nav-number">3.1.</span> <span class="nav-text">SSL 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#nginx-配置"><span class="nav-number">3.2.</span> <span class="nav-text">nginx 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端-Angular-服务启动配置"><span class="nav-number">4.</span> <span class="nav-text">前端 Angular 服务启动配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/';
+          this.page.identifier = '2018/01/23/multiple-tenant-subdomain-dev-env-solution-cn/';
+          this.page.title = '多租户通配子域名开发环境搭建';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

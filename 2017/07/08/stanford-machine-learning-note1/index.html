@@ -1,0 +1,999 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="machine-learning,stanford," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本周课程主要是介绍机器学习的基础知识，通过介绍代价函数来了解机器学习的基本原理：首先构造假设并且假设中包含参数，然后根据假设来建立代价函数，最后通过使代价函数最小化来最终求解假设中的参数从而求解模型。最后又介绍了一种最简单的获得最小代价函数值的方法：梯度下降法，通过直观的是解释详细了解了其原理，并通过偏导公式进行求解。">
+<meta name="keywords" content="machine-learning,stanford">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stanford-Machine-Learning-学习笔记1">
+<meta property="og:url" content="https://notes.mengxin.science/2017/07/08/stanford-machine-learning-note1/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本周课程主要是介绍机器学习的基础知识，通过介绍代价函数来了解机器学习的基本原理：首先构造假设并且假设中包含参数，然后根据假设来建立代价函数，最后通过使代价函数最小化来最终求解假设中的参数从而求解模型。最后又介绍了一种最简单的获得最小代价函数值的方法：梯度下降法，通过直观的是解释详细了解了其原理，并通过偏导公式进行求解。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Stanford-Machine-Learning-学习笔记1">
+<meta name="twitter:description" content="摘要：本周课程主要是介绍机器学习的基础知识，通过介绍代价函数来了解机器学习的基本原理：首先构造假设并且假设中包含参数，然后根据假设来建立代价函数，最后通过使代价函数最小化来最终求解假设中的参数从而求解模型。最后又介绍了一种最简单的获得最小代价函数值的方法：梯度下降法，通过直观的是解释详细了解了其原理，并通过偏导公式进行求解。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/07/08/stanford-machine-learning-note1/"/>
+
+
+
+
+
+  <title> Stanford-Machine-Learning-学习笔记1 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/07/08/stanford-machine-learning-note1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Stanford-Machine-Learning-学习笔记1
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-08T23:00:00+00:00">
+                2017-07-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/08/stanford-machine-learning-note1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/07/08/stanford-machine-learning-note1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本周课程主要是介绍机器学习的基础知识，通过介绍代价函数来了解机器学习的基本原理：首先构造假设并且假设中包含参数，然后根据假设来建立代价函数，最后通过使代价函数最小化来最终求解假设中的参数从而求解模型。最后又介绍了一种最简单的获得最小代价函数值的方法：梯度下降法，通过直观的是解释详细了解了其原理，并通过偏导公式进行求解。</p>
+<a id="more"></a>
+<h2 id="模型与代价函数"><a href="#模型与代价函数" class="headerlink" title="模型与代价函数"></a>模型与代价函数</h2><p>Model and Cost Function</p>
+<h3 id="模型表达"><a href="#模型表达" class="headerlink" title="模型表达"></a>模型表达</h3><p>Model Representation</p>
+<p>这一节主要就是简述一下监督机器学习的目的，通过训练数据集和算法得到预测假设，使用预测假设来预测新的数据分类或趋势。</p>
+<p>关键知识点</p>
+<p>假设 hypothesis，也就是我们在学习前先假设一个输出与输入的关系，然后再不断的更新这个假设使其最优。假设的形式有很多种，比如线性相关假设为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   h_{\theta}(x)= \theta_0 + \theta_1x
+   \label{eq:liner-hypothesis}
+\end{equation}</script><p>这里面的 $\theta$ 是参数，当我们提出了假设后的任务就是想办法计算这个参数。</p>
+<h3 id="代价函数"><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h3><p>Cost Function </p>
+<p>首先课程根据上一节的假设举了三个例子，设置不同的参数（$\theta_0, \theta_1$），得到不同的线性方程。</p>
+<p>下面的问题是，我们如何找到一组$\theta_0, \theta_1$，使其尽可能的表达训练数据，也就是让线性方程尽可能靠近训练数据？</p>
+<p>解决这个问题就引出了代价函数，代价函数就是来评价对于已知的训练数据，给定的线性方法预测值和实际值之间的差异。<br>这个代价函数使用每个数据点的预测值和实际值之差再平方来度量预测的准确度。同时为了尝试尽量减少我们的平均误差，所以除以了 $2m$ 来计算平局值。</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   J(\theta_0, \theta_1) = \dfrac {1}{2m} \displaystyle \sum _{i=1}^m \left ( \hat{y}_{i}- y_{i} \right)^2 = \dfrac {1}{2m} \displaystyle \sum _{i=1}^m \left (h_\theta (x_{i}) - y_{i} \right)^2
+   \label{eq:cost-function}
+\end{equation}</script><p>这个方程实际上很简单，其中 $\hat{y}_i$表示根据给定的假设计算出训练数据点$i$对应的值，这个值一般都和实际值$y_i$有一定的差距，我们通过两者相减再平方得到两者之间的差距，由于是平方所以一定是正值。然后再把所有训练数据都计算这个差距，再相加并取平均数。</p>
+<p>该方程还叫做 <strong>Squared error function</strong></p>
+<p>有了这个代价函数，我们就可以回答上面的问题了，我们尽可能的减少这个代价函数值，就能尽可能的让预测的线性方程穿过或靠近训练数据点（极端情况，预测直线刚好穿过所有的训练数据，这时候这个 $J(\theta_0,\theta_1)$ 为零，也就是最小值，这时直线也就是最优的拟合。 </p>
+<h3 id="代价函数直观解释"><a href="#代价函数直观解释" class="headerlink" title="代价函数直观解释"></a>代价函数直观解释</h3><script type="math/tex; mode=display">
+\begin{equation}
+   \min_{\theta_0,\theta_1} J(\theta_0,\theta_1)
+   \label{eq:min-cost}
+\end{equation}</script><p>首先给出了一个简化版本，其中 $\theta_0 = 0$。然后举例说明代价函数是如何用来比较不同的假设的优劣的。这里通过3条直线举例，求得3个代价函数的值，对$J(\theta_1)$进行作图类似于二维抛物线曲线，然后分析$J(\theta_1)$的最小值。</p>
+<p>然后开始解释 $\theta_0 \neq 0$ 的情况，这回 $J(\theta_0,\theta_1)$ 变成了一个三维的曲面，这个曲面的 $z$ 轴表示代价的大小，同一个$z$截面上的点表示其训练数据的代价函数值相同。</p>
+<h2 id="参数学习"><a href="#参数学习" class="headerlink" title="参数学习"></a>参数学习</h2><h3 id="梯度下降"><a href="#梯度下降" class="headerlink" title="梯度下降"></a>梯度下降</h3><p>目标是求解代价函数的最小值。</p>
+<p>首先从 $\theta_0,\theta_1$ 开始，逐步的变化$\theta_0,\theta_1$从而达到 $J(\theta_0,\theta_1)$</p>
+<p>通过图片直观理解，每次都朝向目标前进一小步。然后逐步迭代知道不需要进行前进。</p>
+<p>赋值符号<br>$a:=b, a:=a+1$</p>
+<p>$\alpha$ 学习速率</p>
+<p>$\frac{\partial }{\partial \theta_0}$ derivative 求导，slope 斜率</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   repeat\ until\ convergence \{\\
+    \theta_j := \theta_j - \alpha \frac{\partial }{\partial \theta_0J(\theta_0)}
+   \\\}
+   \label{eq:thetaj-gradient}
+\end{equation}</script><p>需要同时更新  $\theta_0,\theta_1$，所以引入了两个临时变量。否则在变化 $\theta_0$ 的时候，下一步计算 $\theta_1$时候就用了新的 $\theta_0$</p>
+<p>由于导数的性质，即使在学习速率不变的情况下，变化的步长也会逐步的缩小，因为越靠近最小值的时候，其斜率的绝对值也会逐步缩小。</p>
+<h3 id="梯度下降直观解释"><a href="#梯度下降直观解释" class="headerlink" title="梯度下降直观解释"></a>梯度下降直观解释</h3><h3 id="使用梯度下降进行线性回归"><a href="#使用梯度下降进行线性回归" class="headerlink" title="使用梯度下降进行线性回归"></a>使用梯度下降进行线性回归</h3><p>并没有给出 两个梯度下降的公式的推导，需要多变量求偏导的知识来推导。</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   repeat\ until\ convergence \{\\
+    \theta_0 := \theta_0 - \alpha\frac{1 }{m}  \sum_{i=1}^{m}(h_{\theta}(x_i)-y_i)\\
+    \theta_1 := \theta_1 - \alpha\frac{1}{m}
+    \sum_{i=1}^{m}((h_{\theta}(x_i)-y_i)x_i)
+   \\\}
+   \label{eq:thetaj-gradient-detail}
+\end{equation}</script><p>convex function: local optimization is global optimization</p>
+<h2 id="线性代数回顾"><a href="#线性代数回顾" class="headerlink" title="线性代数回顾"></a>线性代数回顾</h2><p>这一节主要是回顾矩阵和向量的基础知识：</p>
+<p>矩阵加法，减法，乘法<br>矩阵乘法的特性没有交换律，但是有结合律<br>矩阵的逆乘以矩阵本身为单位矩阵<br>矩阵的转置就是行列互换</p>
+<p>矩阵与向量</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/machine-learning/" rel="tag"># machine-learning</a>
+          
+            <a href="/tags/stanford/" rel="tag"># stanford</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/07/hexo-next-renderer-kramed-mathjax/" rel="next" title="Hexo+Next+hexo-renderer-kramed 的 MathJax 显示">
+                <i class="fa fa-chevron-left"></i> Hexo+Next+hexo-renderer-kramed 的 MathJax 显示
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/17/terminal-efficiency-shortcut/" rel="prev" title="Terminal的快捷操作方式">
+                Terminal的快捷操作方式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#模型与代价函数"><span class="nav-number">1.</span> <span class="nav-text">模型与代价函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模型表达"><span class="nav-number">1.1.</span> <span class="nav-text">模型表达</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代价函数"><span class="nav-number">1.2.</span> <span class="nav-text">代价函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代价函数直观解释"><span class="nav-number">1.3.</span> <span class="nav-text">代价函数直观解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数学习"><span class="nav-number">2.</span> <span class="nav-text">参数学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#梯度下降"><span class="nav-number">2.1.</span> <span class="nav-text">梯度下降</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#梯度下降直观解释"><span class="nav-number">2.2.</span> <span class="nav-text">梯度下降直观解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用梯度下降进行线性回归"><span class="nav-number">2.3.</span> <span class="nav-text">使用梯度下降进行线性回归</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性代数回顾"><span class="nav-number">3.</span> <span class="nav-text">线性代数回顾</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/07/08/stanford-machine-learning-note1/';
+          this.page.identifier = '2017/07/08/stanford-machine-learning-note1/';
+          this.page.title = 'Stanford-Machine-Learning-学习笔记1';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

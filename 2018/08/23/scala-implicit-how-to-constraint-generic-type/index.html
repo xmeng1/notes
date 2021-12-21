@@ -1,0 +1,973 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala,implicit," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：在阅读 《Scala程序设计》第二版的 5.2.3 章节时，介绍了隐式参数的使用场景：限定可用实例。读了很多遍，终于把案例看明白了，记录一下理解过程，留作备忘。">
+<meta name="keywords" content="scala,implicit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala 隐式参数限定可用实例案例分析">
+<meta property="og:url" content="https://notes.mengxin.science/2018/08/23/scala-implicit-how-to-constraint-generic-type/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：在阅读 《Scala程序设计》第二版的 5.2.3 章节时，介绍了隐式参数的使用场景：限定可用实例。读了很多遍，终于把案例看明白了，记录一下理解过程，留作备忘。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala 隐式参数限定可用实例案例分析">
+<meta name="twitter:description" content="摘要：在阅读 《Scala程序设计》第二版的 5.2.3 章节时，介绍了隐式参数的使用场景：限定可用实例。读了很多遍，终于把案例看明白了，记录一下理解过程，留作备忘。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/08/23/scala-implicit-how-to-constraint-generic-type/"/>
+
+
+
+
+
+  <title> Scala 隐式参数限定可用实例案例分析 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/08/23/scala-implicit-how-to-constraint-generic-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala 隐式参数限定可用实例案例分析
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-23T23:00:00+00:00">
+                2018-08-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/23/scala-implicit-how-to-constraint-generic-type/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/23/scala-implicit-how-to-constraint-generic-type/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：在阅读 《Scala程序设计》第二版的 5.2.3 章节时，介绍了隐式参数的使用场景：限定可用实例。读了很多遍，终于把案例看明白了，记录一下理解过程，留作备忘。</p>
+<a id="more"></a>
+<h2 id="问题引入"><a href="#问题引入" class="headerlink" title="问题引入"></a>问题引入</h2><p>熟悉 Java 的应该都知道在定义泛型的时候，我们可以指定上界，比如 <code>&lt;T extend UpperClass&gt;</code> 或者是 <code>&lt;T implement SomeInterface&gt;</code>。通过该限定能够让我们在使用泛型的时候，使用某些上界或是接口的方法，提升代码的抽象能力。例如 <code>SomeInterface</code> 定义方法 <code>hello()</code> 那么我们在使用泛型定义的变量就可以使用这个方法，比如 <code>T t; t.hello();</code>。</p>
+<p>虽然已经极大的提升了灵活度，但是如果我们需要处理的泛型类型并没有一个统一的公共的超类或接口，这时候我们又能怎么办呢？</p>
+<p>显然我们没办法指定任何上界了，这时候 <code>Java</code> 可能需要通过传入 <code>Class&lt;T&gt;</code> 变量加反射来解决这个问题。但是这样代码是否脆弱，无法做的类型安全。</p>
+<p>这里使用隐式参数就可以优雅的解决这个问题。</p>
+<p>书中使用的 <code>Scala</code> 集合 <code>API</code> 作为案例首先简要说明。我们这里跳过这个过程，因为 <code>Scala</code> 集合十分复杂，有一套机制需要深入学习理解。我们直接介绍后面完整的案例。</p>
+<p>下面我们跳过中间部分 （从 <code>应用Scala API</code> 到 117页下半页）</p>
+<h2 id="案例介绍"><a href="#案例介绍" class="headerlink" title="案例介绍"></a>案例介绍</h2><p>案例本身十分简单，就是一个模拟的数据库 <code>API</code>，而且只模拟了一行的操作。也就是一行中不同的列的操作。</p>
+<p>一行有多列，每一列可以通过列名字获取其值，每一列的值可能是 <code>Int</code>，<code>Double</code> 和 <code>String</code>。</p>
+<p>现在我们需要提供一组 <code>API</code>，用户可以通过 <code>API</code> 根据列名字获取列值，并且得到正确数据类型。</p>
+<p>书中首先给出了一个实现：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/main/scala/progscala2/implicits/java-database-api.scala</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// A Java-like Database API, written in Scala for convenience.</span></span><br><span class="line"><span class="keyword">package</span> progscala2.implicits &#123;</span><br><span class="line">  <span class="keyword">package</span> database_api &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">InvalidColumnName</span>(<span class="params">name: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class">      <span class="keyword">extends</span> <span class="title">RuntimeException</span>(<span class="params">s"<span class="type">Invalid</span> column name $name"</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">    <span class="title">trait</span> <span class="title">Row</span> </span>&#123;</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getInt</span>   </span>(colName: <span class="type">String</span>): <span class="type">Int</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getDouble</span></span>(colName: <span class="type">String</span>): <span class="type">Double</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getText</span>  </span>(colName: <span class="type">String</span>): <span class="type">String</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">package</span> javadb &#123;</span><br><span class="line">    <span class="keyword">import</span> database_api._</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">JRow</span>(<span class="params">representation: <span class="type">Map</span>[<span class="type">String</span>,<span class="type">Any</span>]</span>) <span class="keyword">extends</span> <span class="title">Row</span> </span>&#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">get</span></span>(colName: <span class="type">String</span>): <span class="type">Any</span> = </span><br><span class="line">        representation.getOrElse(colName, <span class="keyword">throw</span> <span class="type">InvalidColumnName</span>(colName))</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getInt</span>   </span>(colName: <span class="type">String</span>): <span class="type">Int</span>    = get(colName).asInstanceOf[<span class="type">Int</span>]</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getDouble</span></span>(colName: <span class="type">String</span>): <span class="type">Double</span> = get(colName).asInstanceOf[<span class="type">Double</span>]</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">getText</span>  </span>(colName: <span class="type">String</span>): <span class="type">String</span> = get(colName).asInstanceOf[<span class="type">String</span>]</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">object</span> <span class="title">JRow</span> </span>&#123;</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(pairs: (<span class="type">String</span>,<span class="type">Any</span>)*) = <span class="keyword">new</span> <span class="type">JRow</span>(<span class="type">Map</span>(pairs :_*))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; </span><br><span class="line">&#125;b</span><br></pre></td></tr></table></figure>
+<p>该实现定义了三个接口，分别获取不同的数据类型。我们可以思考一下，这种方法肯定不好，首先客户端使用接口需要为不同数据使用不同接口。如果增加一个接口，客户端的就需要修改。</p>
+<p>所以书中提到：</p>
+<blockquote>
+<p>如果我们只定义一个 get[T] 方法，其中 T 代表某一允许的列值类型，会不会更好一些呢？<br>这有助于提供更加统一的调用接口，因为调用这一方法时我们不再需要 case 语句选择正确的调用方法，而且有时候我们还能在这些接口中使用类型推导。<br>在 Java 中，原始类型与引用类型的区别之一在于我们无法在像 get[T] 这样的参数化方法中使用原始类型。我们必须使用装箱后的类型，比如使用 java.lang.Integer 类型来替代int 类型。但是在高性能数据应用程序中我们往往不希望出现装箱操作的性能损耗！</p>
+</blockquote>
+<p>即使我们使用对象类型，我们只能用 Object 来作为通用的返回，又失去了类型信息。</p>
+<p>这时候隐式参数就可以优雅的解决这个问题。</p>
+<h2 id="隐式参数解决方案"><a href="#隐式参数解决方案" class="headerlink" title="隐式参数解决方案"></a>隐式参数解决方案</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/main/scala/progscala2/implicits/scala-database-api.scala</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// A Scala wrapper for the Java-like Database API.</span></span><br><span class="line"><span class="keyword">package</span> progscala2.implicits &#123;</span><br><span class="line">    <span class="keyword">package</span> scaladb &#123;</span><br><span class="line">    <span class="class"><span class="keyword">object</span> <span class="title">implicits</span> </span>&#123;</span><br><span class="line">      <span class="keyword">import</span> javadb.<span class="type">JRow</span></span><br><span class="line">      </span><br><span class="line">      <span class="keyword">implicit</span> <span class="class"><span class="keyword">class</span> <span class="title">SRow</span>(<span class="params">jrow: <span class="type">JRow</span></span>) </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">get</span></span>[<span class="type">T</span>](colName: <span class="type">String</span>)(<span class="keyword">implicit</span> toT: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">T</span>): <span class="type">T</span> =</span><br><span class="line">          toT(jrow, colName)</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">implicit</span> <span class="keyword">val</span> jrowToInt: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">Int</span> = </span><br><span class="line">        (jrow: <span class="type">JRow</span>, colName: <span class="type">String</span>) =&gt; jrow.getInt(colName)</span><br><span class="line">      <span class="keyword">implicit</span> <span class="keyword">val</span> jrowToDouble: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">Double</span> = </span><br><span class="line">        (jrow: <span class="type">JRow</span>, colName: <span class="type">String</span>) =&gt; jrow.getDouble(colName)</span><br><span class="line">      <span class="keyword">implicit</span> <span class="keyword">val</span> jrowToString: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">String</span> = </span><br><span class="line">        (jrow: <span class="type">JRow</span>, colName: <span class="type">String</span>) =&gt; jrow.getText(colName)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">object</span> <span class="title">DB</span> </span>&#123;</span><br><span class="line">      <span class="keyword">import</span> implicits._</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) = &#123;</span><br><span class="line">        <span class="keyword">val</span> row = javadb.<span class="type">JRow</span>(<span class="string">"one"</span> -&gt; <span class="number">1</span>, <span class="string">"two"</span> -&gt; <span class="number">2.2</span>, <span class="string">"three"</span> -&gt; <span class="string">"THREE!"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> oneValue1: <span class="type">Int</span>      = row.get(<span class="string">"one"</span>)</span><br><span class="line">        <span class="keyword">val</span> twoValue1: <span class="type">Double</span>   = row.get(<span class="string">"two"</span>)</span><br><span class="line">        <span class="keyword">val</span> threeValue1: <span class="type">String</span> = row.get(<span class="string">"three"</span>)</span><br><span class="line">        <span class="comment">// val fourValue1: Byte    = row.get("four")  // won't compile</span></span><br><span class="line"></span><br><span class="line">        println(<span class="string">s"one1   -&gt; <span class="subst">$oneValue1</span>"</span>)</span><br><span class="line">        println(<span class="string">s"two1   -&gt; <span class="subst">$twoValue1</span>"</span>)</span><br><span class="line">        println(<span class="string">s"three1 -&gt; <span class="subst">$threeValue1</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> oneValue2   = row.get[<span class="type">Int</span>](<span class="string">"one"</span>)</span><br><span class="line">        <span class="keyword">val</span> twoValue2   = row.get[<span class="type">Double</span>](<span class="string">"two"</span>)</span><br><span class="line">        <span class="keyword">val</span> threeValue2 = row.get[<span class="type">String</span>](<span class="string">"three"</span>)</span><br><span class="line">        <span class="comment">// val fourValue2    = row.get[Byte]("four")  // won't compile</span></span><br><span class="line"></span><br><span class="line">        println(<span class="string">s"one2   -&gt; <span class="subst">$oneValue2</span>"</span>)</span><br><span class="line">        println(<span class="string">s"two2   -&gt; <span class="subst">$twoValue2</span>"</span>)</span><br><span class="line">        println(<span class="string">s"three2 -&gt; <span class="subst">$threeValue2</span>"</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先我们可以看到 <code>SRow</code> （scala row）中只有一个方法：<code>get[T]</code>。但这个方法不仅仅包含参数列名，还有一个隐性参数，这个参数是一个方法：方法的输入有两个参数，分别是 <code>JRow</code> 数据源和一个字符串，这个字符串就是列名，输出是参数类型 <code>T</code>。这个方法其实就是说我们该如何从数据源中取出这个参数类型为 <code>T</code> 的数据。</p>
+<p>如果第二个参数不是隐式参数，用户使用这个接口的时候，还是需要将 <code>Java</code> 的每种数据类型的方法传入。对于客户端来说没有任何改变，只不过将没有类型特有的方法换一种方式使用。</p>
+<p>但是声明了隐式参数就不一样，我们能为不同的数据类型预定义一个方法，这样客户端在使用的时候不需要显示的传入方法，而是可以根据用户希望获取何种数据类型自动加载预定义的方法。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> jrowToInt: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">Int</span> =</span><br><span class="line">(jrow: <span class="type">JRow</span>, colName: <span class="type">String</span>) =&gt; jrow.getInt(colName)</span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">val</span> jrowToDouble: (<span class="type">JRow</span>,<span class="type">String</span>) =&gt; <span class="type">Double</span> =</span><br><span class="line">(jrow: <span class="type">JRow</span>, colName: <span class="type">String</span>) =&gt; jrow.getDouble(colName)</span><br></pre></td></tr></table></figure>
+<p>这个隐式参数的类型是 <code>(JRow,String)</code>，这个类型和我们定义的 <code>get[T]</code> 方法的第二个参数类型是一致的，这样表示这个参数可以根据 <code>T</code> 的类型来隐形推导。</p>
+<p>所以在客户端代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> oneValue1: <span class="type">Int</span> = row.get(<span class="string">"one"</span>)</span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"><span class="keyword">val</span> oneValue2 = row.get[<span class="type">Int</span>](<span class="string">"one"</span>)</span><br></pre></td></tr></table></figure>
+<p>通过指定返回值类型，或者方法调用的 <code>T</code> 值，就可以让编译器决定使用哪个隐式参数了。</p>
+<p>当然如果使用的不支持的类型，就会报错，用户需要自己指定自定义的类型的获取方法。这一点是可以接受的，因为灵活性的相对的。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> fourValue1: <span class="type">Byte</span> = row.get(<span class="string">"four"</span>) <span class="comment">// 编译错误</span></span><br><span class="line"><span class="keyword">val</span> fourValue2 = row.get[<span class="type">Byte</span>](<span class="string">"four"</span>) <span class="comment">// 编译错误</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+            <a href="/tags/implicit/" rel="tag"># implicit</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/21/Remote-SSH-Access-PowerShell/" rel="next" title="Remote SSH Access PowerShell">
+                <i class="fa fa-chevron-left"></i> Remote SSH Access PowerShell
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/27/xpath-web-element-in-practice/" rel="prev" title="XPath 定位网页元素实例分析">
+                XPath 定位网页元素实例分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题引入"><span class="nav-number">1.</span> <span class="nav-text">问题引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例介绍"><span class="nav-number">2.</span> <span class="nav-text">案例介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式参数解决方案"><span class="nav-number">3.</span> <span class="nav-text">隐式参数解决方案</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/08/23/scala-implicit-how-to-constraint-generic-type/';
+          this.page.identifier = '2018/08/23/scala-implicit-how-to-constraint-generic-type/';
+          this.page.title = 'Scala 隐式参数限定可用实例案例分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

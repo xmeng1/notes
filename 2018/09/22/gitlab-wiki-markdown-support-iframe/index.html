@@ -1,0 +1,966 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gitlab," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Abstarct: This article introduce how to configure the GitLab and let the GitLab Wiki MarkDown support the iframe html element.">
+<meta name="keywords" content="gitlab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitLab Wiki MarkDown Support iframe">
+<meta property="og:url" content="https://notes.mengxin.science/2018/09/22/gitlab-wiki-markdown-support-iframe/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="Abstarct: This article introduce how to configure the GitLab and let the GitLab Wiki MarkDown support the iframe html element.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GitLab Wiki MarkDown Support iframe">
+<meta name="twitter:description" content="Abstarct: This article introduce how to configure the GitLab and let the GitLab Wiki MarkDown support the iframe html element.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/09/22/gitlab-wiki-markdown-support-iframe/"/>
+
+
+
+
+
+  <title> GitLab Wiki MarkDown Support iframe | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/09/22/gitlab-wiki-markdown-support-iframe/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                GitLab Wiki MarkDown Support iframe
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-22T23:00:00+00:00">
+                2018-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/22/gitlab-wiki-markdown-support-iframe/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/09/22/gitlab-wiki-markdown-support-iframe/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Abstarct: This article introduce how to configure the GitLab and let the GitLab Wiki MarkDown support the iframe html element.</p>
+<a id="more"></a>
+<p>GitLab is a great software to deploy git repository and manage issues. Meanwhile, the wiki system is also awesome. </p>
+<p>The wiki of GitLab support Markdown, AsciiDoc and RDoc, which nearly include all the syntax and presentation for a document even for formal thesis and paper. </p>
+<p>Currently, most of the developers use the Markdown as the main document language, the GitLab not only support the standard MarkDown but also support other features. This markdown is called GitLab Flavour Markdown (GFM).</p>
+<p>According to the official document, we can find that it supports the <a href="https://gitlab.dualshield-cloud.com/help/user/markdown#inline-html" target="_blank" rel="noopener">Inline HTML</a> which means that we can add any HTML source code to render the Wiki. This feature can enhance the ability of representation of our document.</p>
+<p>However, there are some limitations when using the HTML.  Thinking about the security, there is a whitelist HTML syntax that can be rendered. If you use the HTML tag which is not in the whitelist, the DOM will be ignored.</p>
+<p>This whitelist is based on the <a href="https://github.com/rgrove/sanitize/#readme" target="_blank" rel="noopener">Sanitize</a> which is Whitelist-based Ruby HTML and CSS sanitizer. The detailed document is HTML::Pipeline’s SanitizationFilter class.</p>
+<p>Now the problem is that, is it possible to add some other HTML into the GitLab wiki (on-premise not cloud)? The answer is yes! We can customise the SanitizationFilter by ourselves.</p>
+<h2 id="Sanitize-official-example"><a href="#Sanitize-official-example" class="headerlink" title="Sanitize official example"></a>Sanitize official example</h2><p>There is <a href="https://github.com/rgrove/sanitize/#example-transformer-to-whitelist-youtube-video-embeds" target="_blank" rel="noopener">an example in the official document</a> which adds the iframe with only support YouTube video.  </p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">youtube_transformer = lambda <span class="keyword">do</span> <span class="params">|env|</span></span><br><span class="line">  node      = env[<span class="symbol">:node</span>]</span><br><span class="line">  node_name = env[<span class="symbol">:node_name</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Don't continue if this node is already whitelisted or is not an element.</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">if</span> env[<span class="symbol">:is_whitelisted</span>] <span class="params">||</span> !node.element?</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Don't continue unless the node is an iframe.</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">unless</span> node_name == <span class="string">'iframe'</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Verify that the video URL is actually a valid YouTube video URL.</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">unless</span> node[<span class="string">'src'</span>] =~ %r<span class="params">|\A(?:https?:)?//(?:www\.)?youtube(?:-nocookie)?\.com/|</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># We're now certain that this is a YouTube embed, but we still need to run</span></span><br><span class="line">  <span class="comment"># it through a special Sanitize step to ensure that no unwanted elements or</span></span><br><span class="line">  <span class="comment"># attributes that don't belong in a YouTube embed can sneak in.</span></span><br><span class="line">  Sanitize.node!(node, &#123;</span><br><span class="line">    <span class="symbol">:elements</span> =&gt; <span class="string">%w[iframe]</span>,</span><br><span class="line"></span><br><span class="line">    <span class="symbol">:attributes</span> =&gt; &#123;</span><br><span class="line">      <span class="string">'iframe'</span>  =&gt; <span class="string">%w[allowfullscreen frameborder height src width]</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Now that we're sure that this is a valid YouTube embed and that there are</span></span><br><span class="line">  <span class="comment"># no unwanted elements or attributes hidden inside it, we can tell Sanitize</span></span><br><span class="line">  <span class="comment"># to whitelist the current node.</span></span><br><span class="line">  &#123;<span class="symbol">:node_whitelist</span> =&gt; [node]&#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="GitLab-relative-sanitization-filter-file"><a href="#GitLab-relative-sanitization-filter-file" class="headerlink" title="GitLab relative sanitization_filter file"></a>GitLab relative <code>sanitization_filter</code> file</h2><p>The first and important thing to let GitLab wiki support the iframe is finding the corresponding configuration: <code>sanitization_filter.rb</code></p>
+<p>By using the Linux shell to search <code>sudo find / -name &quot;sanitization_filter.rb&quot;</code> we can find there are two files with this name.</p>
+<p>By the way, the GitLab version is <code>11.1.4-33</code>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/opt/gitlab/embedded/service/gitlab-rails/lib/banzai/filter/sanitization_filter.rb</span><br><span class="line">/opt/gitlab/embedded/lib/ruby/gems/2.4.0/gems/html-pipeline-2.8.3/lib/html/pipeline/sanitization_filter.rb</span><br></pre></td></tr></table></figure>
+<p>The second one is what we need to customise which is under the <code>html-pipeline</code> embedded lib.</p>
+<h2 id="sanitization-filter-update"><a href="#sanitization-filter-update" class="headerlink" title="sanitization_filter update"></a><code>sanitization_filter</code> update</h2><p>The original file is as follows:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">HTML::Pipeline.require_dependency(<span class="string">'sanitize'</span>, <span class="string">'SanitizationFilter'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">module</span> <span class="title">HTML</span></span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Pipeline</span></span></span><br><span class="line">    <span class="comment"># HTML filter with sanization routines and whitelists. This module defines</span></span><br><span class="line">    <span class="comment"># what HTML is allowed in user provided content and fixes up issues with</span></span><br><span class="line">    <span class="comment"># unbalanced tags and whatnot.</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># See the Sanitize docs for more information on the underlying library:</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># https://github.com/rgrove/sanitize/#readme</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># Context options:</span></span><br><span class="line">    <span class="comment">#   :whitelist      - The sanitizer whitelist configuration to use. This</span></span><br><span class="line">    <span class="comment">#                     can be one of the options constants defined in this</span></span><br><span class="line">    <span class="comment">#                     class or a custom sanitize options hash.</span></span><br><span class="line">    <span class="comment">#   :anchor_schemes - The URL schemes to allow in &lt;a href&gt; attributes. The</span></span><br><span class="line">    <span class="comment">#                     default set is provided in the ANCHOR_SCHEMES</span></span><br><span class="line">    <span class="comment">#                     constant in this class. If passed, this overrides any</span></span><br><span class="line">    <span class="comment">#                     schemes specified in the whitelist configuration.</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># This filter does not write additional information to the context.</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">SanitizationFilter</span> &lt; Filter</span></span><br><span class="line">      LISTS     = Set.new(<span class="string">%w[ul ol]</span>.freeze)</span><br><span class="line">      LIST_ITEM = <span class="string">'li'</span>.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># List of table child elements. These must be contained by a &lt;table&gt; element</span></span><br><span class="line">      <span class="comment"># or they are not allowed through. Otherwise they can be used to break out</span></span><br><span class="line">      <span class="comment"># of places we're using tables to contain formatted user content (like pull</span></span><br><span class="line">      <span class="comment"># request review comments).</span></span><br><span class="line">      TABLE_ITEMS = Set.new(<span class="string">%w[tr td th]</span>.freeze)</span><br><span class="line">      TABLE = <span class="string">'table'</span>.freeze</span><br><span class="line">      TABLE_SECTIONS = Set.new(<span class="string">%w[thead tbody tfoot]</span>.freeze)</span><br><span class="line"></span><br><span class="line">      <span class="comment"># These schemes are the only ones allowed in &lt;a href&gt; attributes by default.</span></span><br><span class="line">      ANCHOR_SCHEMES = [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="string">'mailto'</span>, <span class="symbol">:relative</span>, <span class="string">'github-windows'</span>, <span class="string">'github-mac'</span>].freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># The main sanitization whitelist. Only these elements and attributes are</span></span><br><span class="line">      <span class="comment"># allowed through by default.</span></span><br><span class="line">      WHITELIST = &#123;</span><br><span class="line">        <span class="symbol">elements:</span> <span class="string">%w[</span></span><br><span class="line"><span class="string">          h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt</span></span><br><span class="line"><span class="string">          div ins del sup sub p ol ul table thead tbody tfoot blockquote</span></span><br><span class="line"><span class="string">          dl dt dd kbd q samp var hr ruby rt rp li tr td th s strike summary</span></span><br><span class="line"><span class="string">          details caption figure figcaption</span></span><br><span class="line"><span class="string">        ]</span>,</span><br><span class="line">        <span class="symbol">remove_contents:</span> [<span class="string">'script'</span>],</span><br><span class="line">        <span class="symbol">attributes:</span> &#123;</span><br><span class="line">          <span class="string">'a'</span>          =&gt; [<span class="string">'href'</span>],</span><br><span class="line">          <span class="string">'img'</span>        =&gt; <span class="string">%w[src longdesc]</span>,</span><br><span class="line">          <span class="string">'div'</span>        =&gt; <span class="string">%w[itemscope itemtype]</span>,</span><br><span class="line">          <span class="string">'blockquote'</span> =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'del'</span>        =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'ins'</span>        =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'q'</span>          =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="symbol">all:</span> <span class="string">%w[abbr accept accept-charset</span></span><br><span class="line"><span class="string">                  accesskey action align alt</span></span><br><span class="line"><span class="string">                  aria-describedby aria-hidden aria-label aria-labelledby</span></span><br><span class="line"><span class="string">                  axis border cellpadding cellspacing char</span></span><br><span class="line"><span class="string">                  charoff charset checked</span></span><br><span class="line"><span class="string">                  clear cols colspan color</span></span><br><span class="line"><span class="string">                  compact coords datetime dir</span></span><br><span class="line"><span class="string">                  disabled enctype for frame</span></span><br><span class="line"><span class="string">                  headers height hreflang</span></span><br><span class="line"><span class="string">                  hspace ismap label lang</span></span><br><span class="line"><span class="string">                  maxlength media method</span></span><br><span class="line"><span class="string">                  multiple name nohref noshade</span></span><br><span class="line"><span class="string">                  nowrap open prompt readonly rel rev</span></span><br><span class="line"><span class="string">                  rows rowspan rules scope</span></span><br><span class="line"><span class="string">                  selected shape size span</span></span><br><span class="line"><span class="string">                  start summary tabindex target</span></span><br><span class="line"><span class="string">                  title type usemap valign value</span></span><br><span class="line"><span class="string">                  vspace width itemprop]</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="symbol">protocols:</span> &#123;</span><br><span class="line">          <span class="string">'a'</span>          =&gt; &#123; <span class="string">'href'</span> =&gt; ANCHOR_SCHEMES &#125;,</span><br><span class="line">          <span class="string">'blockquote'</span> =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'del'</span>        =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'ins'</span>        =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'q'</span>          =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'img'</span>        =&gt; &#123;</span><br><span class="line">            <span class="string">'src'</span>      =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>],</span><br><span class="line">            <span class="string">'longdesc'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>]</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="symbol">transformers:</span> [</span><br><span class="line">          <span class="comment"># Top-level &lt;li&gt; elements are removed because they can break out of</span></span><br><span class="line">          <span class="comment"># containing markup.</span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">            name = env[<span class="symbol">:node_name</span>]</span><br><span class="line">            node = env[<span class="symbol">:node</span>]</span><br><span class="line">            <span class="keyword">if</span> name == LIST_ITEM &amp;&amp; node.ancestors.none? &#123; <span class="params">|n|</span> LISTS.<span class="keyword">include</span>?(n.name) &#125;</span><br><span class="line">              node.replace(node.children)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">          &#125;,</span><br><span class="line"></span><br><span class="line">          <span class="comment"># Table child elements that are not contained by a &lt;table&gt; are removed.</span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">            name = env[<span class="symbol">:node_name</span>]</span><br><span class="line">            node = env[<span class="symbol">:node</span>]</span><br><span class="line">            <span class="keyword">if</span> (TABLE_SECTIONS.<span class="keyword">include</span>?(name) <span class="params">||</span> TABLE_ITEMS.<span class="keyword">include</span>?(name)) &amp;&amp; node.ancestors.none? &#123; <span class="params">|n|</span> n.name == TABLE &#125;</span><br><span class="line">              node.replace(node.children)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># A more limited sanitization whitelist. This includes all attributes,</span></span><br><span class="line">      <span class="comment"># protocols, and transformers from WHITELIST but with a more locked down</span></span><br><span class="line">      <span class="comment"># set of allowed elements.</span></span><br><span class="line">      LIMITED = WHITELIST.merge(</span><br><span class="line">        <span class="symbol">elements:</span> <span class="string">%w[b i strong em a pre code img ins del sup sub p ol ul li]</span></span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Strip all HTML tags from the document.</span></span><br><span class="line">      FULL = &#123; <span class="symbol">elements:</span> [] &#125;.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Sanitize markup using the Sanitize library.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">call</span></span></span><br><span class="line">        Sanitize.clean_node!(doc, whitelist)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># The whitelist to use when sanitizing. This can be passed in the context</span></span><br><span class="line">      <span class="comment"># hash to the filter but defaults to WHITELIST constant value above.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">whitelist</span></span></span><br><span class="line">        whitelist = context[<span class="symbol">:whitelist</span>] <span class="params">||</span> WHITELIST</span><br><span class="line">        anchor_schemes = context[<span class="symbol">:anchor_schemes</span>]</span><br><span class="line">        <span class="keyword">return</span> whitelist <span class="keyword">unless</span> anchor_schemes</span><br><span class="line">        whitelist = whitelist.dup</span><br><span class="line">        whitelist[<span class="symbol">:protocols</span>] = (whitelist[<span class="symbol">:protocols</span>] <span class="params">||</span> &#123;&#125;).dup</span><br><span class="line">        whitelist[<span class="symbol">:protocols</span>][<span class="string">'a'</span>] = (whitelist[<span class="symbol">:protocols</span>][<span class="string">'a'</span>] <span class="params">||</span> &#123;&#125;).merge(<span class="string">'href'</span> =&gt; anchor_schemes)</span><br><span class="line">        whitelist</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>So what we need to do is to add new <code>lambda</code> in the <code>transformers</code>.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># YouTube Special  </span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">             node      = env[<span class="symbol">:node</span>]</span><br><span class="line">             node_name = env[<span class="symbol">:node_name</span>]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Don't continue if this node is already whitelisted or is not an element.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">if</span> env[<span class="symbol">:is_whitelisted</span>] <span class="params">||</span> !node.element?</span><br><span class="line"> </span><br><span class="line">            <span class="comment"># Don't continue unless the node is an iframe.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node_name == <span class="string">'iframe'</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># Verify that the video URL is actually a valid YouTube video URL.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node[<span class="string">'src'</span>] =~ %r<span class="params">|\A(?:https?:)?//(?:www\.)?youtube(?:-nocookie)?\.com/|</span></span><br><span class="line">          </span><br><span class="line">            <span class="comment"># We're now certain that this is a YouTube embed, but we still need to run</span></span><br><span class="line">            <span class="comment"># it through a special Sanitize step to ensure that no unwanted elements or</span></span><br><span class="line">            <span class="comment"># attributes that don't belong in a YouTube embed can sneak in.</span></span><br><span class="line">              Sanitize.node!(node, &#123;</span><br><span class="line">              <span class="symbol">:elements</span> =&gt; <span class="string">%w[iframe]</span>,</span><br><span class="line"></span><br><span class="line">              <span class="symbol">:attributes</span> =&gt; &#123;</span><br><span class="line">                <span class="string">'iframe'</span>  =&gt; <span class="string">%w[allowfullscreen frameborder height src width]</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment"># Now that we're sure that this is a valid YouTube embed and that there are</span></span><br><span class="line">            <span class="comment"># no unwanted elements or attributes hidden inside it, we can tell Sanitize</span></span><br><span class="line">            <span class="comment"># to whitelist the current node.</span></span><br><span class="line">            &#123;<span class="symbol">:node_whitelist</span> =&gt; [node]&#125;</span><br><span class="line">           &#125;,</span><br></pre></td></tr></table></figure>
+<p>Then the final configure looks like as follows:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br></pre></td><td class="code"><pre><span class="line">HTML::Pipeline.require_dependency(<span class="string">'sanitize'</span>, <span class="string">'SanitizationFilter'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">module</span> <span class="title">HTML</span></span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Pipeline</span></span></span><br><span class="line">    <span class="comment"># HTML filter with sanization routines and whitelists. This module defines</span></span><br><span class="line">    <span class="comment"># what HTML is allowed in user provided content and fixes up issues with</span></span><br><span class="line">    <span class="comment"># unbalanced tags and whatnot.</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># See the Sanitize docs for more information on the underlying library:</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># https://github.com/rgrove/sanitize/#readme</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># Context options:</span></span><br><span class="line">    <span class="comment">#   :whitelist      - The sanitizer whitelist configuration to use. This</span></span><br><span class="line">    <span class="comment">#                     can be one of the options constants defined in this</span></span><br><span class="line">    <span class="comment">#                     class or a custom sanitize options hash.</span></span><br><span class="line">    <span class="comment">#   :anchor_schemes - The URL schemes to allow in &lt;a href&gt; attributes. The</span></span><br><span class="line">    <span class="comment">#                     default set is provided in the ANCHOR_SCHEMES</span></span><br><span class="line">    <span class="comment">#                     constant in this class. If passed, this overrides any</span></span><br><span class="line">    <span class="comment">#                     schemes specified in the whitelist configuration.</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment"># This filter does not write additional information to the context.</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">SanitizationFilter</span> &lt; Filter</span></span><br><span class="line">      LISTS     = Set.new(<span class="string">%w[ul ol]</span>.freeze)</span><br><span class="line">      LIST_ITEM = <span class="string">'li'</span>.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># List of table child elements. These must be contained by a &lt;table&gt; element</span></span><br><span class="line">      <span class="comment"># or they are not allowed through. Otherwise they can be used to break out</span></span><br><span class="line">      <span class="comment"># of places we're using tables to contain formatted user content (like pull</span></span><br><span class="line">      <span class="comment"># request review comments).</span></span><br><span class="line">      TABLE_ITEMS = Set.new(<span class="string">%w[tr td th]</span>.freeze)</span><br><span class="line">      TABLE = <span class="string">'table'</span>.freeze</span><br><span class="line">      TABLE_SECTIONS = Set.new(<span class="string">%w[thead tbody tfoot]</span>.freeze)</span><br><span class="line"></span><br><span class="line">      <span class="comment"># These schemes are the only ones allowed in &lt;a href&gt; attributes by default.</span></span><br><span class="line">      ANCHOR_SCHEMES = [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="string">'mailto'</span>, <span class="symbol">:relative</span>, <span class="string">'github-windows'</span>, <span class="string">'github-mac'</span>].freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># The main sanitization whitelist. Only these elements and attributes are</span></span><br><span class="line">      <span class="comment"># allowed through by default.</span></span><br><span class="line">      WHITELIST = &#123;</span><br><span class="line">        <span class="symbol">elements:</span> <span class="string">%w[</span></span><br><span class="line"><span class="string">          h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt</span></span><br><span class="line"><span class="string">          div ins del sup sub p ol ul table thead tbody tfoot blockquote</span></span><br><span class="line"><span class="string">          dl dt dd kbd q samp var hr ruby rt rp li tr td th s strike summary</span></span><br><span class="line"><span class="string">          details caption figure figcaption</span></span><br><span class="line"><span class="string">        ]</span>,</span><br><span class="line">        <span class="symbol">remove_contents:</span> [<span class="string">'script'</span>],</span><br><span class="line">        <span class="symbol">attributes:</span> &#123;</span><br><span class="line">          <span class="string">'a'</span>          =&gt; [<span class="string">'href'</span>],</span><br><span class="line">          <span class="string">'img'</span>        =&gt; <span class="string">%w[src longdesc]</span>,</span><br><span class="line">          <span class="string">'div'</span>        =&gt; <span class="string">%w[itemscope itemtype]</span>,</span><br><span class="line">          <span class="string">'blockquote'</span> =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'del'</span>        =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'ins'</span>        =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="string">'q'</span>          =&gt; [<span class="string">'cite'</span>],</span><br><span class="line">          <span class="symbol">all:</span> <span class="string">%w[abbr accept accept-charset</span></span><br><span class="line"><span class="string">                  accesskey action align alt</span></span><br><span class="line"><span class="string">                  aria-describedby aria-hidden aria-label aria-labelledby</span></span><br><span class="line"><span class="string">                  axis border cellpadding cellspacing char</span></span><br><span class="line"><span class="string">                  charoff charset checked</span></span><br><span class="line"><span class="string">                  clear cols colspan color</span></span><br><span class="line"><span class="string">                  compact coords datetime dir</span></span><br><span class="line"><span class="string">                  disabled enctype for frame</span></span><br><span class="line"><span class="string">                  headers height hreflang</span></span><br><span class="line"><span class="string">                  hspace ismap label lang</span></span><br><span class="line"><span class="string">                  maxlength media method</span></span><br><span class="line"><span class="string">                  multiple name nohref noshade</span></span><br><span class="line"><span class="string">                  nowrap open prompt readonly rel rev</span></span><br><span class="line"><span class="string">                  rows rowspan rules scope</span></span><br><span class="line"><span class="string">                  selected shape size span</span></span><br><span class="line"><span class="string">                  start summary tabindex target</span></span><br><span class="line"><span class="string">                  title type usemap valign value</span></span><br><span class="line"><span class="string">                  vspace width itemprop]</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="symbol">protocols:</span> &#123;</span><br><span class="line">          <span class="string">'a'</span>          =&gt; &#123; <span class="string">'href'</span> =&gt; ANCHOR_SCHEMES &#125;,</span><br><span class="line">          <span class="string">'blockquote'</span> =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'del'</span>        =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'ins'</span>        =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'q'</span>          =&gt; &#123; <span class="string">'cite'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>] &#125;,</span><br><span class="line">          <span class="string">'img'</span>        =&gt; &#123;</span><br><span class="line">            <span class="string">'src'</span>      =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>],</span><br><span class="line">            <span class="string">'longdesc'</span> =&gt; [<span class="string">'http'</span>, <span class="string">'https'</span>, <span class="symbol">:relative</span>]</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="symbol">transformers:</span> [</span><br><span class="line">          <span class="comment"># Top-level &lt;li&gt; elements are removed because they can break out of</span></span><br><span class="line">          <span class="comment"># containing markup.</span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">            name = env[<span class="symbol">:node_name</span>]</span><br><span class="line">            node = env[<span class="symbol">:node</span>]</span><br><span class="line">            <span class="keyword">if</span> name == LIST_ITEM &amp;&amp; node.ancestors.none? &#123; <span class="params">|n|</span> LISTS.<span class="keyword">include</span>?(n.name) &#125;</span><br><span class="line">              node.replace(node.children)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">          &#125;,</span><br><span class="line"></span><br><span class="line">          <span class="comment"># Table child elements that are not contained by a &lt;table&gt; are removed.</span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">            name = env[<span class="symbol">:node_name</span>]</span><br><span class="line">            node = env[<span class="symbol">:node</span>]</span><br><span class="line">            <span class="keyword">if</span> (TABLE_SECTIONS.<span class="keyword">include</span>?(name) <span class="params">||</span> TABLE_ITEMS.<span class="keyword">include</span>?(name)) &amp;&amp; node.ancestors.none? &#123; <span class="params">|n|</span> n.name == TABLE &#125;</span><br><span class="line">              node.replace(node.children)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="comment"># YouTube Special  </span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">             node      = env[<span class="symbol">:node</span>]</span><br><span class="line">             node_name = env[<span class="symbol">:node_name</span>]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Don't continue if this node is already whitelisted or is not an element.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">if</span> env[<span class="symbol">:is_whitelisted</span>] <span class="params">||</span> !node.element?</span><br><span class="line"> </span><br><span class="line">            <span class="comment"># Don't continue unless the node is an iframe.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node_name == <span class="string">'iframe'</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># Verify that the video URL is actually a valid YouTube video URL.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node[<span class="string">'src'</span>] =~ %r<span class="params">|\A(?:https?:)?//(?:www\.)?youtube(?:-nocookie)?\.com/|</span></span><br><span class="line">          </span><br><span class="line">            <span class="comment"># We're now certain that this is a YouTube embed, but we still need to run</span></span><br><span class="line">            <span class="comment"># it through a special Sanitize step to ensure that no unwanted elements or</span></span><br><span class="line">            <span class="comment"># attributes that don't belong in a YouTube embed can sneak in.</span></span><br><span class="line">              Sanitize.node!(node, &#123;</span><br><span class="line">              <span class="symbol">:elements</span> =&gt; <span class="string">%w[iframe]</span>,</span><br><span class="line"></span><br><span class="line">              <span class="symbol">:attributes</span> =&gt; &#123;</span><br><span class="line">                <span class="string">'iframe'</span>  =&gt; <span class="string">%w[allowfullscreen frameborder height src width]</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment"># Now that we're sure that this is a valid YouTube embed and that there are</span></span><br><span class="line">            <span class="comment"># no unwanted elements or attributes hidden inside it, we can tell Sanitize</span></span><br><span class="line">            <span class="comment"># to whitelist the current node.</span></span><br><span class="line">            &#123;<span class="symbol">:node_whitelist</span> =&gt; [node]&#125;</span><br><span class="line">           &#125;,</span><br><span class="line">          <span class="comment"># Google Drive Shared file Special  </span></span><br><span class="line">          lambda &#123; <span class="params">|env|</span></span><br><span class="line">             node      = env[<span class="symbol">:node</span>]</span><br><span class="line">             node_name = env[<span class="symbol">:node_name</span>]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Don't continue if this node is already whitelisted or is not an element.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">if</span> env[<span class="symbol">:is_whitelisted</span>] <span class="params">||</span> !node.element?</span><br><span class="line"> </span><br><span class="line">            <span class="comment"># Don't continue unless the node is an iframe.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node_name == <span class="string">'iframe'</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># Verify that the URL is actually a valid Google Drive document URL.</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">unless</span> node[<span class="string">'src'</span>] =~ %r<span class="params">|\A(?:https?:)?//(?:drive\.)?google(?:-nocookie)?\.com/|</span></span><br><span class="line">          </span><br><span class="line">            <span class="comment"># We're now certain that this is a YouTube embed, but we still need to run</span></span><br><span class="line">            <span class="comment"># it through a special Sanitize step to ensure that no unwanted elements or</span></span><br><span class="line">            <span class="comment"># attributes that don't belong in a YouTube embed can sneak in.</span></span><br><span class="line">              Sanitize.node!(node, &#123;</span><br><span class="line">              <span class="symbol">:elements</span> =&gt; <span class="string">%w[iframe]</span>,</span><br><span class="line"></span><br><span class="line">              <span class="symbol">:attributes</span> =&gt; &#123;</span><br><span class="line">                <span class="string">'iframe'</span>  =&gt; <span class="string">%w[allowfullscreen frameborder height src width]</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment"># Now that we're sure that this is a valid YouTube embed and that there are</span></span><br><span class="line">            <span class="comment"># no unwanted elements or attributes hidden inside it, we can tell Sanitize</span></span><br><span class="line">            <span class="comment"># to whitelist the current node.</span></span><br><span class="line">            &#123;<span class="symbol">:node_whitelist</span> =&gt; [node]&#125;</span><br><span class="line">           &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># A more limited sanitization whitelist. This includes all attributes,</span></span><br><span class="line">      <span class="comment"># protocols, and transformers from WHITELIST but with a more locked down</span></span><br><span class="line">      <span class="comment"># set of allowed elements.</span></span><br><span class="line">      LIMITED = WHITELIST.merge(</span><br><span class="line">        <span class="symbol">elements:</span> <span class="string">%w[b i strong em a pre code img ins del sup sub p ol ul li]</span></span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Strip all HTML tags from the document.</span></span><br><span class="line">      FULL = &#123; <span class="symbol">elements:</span> [] &#125;.freeze</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Sanitize markup using the Sanitize library.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">call</span></span></span><br><span class="line">        Sanitize.clean_node!(doc, whitelist)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># The whitelist to use when sanitizing. This can be passed in the context</span></span><br><span class="line">      <span class="comment"># hash to the filter but defaults to WHITELIST constant value above.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">whitelist</span></span></span><br><span class="line">        whitelist = context[<span class="symbol">:whitelist</span>] <span class="params">||</span> WHITELIST</span><br><span class="line">        anchor_schemes = context[<span class="symbol">:anchor_schemes</span>]</span><br><span class="line">        <span class="keyword">return</span> whitelist <span class="keyword">unless</span> anchor_schemes</span><br><span class="line">        whitelist = whitelist.dup</span><br><span class="line">        whitelist[<span class="symbol">:protocols</span>] = (whitelist[<span class="symbol">:protocols</span>] <span class="params">||</span> &#123;&#125;).dup</span><br><span class="line">        whitelist[<span class="symbol">:protocols</span>][<span class="string">'a'</span>] = (whitelist[<span class="symbol">:protocols</span>][<span class="string">'a'</span>] <span class="params">||</span> &#123;&#125;).merge(<span class="string">'href'</span> =&gt; anchor_schemes)</span><br><span class="line">        whitelist</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="Apply-the-configuration"><a href="#Apply-the-configuration" class="headerlink" title="Apply the configuration"></a>Apply the configuration</h2><p>In order to apply the change, we need to update the configuration:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gitlab-ctl restart</span><br></pre></td></tr></table></figure>
+<h2 id="Other-configuration"><a href="#Other-configuration" class="headerlink" title="Other configuration"></a>Other configuration</h2><p>if you want to add more HTML support, you can reference the official document to update the <code>sanitization_fileter.rb</code> file</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gitlab/" rel="tag"># gitlab</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/18/study-driving-licence-in-uk-13/" rel="next" title="英国学车记第十三课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第十三课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/28/study-driving-licence-in-uk-14/" rel="prev" title="英国学车记第十四课">
+                英国学车记第十四课 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Sanitize-official-example"><span class="nav-number">1.</span> <span class="nav-text">Sanitize official example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitLab-relative-sanitization-filter-file"><span class="nav-number">2.</span> <span class="nav-text">GitLab relative sanitization_filter file</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sanitization-filter-update"><span class="nav-number">3.</span> <span class="nav-text">sanitization_filter update</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apply-the-configuration"><span class="nav-number">4.</span> <span class="nav-text">Apply the configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other-configuration"><span class="nav-number">5.</span> <span class="nav-text">Other configuration</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/09/22/gitlab-wiki-markdown-support-iframe/';
+          this.page.identifier = '2018/09/22/gitlab-wiki-markdown-support-iframe/';
+          this.page.title = 'GitLab Wiki MarkDown Support iframe';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1162 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文基于 SVM 三层境界，对某些问题进行更加彻底的解释，彻底到只需要有少量的向量和线性代数基础就可以看懂。">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SVM 三层境界解析版-第一层">
+<meta property="og:url" content="https://notes.mengxin.science/2017/07/06/understand-svm-easily-first-level/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文基于 SVM 三层境界，对某些问题进行更加彻底的解释，彻底到只需要有少量的向量和线性代数基础就可以看懂。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/svm-sample-space.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/svm-sample-space-2.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/sigmoid1.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/tanh.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/svm-super-plane.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/geo-margin.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/gap-between-different-class.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/max-gap-animation.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SVM 三层境界解析版-第一层">
+<meta name="twitter:description" content="摘要：本文基于 SVM 三层境界，对某些问题进行更加彻底的解释，彻底到只需要有少量的向量和线性代数基础就可以看懂。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/svm-sample-space.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/07/06/understand-svm-easily-first-level/"/>
+
+
+
+
+
+  <title> SVM 三层境界解析版-第一层 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/07/06/understand-svm-easily-first-level/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                SVM 三层境界解析版-第一层
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-06T23:00:00+00:00">
+                2017-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/06/understand-svm-easily-first-level/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/07/06/understand-svm-easily-first-level/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文基于 SVM 三层境界，对某些问题进行更加彻底的解释，彻底到只需要有少量的向量和线性代数基础就可以看懂。</p>
+<a id="more"></a>
+<p>Outline:</p>
+<ol>
+<li>样本空间（训练数据）</li>
+<li>逻辑回归和线性分类</li>
+<li>线性分类实例</li>
+<li>函数间隔</li>
+<li>几何间隔</li>
+<li>最大间隔分类器</li>
+</ol>
+<p>支持向量机通俗导论（理解SVM的三层境界）应该算的上是解释 SVM 比较透彻的文章了，本人通过对照《支持向量机导论》对该文进行阅读，由于很多数学知识忘得差不多，所以一边读一边恶补数学知识，目前已经彻底理解了第一层境界，虽然原文章已经解析的十分详细，但是感觉作者数学功底比较好，所有有些简单的数学问题并没有具体说明，所以想把里面各种数学知识展开详细阐述，一方面给学习过程留一个记录备忘，另一方面也希望得到大家的指正。</p>
+<p>本文的整体逻辑结构和原文相符，增加了一些章节来扩展，大家可以对照阅读。</p>
+<h2 id="关于样本空间"><a href="#关于样本空间" class="headerlink" title="关于样本空间"></a>关于样本空间</h2><p>本文从样本空间开始讲起，我认为通过样本空间能够更好的理解逻辑回归。所谓样本空间，也可以成为训练样例或者训练数据。通俗的讲就是一堆已知的数据输入和数据对应的分类信息。一般将数据成为输入空间:一般用 $X$ 表示，对应的分类信息成为输出域：一般用 $Y$ 表示。这里需要注意：一定不要把 $y$ 当作是我们熟悉的二维空间中纵轴坐标，时刻提醒自己，否则在理解的过程中会有阻力。</p>
+<p>一般为了理解样本空间，我们都是用二维空间作为例子，通过点来形象的形容训练数据，本文也通过这个方法详细的解释一下。</p>
+<p>假设我们现在有一组数据，数据显示的是身高体重与性别的关系。那么每个人的可以作为一个数据点，每个数据点有两个特性：身高和体重，同时数据点有两个类别：男或女 （这里仅仅是一个例子，不讨论实际情况）。这样我们可以把这些数据点放到一个二维的样本空间，我们通常会用 $(x,y)$ 来表示点的坐标，但是前面说到坐标和输出域需要区分，所以我们把坐标点表示为 $(x^{(1)},x^{(2)})$ 其中的$(1)$和$(2)$就分别表示两个属性，这种表达方法好处是可以很容易扩展为 $k$ 维空间 $(x^{(1)},x^{(2)},x^{(3)}…,x^{(k)})$。多个数据点我们使用下标来表示 $(x_1^{(1)},x_1^{(2)}), (x_2^{(1)},x_2^{(2)}),…, (x_l^{(1)},x_l^{(2)})$ 其中 $l$ 表示数据点的个数。数据点的分类使用 $y$ 表示，所以多个数据点的分类分别是 $y_1, y_2, … y_l$。</p>
+<p>这种表示方法虽然清晰，但是很啰嗦，所以我们引入向量的概念来描述，我们令向量 $X_l = (x_l^{(1)},x_l^{(2)})$, 这样我们的数据点就可以表示为 $X_1,X_2,X_3,…,X_l$，同时使用向量 $Y = (y_1,y_2,y_3,…y_l)$。这样我们就最终使用向量来表示训练数据，该定义就是《支持向量机导论》的定义2.1 (中文版 P9)：</p>
+<blockquote>
+<p>一般使用 $X$ 表示输入空间，$Y$ 表示输出域。通常 $X\subseteq \mathbb{R} ^n$， 对于两类问题，<script type="math/tex">Y=\left \{ -1,1 \right \}</script> ；对多类问题，<script type="math/tex">Y=\left \{ 1,2,...,m \right \}</script>； 对回归问题，$Y \subseteq \mathbb{R}$。训练集是训练样例的集合，训练样例也称为训练数据。通常表示为：</p>
+</blockquote>
+<script type="math/tex; mode=display">
+\begin{equation}
+   S=((X_1,y_1),...,(X_l,y_l)) \subseteq ( X \times Y )^l
+   \label{eq:sample_space}
+\end{equation}</script><blockquote>
+<p>其中，$l$ 是样例数目。$X_i$ 指样例，$y_i$ 是它们的标记(也就是类别)。</p>
+</blockquote>
+<p>这个定义我们需要了解，大写字母表示向量，小写字母表示值。同时 $X$ 是一个 $n$ 维向量，而 $Y$ 是一个一维向量，他们的数量都是 $l$ 。本文将只研究二分类问题，也就是说 <script type="math/tex">Y=\left \{ -1,1 \right \}</script>。</p>
+<h2 id="逻辑回归与线性分类"><a href="#逻辑回归与线性分类" class="headerlink" title="逻辑回归与线性分类"></a>逻辑回归与线性分类</h2><p>《支持向量机通俗导论-理解SVM的三层境界》（以下称为 SVM 三层境界）一文开篇便介绍了超平面方程，依照规则向量仍然用大写字母表示：</p>
+<p>给定一些数据点，它们分别属于两个不同的类，现在要找到一个线性分类器把这些数据分成两类。如果用$X$表示数据点，用$y$表示类别（$y$可以取1或者-1，分别代表两个不同的类），一个线性分类器的学习目标便是要在$n$维的数据空间中找到一个超平面（hyper plane），这个超平面的方程可以表示为（ $W^T$中的$T$代表转置）：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   W^TX+b=0
+   \label{eq:hyper_plane}
+\end{equation}</script><p>这里我们将详细阐述为何这个方程能够表示超平面。首先我们定义函数</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   f(x)=W^TX+b
+   \label{eq:function}
+\end{equation}</script><p>该函数可以接受任意的数据点$X_i=(x_i^1,x_i^2…x_i^n)$，每个数据点带入后得到不同的函数值，有的大于零，有的小于零，还有的等于零。等于零的情况就是公式$\eqref{eq:hyper_plane}$所定义的，也就是说，所有的带入方程 $\eqref{eq:function}$得零的数据点都会落在超平面$\eqref{eq:hyper_plane}$上。</p>
+<p>下面我们用一个二维空间的实例来解释这个超平面方程。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/svm-sample-space.png" alt="enter description here" title="svm-sample-space"></p>
+<p>上图（<a href="https://ggbm.at/mUPX6eVZ" target="_blank" rel="noopener">该链接为图形原始文件</a>）是一个二维坐标系，散落着若干数据点，数据点有两种类型一个是 <strong>X</strong>，另一种是 <strong>O</strong>。坐标系中有一条直线，直线方程为 $x+2y-6=0$。我们将坐标替换为 $(x^{(1)},x^{(2)})$，这样直线方程为 $x^{(1)}+2x^{(2)}-6=0$。为了理解方程$\eqref{eq:hyper_plane}$，我们用向量的方法将该直线方程表示出来（这里是矩阵乘法的知识点，不懂的可以参考该链接）：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \begin{bmatrix}
+    1\\2
+    \end{bmatrix}
+    \begin{bmatrix}
+    x^{(1)} & x^{(2)}
+    \end{bmatrix} - 6 =0
+   \label{eq:demo-line-1}
+\end{equation}</script><p>进一步转化为:</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \begin{bmatrix}
+    1 & 2
+    \end{bmatrix}^T
+    X - 6 =0
+   \label{eq:demo-line-2}
+\end{equation}</script><p>这时候我们是不是发现了方程$\eqref{eq:demo-line-2}$和$\eqref{eq:hyper_plane}$非常相似。也就是说这个例子中对应到公式中的参数：$W = \begin{bmatrix} 1 &amp; 2\end{bmatrix}, b=6$。通过这种方法我们就能直观的理解超平面方程$\eqref{eq:hyper_plane}$。</p>
+<p>有了超平面方程后，我们就可以讨论分类问题了。首先我们思考一个问题，$f(x)$ 是一条直线，实际上当我们变化 $W$ 和 $b$ 我们可以得到多条直线，比如下图中的蓝色的直线，该直线$W = \begin{bmatrix} 4 &amp; 7\end{bmatrix}, b=28$。所以说在目标样本空间有无数个超平面，直观上讲，给定一个超平面，超平面将样本空间分为两部分，这两部分就对应这两个类别，一般我们用<script type="math/tex">\{-1,1\}</script>来分别表示两个类别（实际上可以用任意符号来表示两个类别，比如<script type="math/tex">\{true,false\},\{infect,normal\},\{red,blue\}</script>）。在给定一个超平面下，将数据点带入到超平面函数后如果大于等于零，就认为该超平面将该数据点分为了正类（1），如果小于等于零，认为是负类（-1）。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/svm-sample-space-2.png" alt="enter description here" title="svm-sample-space-2"></p>
+<p>怎么把上面这种描述转化为数学符号来表达呢？这时候就需要引入一个信号函数的概念（Sigmoid Function），SVM 三层境界使用的信号函数为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   sgn(x) = \frac{1}{1+e^{-x}}
+   \label{eq:sgn1}
+\end{equation}</script><p><img src="https://www.github.com/xmeng1/images/raw/master/sigmoid1.png" alt="enter description here" title="sigmoid1"></p>
+<p>但是这个信号函数有一个缺点，那就是该函数通过$sgn(x)=0.5$进行分割，而我们希望通过$sgn(x)=0$来进行分割。所以我们引入一个新的信号函数 $sgn(x) = tanh(x) = \frac{e^x-e^{-x}}{e^x+e^{-x}}$，该函数称为双曲函数，函数图像如下图，更好的将输出域以0为分割点分为两部分：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/tanh.png" alt="enter description here" title="tanh"></p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   g(x)=tanh(f(x))=tanh(W^TX+b)
+   \label{eq:}
+\end{equation}</script><p>给定一个数据点$X_i$，如果$W^TX_i+b \geq 0$，那么 $tanh(W^TX_i+b)\geq 0$，数据点分为类${1}$，反之$W^TX_i+b &lt; 0$，那么 $tanh(W^TX_i+b) &lt; 0$，数据点分为类${-1}$。这样通过信号函数将原函数进行变换将样本数据空间映射到二元集合<script type="math/tex">{-1,1}</script>。</p>
+<h2 id="线性分类实例"><a href="#线性分类实例" class="headerlink" title="线性分类实例"></a>线性分类实例</h2><p>上一节主要是介绍了样本空间，超平面以及分类方法。这一节通过例子再对上面的概念进行说明。我们以图svm-sample-space2为例说明。在样本空间中，有7个数据点分别为$X^1=(1,1)$, $X^2=(2,1)$, $X^3=(3,1)$, $X^4=(4,1)$, $X^5=(5,2)$, $X^6=(3,4)$, $X^7=(5,5)$，我们用${y_1,y_2,…y_7}$来表示其分类情况，图中显示有两条直线方程可以作为两个超平面方程，其中<strong>O</strong>表示类1，<strong>X</strong>表示类-1，下面我们来查看一下各个数据点对于这两个超平面的分类情况：</p>
+<p>对于直线方程$f(x)$</p>
+<script type="math/tex; mode=display">
+f(x) = x+2y-6</script><script type="math/tex; mode=display">
+f(X^1) = 1+2\times1-6 = -4 < 0, y_1 = -1\\
+f(X^2) = 2+2\times1-6 = -2 < 0, y_1 = -1\\
+f(X^3) = 3+2\times1-6 = -1 < 0, y_1 = -1\\
+f(X^4) = 4+2\times1-6 = 0 = 0, y_1 = 1\\
+f(X^5) = 5+2\times2-6 = 4 > 0, y_1 = 1\\
+f(X^6) = 3+2\times4-6 = 5 > 0, y_1 = 1\\
+f(X^7) = 5+2\times5-6 = 9 > 0, y_1 = 1\\</script><p>我们发现实际上第四个数据点落在超平面上，但是其分类出错了，数据点实际类别是 <strong>X</strong>，也就是-1，但是超平面$f(x)$将其分为了1，其他数据点的分类都是正确的，所以超平面$f(x)$不能很好的完成分类工作。</p>
+<p>对于直线方程$g(x)$</p>
+<script type="math/tex; mode=display">
+g(x) = 4x+7y-28</script><script type="math/tex; mode=display">
+g(X^1) = 4\times1+7\times1-28 = -17 < 0, y_1 = -1\\
+g(X^2) = 4\times2+7\times1-28 = -13 < 0, y_1 = -1\\
+g(X^3) = 4\times3+7\times1-28 = -9 < 0, y_1 = -1\\
+g(X^4) = 4\times4+7\times1-28 = -5 < 0, y_1 = -1\\
+g(X^5) = 4\times5+7\times2-28 = 1 > 0, y_1 = 1\\
+g(X^6) = 4\times3+7\times4-28 = 12 > 0, y_1 = 1\\
+g(X^7) = 4\times5+7\times5-28 = 27 > 0, y_1 = 1\\</script><p>我们发现这个超平面将数据点的类别分类全部正确。</p>
+<p>这里只是列出了两条超平面，然而这里面有无数条超平面，而且很多超平面都能很好的把已知的训练数据点分割，但是这里面有没有<strong>最优的一个超平面呢</strong>？如果有最优的超平面那么<strong>判断标准</strong>又是什么呢？这两个问题是对 SVM 这一层理解的核心。通过二维案例直观的讲，这条超平面直线应该尽可能的在两种类别的数据点中间，不能偏向于任何一方。比如下图中，蓝色和绿色的超平面优于红色和黑色的超平面。应为红色和黑色直线离类别<strong>X</strong>的数据点的距离远远小于离类别<strong>O</strong>数据点的距离。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/svm-super-plane.png" alt="enter description here" title="svm-super-plane"></p>
+<p>上面都是通过直观分析得到的，那么如何用数学符号系统来描述呢？我们先看一下上面的案例，然后再引出函数和几何间隔。通过上面的案例我们可以发现，当 $f(x)$ 和 $g(x)$ 的绝对值越大时，点离直线的距离约远（比如 $|g(X_7)|&gt;|g(X_4)|$，$X_7$距离直线 $g(x)=0$的距离比$X_4$要远）。所以我们可以用数据点带入公式$\eqref{eq:function}$得到的绝对值来衡量点到直线远近。这样就引出了函数间隔。</p>
+<h2 id="函数间隔-Functional-margin"><a href="#函数间隔-Functional-margin" class="headerlink" title="函数间隔 Functional margin"></a>函数间隔 Functional margin</h2><p>函数间隔的定义进一步理解其获得绝对值的方法，如果超平面方程能够将数据点正确分离，那么由于我们将类别定位 <script type="math/tex">\{-1,1\}</script>，那么将数据点 $X$ 带入公式$\eqref{eq:function}$ 得到 $f(X)$ 应该与类别正负号相同，又因为分类值的绝对值是1，所以我们可以用分类值乘以函数值来表示其绝对值。所以函数间隔定义为</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \hat {\gamma} = y(W^TX+b) = yf(X)
+   \label{eq:func-margin-1}
+\end{equation}</script><p>但是数据点有很多，每一个点对应于超平面都有一个函数间隔，那么如何定义一个训练集（一组数据点）到超平面的函数间隔呢？这里我们取训练集中函数间隔最小的作为整个训练集的函数间隔，或者说是距离超平面最近的数据点决定了其所属的数据集距离超平面的距离。这有点类似于木桶原理，最短木板决定了木桶的容积。我们用数学符号表达为：训练数据集 $T$中所有的样本点表示为$(X_i,y_i)$，其中$i$表示第$i$个样本，$X_i$是$n$维特征向量, $y_i$是第$i$个样本的分类结果，那么训练数据集$T$到超平面 $\left \langle W,b \right \rangle$的函数间隔为</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \hat{\gamma}=\mathbf{min}{\tilde{\gamma}}_i
+   \\{\hat{\gamma}}_i = y_i(W^TX_i+b) = y_if(X_i)
+   \label{eq:func-margin-2}
+\end{equation}</script><p>其中 $i=1…m$， 并且 $m$ 为样本数据集 $T$ 中数据点的个数。</p>
+<p>函数间隔有一个缺点，导致其只能从直观上去评价点到超平面的远近，但不能定量，因为这个值是随着 $\left \langle W,b \right \rangle$ 的取值而变动的，这两个值是可以成比例增加或减少的（比如我们上面例子 $f(x) = x+2y-6$完全可以写成 $f(x)= 2x+4y-12$）,这样将导致函数间隔也成比例的放大或缩小。因此我们进一步需要几何间隔来定量的研究数据点到超平面的间隔。</p>
+<h2 id="几何间隔-Geometrical-margin"><a href="#几何间隔-Geometrical-margin" class="headerlink" title="几何间隔 Geometrical margin"></a>几何间隔 Geometrical margin</h2><p>几何间隔实际上就是点到超平面的真实距离，在二维空间实际上就是我们大家非常熟悉的点到直线距离。SVM 三层境界使用的是向量法来推导的，要了解这个推导需要知道几个向量相关的知识。</p>
+<h3 id="基础数学知识"><a href="#基础数学知识" class="headerlink" title="基础数学知识"></a>基础数学知识</h3><h4 id="关于直线法向量"><a href="#关于直线法向量" class="headerlink" title="关于直线法向量"></a>关于直线法向量</h4><p>对于直线方程$ax+by+c=0$的方向向量为$(b,-a)$，法向量为$(a,b)$，所以对于方程$\eqref{eq:function}$，其法向量就是$W$。该证明大家可以学习一下向量和直线的基本知识，比如直线的点向式表达，两个垂直向量的点积为0等知识点。</p>
+<h4 id="关于向量相加"><a href="#关于向量相加" class="headerlink" title="关于向量相加"></a>关于向量相加</h4><p>两个向量相加几何上就是首尾相连，然后再连接前一个向量的首和后一个向量的尾即可。解析表达就对应维度值相加：</p>
+<script type="math/tex; mode=display">
+\vec{a} = (a_1,a_2) \\
+\vec{b} = (b_1,b_2) \\
+\vec{a} + \vec{b} = (a_1+b_1,a_2+b_2)</script><h4 id="二阶范数"><a href="#二阶范数" class="headerlink" title="二阶范数"></a>二阶范数</h4><p><a href="https://zh.wikipedia.org/wiki/%E8%8C%83%E6%95%B0" target="_blank" rel="noopener">范数维基百科的解释</a></p>
+<blockquote>
+<p>范数(norm)，是具有“长度”概念的函数。在线性代数、泛函分析及相关的数学领域，是一个函数，其为向量空间内的所有向量赋予非零的正长度或大小。半范数反而可以为非零的向量赋予零长度。</p>
+</blockquote>
+<p>向量 $W=(W_1,W_2)$ 的二阶范数就是 $\left |W  \right |=\sqrt{W_1^2+W_2^2}$</p>
+<h4 id="单位向量"><a href="#单位向量" class="headerlink" title="单位向量"></a>单位向量</h4><p><a href="https://zh.wikipedia.org/wiki/%E5%8D%95%E4%BD%8D%E5%90%91%E9%87%8F" target="_blank" rel="noopener">单位向量维基百科</a></p>
+<blockquote>
+<p>数学上，赋范向量空间中的单位向量就是长度为 1 的向量。单位向量的符号通常有个“帽子”，如： ${\hat{\imath }}$。欧几里得空间中，两个单位向量的点积就是它们之间角度的余弦（因为它们的长度都是 1）。 一个非零向量 $\vec{u}$ 的正规化向量 $\hat{u}$ 就是平行于 $\vec{u}$ 的单位向量：</p>
+</blockquote>
+<script type="math/tex; mode=display">
+\hat{u}=\frac{\vec{u}}{\|{\vec{u}}\|}</script><h3 id="几何间隔的推导"><a href="#几何间隔的推导" class="headerlink" title="几何间隔的推导"></a>几何间隔的推导</h3><p>假定对于一个点 $X$ ，令其垂直投影到超平面上的对应点为  $X_0$ ，$W$ 是垂直于超平面的一个向量，$\gamma$为样本X到超平面的距离，如下图所示：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/geo-margin.png" alt="enter description here" title="geo-margin"></p>
+<p>根据向量加法定理可以</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \vec{X} = \vec{X_0} + \vec{v}
+   \label{eq:geo-margin1}
+\end{equation}</script><p>又因为向量 $\vec{v}$ 的单位向量为 $\frac{\vec{W}}{\left |W  \right |}$，所以</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \vec{v} = \gamma \cdot \frac{\vec{W}}{\left \|W  \right \|}
+   \label{eq:geo-margin2}
+\end{equation}</script><p>所以</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \vec{X} = \vec{X_0} +  \gamma \cdot \frac{\vec{W}}{\left \|W  \right \|}
+   \label{eq:geo-margin3}
+\end{equation}</script><p>又因为点 $X_0$ 在超平面上，所以$f(\vec{X_0})=0$， 也就是</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   W^T\vec{X_0}+b = 0
+   \label{eq:geo-margin4}
+\end{equation}</script><p>将公式 $\eqref{eq:geo-margin3}$ 带入 公式$\eqref{eq:geo-margin4}$ 得</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   W^T(\vec{X} - \gamma \cdot \frac{\vec{W}}{\left \|W  \right \|}) +b = 0
+   \label{eq:geo-margin5}
+\end{equation}</script><p>进而推导 $\gamma$ (这里我们去掉向量符号根据约定大写字母表示向量):</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \gamma = \frac{(W^TX+b) \cdot {\left \|W  \right \|} }{W^T \cdot W}
+   \label{eq:geo-margin6}
+\end{equation}</script><p>又根据向量和向量转置相乘等于向量范数的平方，这个可以根据转置的定义证明。</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   W^T \cdot W = {\left\|W\right\|}^2
+   \label{eq:geo-margin7}
+\end{equation}</script><p>最终$\gamma$值为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \gamma = \frac{W^TX+b}{\left\|W\right\|}
+   \label{eq:geo-margin8}
+\end{equation}</script><p>我们上面的推导过程并没有考虑符号，所以和函数间隔类似通过乘以其分类类别来获取绝对值</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+   \tilde \gamma = \frac{y(W^TX+b) }{\left \|W  \right \|}
+   \label{eq:geo-margin9}
+\end{equation}</script><p>最后总结一下</p>
+<p>函数间隔，用$\hat\gamma$表示</p>
+<script type="math/tex; mode=display">
+\hat {\gamma} = y(W^TX+b) = yf(X)</script><p>几何间隔，用$\tilde\gamma$表示</p>
+<script type="math/tex; mode=display">
+\tilde \gamma = \frac{y(W^TX+b) }{\left \|W  \right \|} =  \frac{\hat {\gamma} }{\left \|W  \right \|}</script><p>至此我们完成了几何间隔的推导，其实也可以使用点到直线的距离来推导，但是那样推导过程局限于二维空间。有兴趣可以自行推导。</p>
+<h2 id="最大间隔分类器"><a href="#最大间隔分类器" class="headerlink" title="最大间隔分类器"></a>最大间隔分类器</h2><p>还记得之前我们提到的两个问题？</p>
+<p>有没有<strong>最优的一条超平面呢</strong>？如果有最优的超平面那么<strong>判断标准</strong>又是什么呢？</p>
+<p>几何间隔就是我们的判断标准，那么怎么用这个判断标准来表示最优的超平面呢？</p>
+<p>我们在定义函数间隔时定义了训练数据集合到超平面的距离，见定义$\eqref{eq:func-margin-2}$。这也适用于几何间隔，根据这个定义我么来定义数据集合中不同类别数据的间隔。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/gap-between-different-class.png" alt="enter description here" title="gap-between-different-class"></p>
+<p>参照上图，在给定一个超平面$f(X)=0$后，我们创建两个平行于该超平面的平面$L_1$和$L_2$，分别将两个平面向超平面的两边移动，知道碰到两边的第一个数据点，这个数据点就是距离超平面最近的数据点（也就是木桶的最短的那一块）。这时候$L_1$和$L_2$之间的距离就可以成为数据集合中两种类别数据的$Gap$。</p>
+<p>直观上来看，这个$Gap$越大，那么说明两种类别的数据分开的越明显，所以我们的目标就是找一个超平面，然后按照上面的方法计算出$Gap$，尽可能的让这个$Gap$最大。而且我们同等对待两种类别，所以超平面应该在$L_1$和$L_2$的正中央。有根据几何间隔的定义，这个 $Gap$ 实际就是 $L_1$和$L_2$经过的数据点到超平面的距离之和，也就是两个点的几何间隔之和，或者也可以成为两种类别数据集到超平面的几何间隔之和。所以$Gap$最大化，等价于几何间隔最大化，所以我们的最大化间隔分类器的目标就是</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+  \mathbf{max}{\tilde{\gamma}}
+   \label{eq:max-gap-1}
+\end{equation}</script><p>同时我们需要保证分类必须正确，所以</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+  y_i(W^TX_i+b)= \hat{\gamma_i} \geq \hat{\gamma}\\
+  i=1,2,...,n
+   \label{eq:max-gap-2}
+\end{equation}</script><p>这个公式是因为一旦分类错误，那么根据函数间隔的定义将会得到负值，因为类别符号和$f(X)$的符号不同了，所以只要保证函数间隔大于等于几何间隔，就能保证分类都是正确的。</p>
+<p>最后我们假设当超平面最优时，函数间隔 $\hat{\gamma}=1$，原因是方便推导和优化目标函数，则几何间隔为 $\tilde{\gamma} = \frac{1}{\left |W  \right |}$。这样 $\eqref{eq:max-gap-1}$ 就转化为</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+  \mathbf{max} \frac{1}{\left \|W  \right \|}, s.t. y_i(W^TX_i+b) \geq 1, i=1,2,...,n
+   \label{eq:max-gap-3}
+\end{equation}</script><p>这个目标函数便是在相应的约束条件 $y_i(W^TX_i+b) \geq 1, i=1,2,…,n$下，最大化这个$\frac{1 }{\left |W  \right |}$值，也就是几何间隔。</p>
+<p>SVM三层境界还进行变量替换，通过替换是的最大化问题不依赖与几何间隔，实际上就是求出一组 $\left \langle W,b \right \rangle$，使得 $\eqref{eq:max-gap-3}$最大化。</p>
+<p>最后本人制作了一个交互演示图片，大家可以通过调整slider c和 d 来调整超平面，调整的过程中可以看到 Gap 的变化以及超平面到两种分类数据集合的距离的变化，你能找到最佳的超平面吗？</p>
+<iframe scrolling="no" title="max-gap-animation" src="https://www.geogebra.org/material/iframe/id/ESebhqmw/width/1399/height/792/border/888888/smb/false/stb/false/stbh/false/ai/false/asb/false/sri/false/rc/false/ld/false/sdz/false/ctl/false" width="720px" height="350px" style="border:0px;"> </iframe>
+
+<p>缩略图，也可以<a href="https://ggbm.at/ESebhqmw" target="_blank" rel="noopener">点击链接</a>查看，通过这个动画我认为大家能改能够理解什么是支持向量。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/max-gap-animation.png" alt="enter description here" title="max-gap-animation"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/16/hard-driver-check-chkdsk/" rel="next" title="移动硬盘只显示盘符无法进入">
+                <i class="fa fa-chevron-left"></i> 移动硬盘只显示盘符无法进入
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/07/hexo-next-renderer-kramed-mathjax/" rel="prev" title="Hexo+Next+hexo-renderer-kramed 的 MathJax 显示">
+                Hexo+Next+hexo-renderer-kramed 的 MathJax 显示 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于样本空间"><span class="nav-number">1.</span> <span class="nav-text">关于样本空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逻辑回归与线性分类"><span class="nav-number">2.</span> <span class="nav-text">逻辑回归与线性分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性分类实例"><span class="nav-number">3.</span> <span class="nav-text">线性分类实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数间隔-Functional-margin"><span class="nav-number">4.</span> <span class="nav-text">函数间隔 Functional margin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几何间隔-Geometrical-margin"><span class="nav-number">5.</span> <span class="nav-text">几何间隔 Geometrical margin</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础数学知识"><span class="nav-number">5.1.</span> <span class="nav-text">基础数学知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#关于直线法向量"><span class="nav-number">5.1.1.</span> <span class="nav-text">关于直线法向量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于向量相加"><span class="nav-number">5.1.2.</span> <span class="nav-text">关于向量相加</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二阶范数"><span class="nav-number">5.1.3.</span> <span class="nav-text">二阶范数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#单位向量"><span class="nav-number">5.1.4.</span> <span class="nav-text">单位向量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#几何间隔的推导"><span class="nav-number">5.2.</span> <span class="nav-text">几何间隔的推导</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大间隔分类器"><span class="nav-number">6.</span> <span class="nav-text">最大间隔分类器</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/07/06/understand-svm-easily-first-level/';
+          this.page.identifier = '2017/07/06/understand-svm-easily-first-level/';
+          this.page.title = 'SVM 三层境界解析版-第一层';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

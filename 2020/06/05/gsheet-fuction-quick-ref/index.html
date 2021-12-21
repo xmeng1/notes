@@ -1,0 +1,1085 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="GSheet,Excel," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要:    本文总结一些常用的 GSheet 函数，提高 GSheet 编辑的效率。">
+<meta name="keywords" content="GSheet,Excel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GSheet常用函数快速参考">
+<meta property="og:url" content="https://notes.mengxin.science/2020/06/05/gsheet-fuction-quick-ref/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要:    本文总结一些常用的 GSheet 函数，提高 GSheet 编辑的效率。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GSheet常用函数快速参考">
+<meta name="twitter:description" content="摘要:    本文总结一些常用的 GSheet 函数，提高 GSheet 编辑的效率。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2020/06/05/gsheet-fuction-quick-ref/"/>
+
+
+
+
+
+  <title> GSheet常用函数快速参考 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2020/06/05/gsheet-fuction-quick-ref/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                GSheet常用函数快速参考
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-05T23:00:00+00:00">
+                2020-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Knowledge/" itemprop="url" rel="index">
+                    <span itemprop="name">Knowledge</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/06/05/gsheet-fuction-quick-ref/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2020/06/05/gsheet-fuction-quick-ref/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要:    本文总结一些常用的 GSheet 函数，提高 GSheet 编辑的效率。</p>
+<a id="more"></a>
+<h1 id="regexreplace-批量替换多组数据"><a href="#regexreplace-批量替换多组数据" class="headerlink" title="regexreplace 批量替换多组数据"></a>regexreplace 批量替换多组数据</h1><p>Functions：</p>
+<ol>
+<li>regexreplace</li>
+<li>ArrayFormula</li>
+</ol>
+<p>需求：给定一列数据 T，然后给定一组映射数据 M(K-V)，要求替换数据列 T 中的所有的 K 到 V。</p>
+<p>该方案解决方法有点繁琐，但是目前是最简单的方法，就是嵌套使用 <code>regexreplace</code>。</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">=ArrayFormula(regexreplace(regexreplace(regexreplace(regexreplace(  regexreplace(regexreplace(  regexreplace(  regexreplace(  regexreplace(<span class="symbol">A2</span>:A,<span class="symbol">D2</span>,<span class="symbol">E2</span>),<span class="symbol">D3</span>,<span class="symbol">E3</span>)  ,<span class="symbol">D4</span>,<span class="symbol">E4</span>)  ,<span class="symbol">D5</span>,<span class="symbol">E5</span>)  ,<span class="symbol">D6</span>,<span class="symbol">E6</span>),<span class="symbol">D7</span>,<span class="symbol">E7</span>)  ,<span class="symbol">D8</span>,<span class="symbol">E8</span>),<span class="symbol">D9</span>,<span class="symbol">E9</span>),<span class="symbol">D10</span>,<span class="symbol">E10</span>))</span><br></pre></td></tr></table></figure>
+<p>简单的说就是依次替换映射数据，然后把上一次替换结果传入下一次的输入。</p>
+<h2 id="REGEXREPLACE"><a href="#REGEXREPLACE" class="headerlink" title="REGEXREPLACE"></a>REGEXREPLACE</h2><p>Replaces part of a text string with a different text string using regular expressions.</p>
+<h3 id="Sample-usage"><a href="#Sample-usage" class="headerlink" title="Sample usage"></a>Sample usage</h3><p><code>REGEXREPLACE(&quot;Spreadsheets&quot;, &quot;S.*d&quot;, &quot;Bed&quot;)</code></p>
+<h3 id="Syntax"><a href="#Syntax" class="headerlink" title="Syntax"></a>Syntax</h3><p><code>REGEXREPLACE(text, regular_expression, replacement)</code></p>
+<ul>
+<li><p><code>text</code>  – The text, a part of which will be replaced.</p>
+</li>
+<li><p><code>regular_expression</code>  – The regular expression. All matching instances in  <code>text</code>  will be replaced.</p>
+</li>
+<li><p><code>replacement</code>  – The text that will be inserted into the original text.</p>
+</li>
+</ul>
+<h3 id="Notes"><a href="#Notes" class="headerlink" title="Notes"></a>Notes</h3><ul>
+<li>Google products use RE2 for regular expressions. Google Sheets supports RE2 except Unicode character class matching. Learn more on  <a href="https://github.com/google/re2/blob/master/doc/syntax.txt" target="_blank" rel="noopener">how to use RE2 expressions</a>.</li>
+<li>This function only works with text (not numbers) as input and returns text as output. If a number is desired as the output, try using the  <a href="https://support.google.com/docs/answer/3094220" target="_blank" rel="noopener"><code>VALUE</code></a>  function in conjunction with this function. If numbers are used as input, convert them to text using the  <a href="https://support.google.com/docs/answer/3094139" target="_blank" rel="noopener"><code>TEXT</code></a>  function.</li>
+</ul>
+<h3 id="See-also"><a href="#See-also" class="headerlink" title="See also"></a>See also</h3><p><a href="https://support.google.com/docs/answer/3098244" target="_blank" rel="noopener"><code>REGEXEXTRACT</code></a>: Extracts matching substrings according to a regular expression.</p>
+<p><a href="https://support.google.com/docs/answer/3098292" target="_blank" rel="noopener"><code>REGEXMATCH</code></a>: Whether a piece of text matches a regular expression.</p>
+<p><a href="https://support.google.com/docs/answer/3094215" target="_blank" rel="noopener"><code>SUBSTITUTE</code></a>: Replaces existing text with new text in a string.</p>
+<p><a href="https://support.google.com/docs/answer/3098247" target="_blank" rel="noopener"><code>REPLACE</code></a>: Replaces part of a text string with a different text string.</p>
+<h3 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h3><iframe height="300" src="//docs.google.com/spreadsheet/pub?key=0As3tAuweYU9QdGFUTDhRTFVRUkpWZmp0emhOSm1yd0E&amp;output=html" width="500"></iframe>
+
+<h1 id="VLOOKUP-批量数据分类"><a href="#VLOOKUP-批量数据分类" class="headerlink" title="VLOOKUP 批量数据分类"></a>VLOOKUP 批量数据分类</h1><p>Functions：</p>
+<ol>
+<li>vlookup: </li>
+</ol>
+<p>需求：给定一列数据 T，给定一组映射数据，映射数据表示数据值范围及映射目标值，批量将数据 T 根据映射关系转化为映射值。</p>
+<p>举个简答的例子：</p>
+<p>我们有一组概率范围对应的评级级别：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>prob</th>
+<th>level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0.001</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0.006</td>
+<td>2</td>
+</tr>
+<tr>
+<td>0.012</td>
+<td>3</td>
+</tr>
+<tr>
+<td>0.03</td>
+<td>4</td>
+</tr>
+<tr>
+<td>1</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>表示如果概率落在上述 prob 的范围内，则级别为 level 数据，比如 0&lt;0.0005&lt;0.001，则 0.0005 级别是 0</p>
+<p>实现方法：</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">=<span class="built_in">VLOOKUP</span>(<span class="symbol">A2</span>,$D$<span class="symbol">1:</span>$E$<span class="number">6</span>,<span class="number">2</span>,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<ol>
+<li>其中 A2 表示目标数据，及 0.0005</li>
+<li><code>$D$1:$E$6</code> 表示映射关系数据，这里我们必须保证这个返回的第一列是和目标数据相关的，用于搜索数据。</li>
+<li>第三个参数需要重点注意，他和第二个参数相关，表示最终返回哪个数据，这个值是在第二个参数数据的 index，比如我们第二个参数是一个有 2 列的数据，那么如果 该参数 = 1， 表示返回第二列数据。</li>
+<li>is_sorted：需要设置为 1，只有 TRUE 才会返回最相近的匹配。</li>
+</ol>
+<h2 id="完全匹配用例"><a href="#完全匹配用例" class="headerlink" title="完全匹配用例"></a>完全匹配用例</h2><p>该函数还可以实现搜索一列，然后替换对应的字段，但是要求数据具有一定规律，比如 Prefex。这样就可以通过一些其他公式实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">=IFERROR(VLOOKUP(LEFT(H7,LEN(H7)-2),data!$C$2:$D$52,2,0)&amp;RIGHT(H7,1))</span><br></pre></td></tr></table></figure>
+<p><code>data!$C$2:$D$52</code> 是一个 key value 对照关系。<br>我们对目标字符串 <code>LEFT(H7,LEN(H7)-2)</code> 进行处理，转化成数据的 key 列，这样就可以通过 VLOOKUP 来替换为 value 了。注意这里最后一个参数是 <code>0</code> ，也就是不是有序的，这个才能实现全局匹配。</p>
+<p><code>IFERROR</code> 表示如果找不到我们可以显示其他内容，比如留空。</p>
+<h2 id="VLOOKUP"><a href="#VLOOKUP" class="headerlink" title="VLOOKUP"></a>VLOOKUP</h2><p>Vertical lookup. Searches down the first column of a range for a key and returns the value of a specified cell in the row found.</p>
+<h3 id="Sample-usage-1"><a href="#Sample-usage-1" class="headerlink" title="Sample usage"></a>Sample usage</h3><p><code>VLOOKUP(10003, A2:B26, 2, FALSE)</code></p>
+<h3 id="Syntax-1"><a href="#Syntax-1" class="headerlink" title="Syntax"></a>Syntax</h3><p><code>VLOOKUP(search_key, range, index, [is_sorted])</code></p>
+<ul>
+<li><code>search_key</code>  – The value to search for. For example,  <code>42</code>,  <code>&#39;Cats&#39;</code>  or  <code>I24</code>.</li>
+<li><code>range</code>  – The range to consider for the search. The first column in the range is searched for the key specified in  <code>search_key</code>.</li>
+<li><code>index</code>  – The column index of the value to be returned, where the first column in range is numbered 1.<ul>
+<li>If  <code>index</code>  is not between 1 and the number of columns in range, #VALUE! is returned.</li>
+</ul>
+</li>
+<li><code>is_sorted</code>  –  <strong>[</strong>TRUE by default<strong>]</strong>  – Indicates whether the column to be searched (the first column of the specified range) is sorted. FALSE is recommended in most cases.<ul>
+<li>It’s recommended to set  <code>is_sorted</code>  to FALSE. If set to FALSE, an exact match is returned. If there are multiple matching values, the content of the cell corresponding to the first value found is returned, and  <code>#N/A</code>  is returned if no such value is found.</li>
+<li>If  <code>is_sorted</code>  is TRUE or omitted, the nearest match (less than or equal to the search key) is returned. If all values in the search column are greater than the search key,  <code>#N/A</code>  is returned.</li>
+</ul>
+</li>
+</ul>
+<h1 id="组合多项字符串及附加操作"><a href="#组合多项字符串及附加操作" class="headerlink" title="组合多项字符串及附加操作"></a>组合多项字符串及附加操作</h1><p>Functions：</p>
+<ol>
+<li>JOIN</li>
+<li>SPLIT</li>
+<li>SUBSTITUTE</li>
+</ol>
+<p>需求：组合多项字符串为逗号分隔字符串，并且末尾不能有多于的逗号。这里实际上使用 JOIN 就可以实现，但是如果我们需要 JOIN 4 个项目，但是并不是所有的 Cell 都有数据，比如有的有 3 个数据，有的有 1 个数据，这样只用 JOIN 就是有出现 <code>,,,</code> 分隔符之间无字符。所以我们需要使用  <code>SPLIT</code> 进行一次清理，因为 <code>SPLIT</code> 默认选项<code>remove_empty_text</code> 是 true，就会把空白的分割值忽略掉。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">=SUBSTITUTE(JOIN(&quot;,&quot;,SPLIT(JOIN(&quot;%&quot;,M2:P2),&quot;%&quot;,0)),&quot;%&quot;,&quot;&quot;)</span><br></pre></td></tr></table></figure>
+<p>这里的实现步骤：</p>
+<ol>
+<li>先将数据使用 <code>%</code> JOIN</li>
+<li>然后 <code>SPLIT</code> 这样空白的就没有了</li>
+<li>再用 <code>,</code> JOIN</li>
+</ol>
+<h2 id="SPLIT-function"><a href="#SPLIT-function" class="headerlink" title="SPLIT function"></a>SPLIT function</h2><p>Divides text around a specified character or string and puts each fragment into a separate cell in the row.</p>
+<h3 id="Examples-1"><a href="#Examples-1" class="headerlink" title="Examples"></a>Examples</h3><p><a href="https://docs.google.com/spreadsheets/d/1fnJNavi4NHw1sa9huCwg8UMzz3ztRwQfKb-Je5XFCNo/copy" target="_blank" rel="noopener">Make a copy</a></p>
+<h3 id="Sample-usage-2"><a href="#Sample-usage-2" class="headerlink" title="Sample usage"></a>Sample usage</h3><p><code>SPLIT(&quot;1,2,3&quot;, &quot;,&quot;)</code></p>
+<p><code>SPLIT(&quot;Alas, poor Yorick&quot;,&quot; &quot;)</code></p>
+<p><code>SPLIT(A1, &quot;,&quot;)</code></p>
+<h3 id="Syntax-2"><a href="#Syntax-2" class="headerlink" title="Syntax"></a>Syntax</h3><p><code>SPLIT(text, delimiter, [split_by_each], [remove_empty_text])</code></p>
+<ul>
+<li><p><code>text</code>  – The text to be divided.</p>
+</li>
+<li><p><code>delimiter</code>  – The character or characters to be used to split text.</p>
+<ul>
+<li>By default, each character in  <code>delimiter</code>  is considered individually, e.g. if delimiter is ‘the’, then text is divided around the characters ‘t’, ‘h’ and ‘e’. Set  <code>split_by_each</code>  to  <code>FALSE</code>  to turn off this behaviour.</li>
+</ul>
+</li>
+<li><p><code>split_by_each</code>  –  <strong>[</strong>  OPTIONAL – TRUE by default  <strong>]</strong>  – Whether or not to divide text around each character contained in delimiter.</p>
+</li>
+<li><p><code>remove_empty_text</code> – [ OPTIONAL – TRUE by default ] – Whether or not to remove empty text messages from the split results. The default behavior is to treat consecutive delimiters as one (if  <code>TRUE</code>). If  <code>FALSE</code>, empty cells values are added between consecutive delimiters.</p>
+</li>
+</ul>
+<h3 id="Notes-1"><a href="#Notes-1" class="headerlink" title="Notes"></a>Notes</h3><ul>
+<li>Note that the character or characters to split the string around will not be contained in the result themselves.</li>
+</ul>
+<h3 id="See-also-1"><a href="#See-also-1" class="headerlink" title="See also"></a>See also</h3><p><a href="https://support.google.com/docs/answer/3094123" target="_blank" rel="noopener"><code>CONCATENATE</code></a>: Appends strings to one another.</p>
+<p>参考：<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTkNsIXXIjvzgbw5_65Z72wlUPCN-7HIPfJu9bawd4imBMf5dIvg0VWiUrU6QE_xAJkw_J57v6kcOT4/pubhtml" target="_blank" rel="noopener">https://docs.google.com/spreadsheets/d/e/2PACX-1vTkNsIXXIjvzgbw5_65Z72wlUPCN-7HIPfJu9bawd4imBMf5dIvg0VWiUrU6QE_xAJkw_J57v6kcOT4/pubhtml</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/GSheet/" rel="tag"># GSheet</a>
+          
+            <a href="/tags/Excel/" rel="tag"># Excel</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/16/dynamodb-notes-1-table-prefix/" rel="next" title="DynamoDB笔记1-Table Prefix">
+                <i class="fa fa-chevron-left"></i> DynamoDB笔记1-Table Prefix
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/12/kotlin-note-sort-advance/" rel="prev" title="Kotlin笔记之高级排序">
+                Kotlin笔记之高级排序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#regexreplace-批量替换多组数据"><span class="nav-number">1.</span> <span class="nav-text">regexreplace 批量替换多组数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#REGEXREPLACE"><span class="nav-number">1.1.</span> <span class="nav-text">REGEXREPLACE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Sample-usage"><span class="nav-number">1.1.1.</span> <span class="nav-text">Sample usage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Syntax"><span class="nav-number">1.1.2.</span> <span class="nav-text">Syntax</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Notes"><span class="nav-number">1.1.3.</span> <span class="nav-text">Notes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#See-also"><span class="nav-number">1.1.4.</span> <span class="nav-text">See also</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Examples"><span class="nav-number">1.1.5.</span> <span class="nav-text">Examples</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VLOOKUP-批量数据分类"><span class="nav-number">2.</span> <span class="nav-text">VLOOKUP 批量数据分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#完全匹配用例"><span class="nav-number">2.1.</span> <span class="nav-text">完全匹配用例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VLOOKUP"><span class="nav-number">2.2.</span> <span class="nav-text">VLOOKUP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Sample-usage-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">Sample usage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Syntax-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">Syntax</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组合多项字符串及附加操作"><span class="nav-number">3.</span> <span class="nav-text">组合多项字符串及附加操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SPLIT-function"><span class="nav-number">3.1.</span> <span class="nav-text">SPLIT function</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Examples-1"><span class="nav-number">3.1.1.</span> <span class="nav-text">Examples</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sample-usage-2"><span class="nav-number">3.1.2.</span> <span class="nav-text">Sample usage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Syntax-2"><span class="nav-number">3.1.3.</span> <span class="nav-text">Syntax</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Notes-1"><span class="nav-number">3.1.4.</span> <span class="nav-text">Notes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#See-also-1"><span class="nav-number">3.1.5.</span> <span class="nav-text">See also</span></a></li></ol></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2020/06/05/gsheet-fuction-quick-ref/';
+          this.page.identifier = '2020/06/05/gsheet-fuction-quick-ref/';
+          this.page.title = 'GSheet常用函数快速参考';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

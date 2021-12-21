@@ -1,0 +1,1088 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="CubaFramework,RAD," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要:   本文根据 CUBA Framework v7.2 官方 Quick Start 文档介绍其 Entity 与 Screen 原理，并进行一些扩展。">
+<meta name="keywords" content="CubaFramework,RAD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CUBA笔记1之Screen与Entity 关系">
+<meta property="og:url" content="https://notes.mengxin.science/2020/06/26/cuba-note-1-screen-with-entity/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要:   本文根据 CUBA Framework v7.2 官方 Quick Start 文档介绍其 Entity 与 Screen 原理，并进行一些扩展。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200627214521.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628084349.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628090721.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628090844.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091109.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091232.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091931.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CUBA笔记1之Screen与Entity 关系">
+<meta name="twitter:description" content="摘要:   本文根据 CUBA Framework v7.2 官方 Quick Start 文档介绍其 Entity 与 Screen 原理，并进行一些扩展。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images20200627214521.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2020/06/26/cuba-note-1-screen-with-entity/"/>
+
+
+
+
+
+  <title> CUBA笔记1之Screen与Entity 关系 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2020/06/26/cuba-note-1-screen-with-entity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                CUBA笔记1之Screen与Entity 关系
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-26T23:00:00+00:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Knowledge/" itemprop="url" rel="index">
+                    <span itemprop="name">Knowledge</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/06/26/cuba-note-1-screen-with-entity/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2020/06/26/cuba-note-1-screen-with-entity/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要:   本文根据 CUBA Framework v7.2 官方 Quick Start 文档介绍其 Entity 与 Screen 原理，并进行一些扩展。</p>
+<a id="more"></a>
+<ol>
+<li>CUBA 开发过程简介</li>
+<li>只包含 DataType 属性的Basic Screen</li>
+<li>如何处理 many-to-one 的 Screen</li>
+<li>如何处理 one-to-many 的 Screen</li>
+<li>如何处理 many-to-many 的 Screen</li>
+<li>总结</li>
+</ol>
+<h1 id="CUBA-简介"><a href="#CUBA-简介" class="headerlink" title="CUBA 简介"></a>CUBA 简介</h1><p>CUBA 是一个 RAD （Rapid Application Development）Framework，之所以叫做快速是因为使用该 Framework 开发传统的软件速度很快。如果使用目前主流的开发方法，主要有两种：一种就是前后端分离式开发，另外一种就是使用 MVC 来开发，但是无论使用哪种方法都无法绕开前端的 HTML+CSS 的开发。</p>
+<p>之前在研究 JHipster 的时候，已经有一些 RAD 的影子，JHipster 通过 JHL Domain language 来生成 Angular 或者 React 的模型操作的前端代码。但是我们会发现这种生成代码方法十分笨重，而且前端代码十分 Basic 很难使用，前端的可用性上还是需要大量的前端工作才能最终实现。 比如我们想实现一个复杂的表格或者较为复杂的映射关系就必须自己手动实现。对于纯后端开发者不是很友好（当然如果有独立的前端开发者可以忽略）</p>
+<p>究竟有没有一种对于后端友好的全栈开发框架呢？目前来开 CUBA 可以胜任。目前可以总结一下优点：</p>
+<ol>
+<li>完善的 Intellij 插件，提供很多工具用于开发</li>
+<li>数据库开发机制比较完善，比如数据库 SQL 的更新以及数据库更新操作等</li>
+<li>使用 JVM 配合 XML 开发 UI（内核是成熟的 <a href="https://vaadin.com/" target="_blank" rel="noopener">Vaadin</a>）</li>
+<li>UI 整体感觉很专业，定制性较强，比如很容易创建UI来处理  many-to-one 和 one-to-many 的Entity 的关系</li>
+<li>支持 Kotlin</li>
+</ol>
+<p>当然有优点就有缺点，我们还是需要根据我们的需求来选择</p>
+<ol>
+<li>UI 在美观度上不容易定制</li>
+<li>Frontend 不太容易做出更多的前端特殊功能，比较依赖框架的能力</li>
+<li>XML 描述 UI 可能不符合口味</li>
+<li>没有基于 spring boot 而是基于 Spring，可能有些现有的功能集成需要进行一些研究</li>
+</ol>
+<p>综上可述， CUBA 适用的场景：</p>
+<ol>
+<li>内部系统，不追求 UI 美观独特而注重功能的实现</li>
+<li>没有独立有经验的前端开发者，而希望快速的完成可用的前端</li>
+<li>功能较为传统</li>
+</ol>
+<h1 id="CUBA-开发过程简介"><a href="#CUBA-开发过程简介" class="headerlink" title="CUBA 开发过程简介"></a>CUBA 开发过程简介</h1><p> 根据官方 7.2 版本的 Quick Start，在使用 CUBA 进行开发的过程主要包括如下几个步骤</p>
+<ol>
+<li>创建项目</li>
+<li>根据业务逻辑创建 Entity</li>
+<li>生成数据库脚本并更新数据库</li>
+<li>根据 Entity 关系和需求创建对应的 Screen 实现对 Entity 的基本 CRUD 操作</li>
+<li>根据业务需求增加其他的功能和 UI，比如增加一个 Button 实现某个操作 （Quick start 不包含）</li>
+<li>运行程序</li>
+<li>打包程序并部署</li>
+</ol>
+<p>其中个人认为只有第 4 步可能是最重要的，这一步直接决定了UI 和 Entity 是如何关联的。掌握了这一步就基本掌握了 CUBA 的核心，作为一个后端开发者，纯后端的逻辑不难理解，因为基于 Spring，所以符合一切 Spring 的 IOC 机制。通过掌握模型和视图的关系，就可以理解后端和前端的联通的原理。</p>
+<h1 id="Local-属性的-Basic-Screen"><a href="#Local-属性的-Basic-Screen" class="headerlink" title="Local 属性的 Basic Screen"></a>Local 属性的 Basic Screen</h1><p>在创建 Screen 的时候，这里有一个 View 的概念，这个 View 就是 Entity 的 View。如何理解这个 View？其实很简单，我们就可以直接理解为如何展示这个 Entity。比如 _local 这个 view 是内置，表示只显示本地属性，也就是不包含关联属性。</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200627214521.png" alt=""></p>
+<blockquote>
+<p><strong>Local attribute</strong><br>An entity attribute that is not a reference or a collection of references to other entities. Values of all local entity attributes are typically stored in one table (with the exception of certain entity inheritance strategies).</p>
+<p>Three views named <em>_local</em>, <em>_minimal</em> and <em>_base</em> are available in the views repository for each entity by default:</p>
+<p><strong>_local</strong> contains all local entity attributes.</p>
+<p><strong>_minimal</strong> contains the attributes which are included to the name of the entity instance and specified in the @NamePattern annotation. If the @NamePattern annotation is not specified at the entity, this view does not contain any attributes.</p>
+<p><strong>_base</strong> includes all local non-system attributes and attributes defined by @NamePattern (effectively _minimal + _local).</p>
+</blockquote>
+<p>所以对于简单的独立的 Entity，我们只需 local view 就足够了。我们可以分析一下创建完 Screen 生成的 XML 文件究竟有哪些信息。</p>
+<p>简单的讲这里就有两个XML，一个用于浏览，一个用于编辑</p>
+<h2 id="浏览-Browser"><a href="#浏览-Browser" class="headerlink" title="浏览 Browser"></a>浏览 Browser</h2><p>这个文件主要由两部分组成：data 和 layout。结构十分清晰，data 表示显示什么数据，而 layout 表示如何显示数据。</p>
+<p>注意这里 </p>
+<ol>
+<li><code>gameBracketsDl</code> 中的 <code>Dl</code> 是 DataLoader 的含义， 所谓 loader 直观上讲就是一个 SQL 执行器，执行 SQL 获取数据</li>
+<li><code>gameBracketsDc</code> 中的 <code>Dc</code> 是 <del>DataCollection</del>  DataContainer 的含义， loader 返回了数据后，数据就会按照 Entity 对象存放到内存。对于如何将 SQL 数据转化为对象，是更具 View，这里如果是 collection 的 view 是 <code>_local</code>，就表示只把本地属性加载到内存对象中。</li>
+</ol>
+<p>在 layout 中主要是使用 <code>gameBracketsDc</code> 来渲染 UI。比如使用 <code>groupTable</code> 指定 <code>dataContainer</code> 为 <code>gameBracketsDc</code> 就可以实现对这个列表进行显示了。</p>
+<p>当然这里还有很多细节，以后可以每个控件单独介绍，但是在使用中通过文档和自动提醒可以很容易的理解 XML 标签的字段和属性的含义。</p>
+<blockquote>
+<p> xxx-browse.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">window</span> <span class="attr">xmlns</span>=<span class="string">"http://schemas.haulmont.com/cuba/screen/window.xsd"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">xmlns:c</span>=<span class="string">"http://schemas.haulmont.com/cuba/screen/jpql_condition.xsd"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">caption</span>=<span class="string">"msg://browseCaption"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">focusComponent</span>=<span class="string">"gameBracketsTable"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">messagesPack</span>=<span class="string">"xx.web.screens.gamebracket"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">data</span> <span class="attr">readOnly</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">id</span>=<span class="string">"gameBracketsDc"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">class</span>=<span class="string">"xx.entity.BoGameBracket"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">view</span>=<span class="string">"_local"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">loader</span> <span class="attr">id</span>=<span class="string">"gameBracketsDl"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">query</span>&gt;</span></span><br><span class="line">          &lt;![CDATA[select e from bo_GameBracket e]]&gt;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">query</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">loader</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">data</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">dialogMode</span> <span class="attr">height</span>=<span class="string">"600"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">width</span>=<span class="string">"800"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">layout</span> <span class="attr">expand</span>=<span class="string">"gameBracketsTable"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">spacing</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter</span> <span class="attr">id</span>=<span class="string">"filter"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">applyTo</span>=<span class="string">"gameBracketsTable"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">dataLoader</span>=<span class="string">"gameBracketsDl"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">properties</span> <span class="attr">include</span>=<span class="string">".*"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupTable</span> <span class="attr">id</span>=<span class="string">"gameBracketsTable"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">width</span>=<span class="string">"100%"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">dataContainer</span>=<span class="string">"gameBracketsDc"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">actions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">id</span>=<span class="string">"create"</span> <span class="attr">type</span>=<span class="string">"create"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">id</span>=<span class="string">"edit"</span> <span class="attr">type</span>=<span class="string">"edit"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">id</span>=<span class="string">"remove"</span> <span class="attr">type</span>=<span class="string">"remove"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">actions</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">columns</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">column</span> <span class="attr">id</span>=<span class="string">"mathName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">column</span> <span class="attr">id</span>=<span class="string">"displayName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">column</span> <span class="attr">id</span>=<span class="string">"enumType"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">columns</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">rowsCount</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">buttonsPanel</span> <span class="attr">id</span>=<span class="string">"buttonsPanel"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">alwaysVisible</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"createBtn"</span> <span class="attr">action</span>=<span class="string">"gameBracketsTable.create"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"editBtn"</span> <span class="attr">action</span>=<span class="string">"gameBracketsTable.edit"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"removeBtn"</span> <span class="attr">action</span>=<span class="string">"gameBracketsTable.remove"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">buttonsPanel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">groupTable</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">hbox</span> <span class="attr">id</span>=<span class="string">"lookupActions"</span> <span class="attr">spacing</span>=<span class="string">"true"</span> <span class="attr">visible</span>=<span class="string">"false"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">action</span>=<span class="string">"lookupSelectAction"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">action</span>=<span class="string">"lookupCancelAction"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">hbox</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">window</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h2 id="编辑-Edit"><a href="#编辑-Edit" class="headerlink" title="编辑 Edit"></a>编辑 Edit</h2><p>基本结构类似，但是数据中不在是 collection 了，而是 instance，因为我们关注的是一个Entity 对象的 instance。同样在 layout 中使用 form 来操作编辑，其 <code>dataContainer</code> 是 data 中的 instance。</p>
+<blockquote>
+<p> xxx-edit.xml</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">window</span> <span class="attr">xmlns</span>=<span class="string">"http://schemas.haulmont.com/cuba/screen/window.xsd"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">caption</span>=<span class="string">"msg://editorCaption"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">focusComponent</span>=<span class="string">"form"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">messagesPack</span>=<span class="string">"xx.web.screens.gamebracket"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">data</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">instance</span> <span class="attr">id</span>=<span class="string">"gameBracketDc"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">class</span>=<span class="string">"xx.entity.BoGameBracket"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">view</span>=<span class="string">"_local"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">loader</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">instance</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">data</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">dialogMode</span> <span class="attr">height</span>=<span class="string">"600"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">width</span>=<span class="string">"800"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">layout</span> <span class="attr">expand</span>=<span class="string">"editActions"</span> <span class="attr">spacing</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">id</span>=<span class="string">"form"</span> <span class="attr">dataContainer</span>=<span class="string">"gameBracketDc"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">column</span> <span class="attr">width</span>=<span class="string">"250px"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">textField</span> <span class="attr">id</span>=<span class="string">"mathNameField"</span> <span class="attr">property</span>=<span class="string">"mathName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">textField</span> <span class="attr">id</span>=<span class="string">"displayNameField"</span> <span class="attr">property</span>=<span class="string">"displayName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">lookupField</span> <span class="attr">id</span>=<span class="string">"enumTypeField"</span> <span class="attr">property</span>=<span class="string">"enumType"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">column</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">hbox</span> <span class="attr">id</span>=<span class="string">"editActions"</span> <span class="attr">spacing</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">action</span>=<span class="string">"windowCommitAndClose"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">action</span>=<span class="string">"windowClose"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">hbox</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">window</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="Entity-关联属性的-Screen"><a href="#Entity-关联属性的-Screen" class="headerlink" title="Entity 关联属性的 Screen"></a>Entity 关联属性的 Screen</h1><p>有了上面的理解基础，我们就可以扩展 View 来支持 Entity 之间的关联关系。内置的View 不包含关联属性，所以如果我们能创建一个 View 包含了关联属性，那么就可以在 UI 上显示了。</p>
+<p>对于关联属性主要有三种</p>
+<ol>
+<li>one-to-one</li>
+<li>one-to-many （many-to-one）</li>
+<li>many-to-many</li>
+</ol>
+<p>这里主要介绍第二种，为了方便我们介绍，我们引用文档案例并作出适当抽象总结。</p>
+<p>一个 Customer 可以有多个 Order， 一个 Order 只能属于一个 Customer。所以 Customer 和 Order 就是 one-to-many 的关系。反过来 Order 对于 Customer 就是 many-to-one 的关系。那么对于这种关系的对象我们一般需要什么样的 UI 呢？</p>
+<p>首先最基础的就是在创建 Order 的时候，可以选择一个 Customer，也就是说创建 Many Entity 的时候需要指定 One Entity。因为指定 One 只需要一个下拉列表就可以实现，所以比较简单 （JHipster 生成的 Frontend 也是这种实现思路）。理论上实现了这个 UI 对于功能上就是已经完整。</p>
+<p>如果我们能在 Customer 编辑的时候可以显示和编辑 Order 可能体验更好。也就是在 One Entity 的编辑页面显示 Many Entity，显然这里必须是一个列表来实现，而且还需要支持比如多选的操作。</p>
+<p>one-to-many （many-to-one）UI 总结：</p>
+<ol>
+<li>many entity 编辑 one entity 下拉列表，相对简单，基础功能</li>
+<li>one entity 编辑 many entity 列表，扩展功能，该功能包括显示到编辑</li>
+</ol>
+<p>下面我们详细介绍一下两种 UI 在Cuba 的实现</p>
+<h2 id="如何处理-many-to-one-的-Screen"><a href="#如何处理-many-to-one-的-Screen" class="headerlink" title="如何处理 many-to-one 的 Screen"></a>如何处理 many-to-one 的 Screen</h2><p>按照案例来理解就是在 Order 创建的时候可以选择一个 Customer。通过我们对 View 的理解，我们只需要创建一个 View，这个 View 包含对应的关联属性，同时我们可以选择这个关联的 Entity 的某几个字段用于显示。</p>
+<p>对于 View 的命名，我们可以 follow convention：[many]-with-[one]，比如 order-with-customer，表示在 Order（many）的页面带有 Customer（one）对象的操作。</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628084349.png" alt=""></p>
+<p>有了这个 View，我们在创建 Many 端的 Entity 的时候，只需要选择这个 View 即可。这样 Screen 会自动根据 View 创建新的 DataContainer 用于渲染 UI，下面我们可以看一下生成的 XML，并和前面简单的 Entity 对比。</p>
+<h2 id="浏览-Browser-1"><a href="#浏览-Browser-1" class="headerlink" title="浏览 Browser"></a>浏览 Browser</h2><p>这里主要的区别就是 Data 部分，这里 view 换成我们自定义的 view，但是对于 DataLoader 实际上是一样的，因为我们仍然只需要通过 SQL 获取 Many 的 Entity，但是我们通过 View 可以获取到Many Entity 的关联属性，进而显示其对应的字段信息。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">data</span> <span class="attr">readOnly</span>=<span class="string">"true"</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">collection</span> <span class="attr">id</span>=<span class="string">"boExpVariantsDc"</span>  </span></span><br><span class="line"><span class="tag">  <span class="attr">class</span>=<span class="string">"xx.BoExpVariant"</span>  </span></span><br><span class="line"><span class="tag">  <span class="attr">view</span>=<span class="string">"boExpVariant-wiht-boExperiment"</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">loader</span> <span class="attr">id</span>=<span class="string">"boExpVariantsDl"</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">query</span>&gt;</span>  </span><br><span class="line"> &lt;![CDATA[select e from bo_BoExpVariant e]]&gt;  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">query</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">loader</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">collection</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">data</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="编辑-Edit-1"><a href="#编辑-Edit-1" class="headerlink" title="编辑 Edit"></a>编辑 Edit</h2><p>首先是 Data 部分，同样只有 view 变化</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">data</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">instance</span> <span class="attr">id</span>=<span class="string">"boExpVariantDc"</span>  </span></span><br><span class="line"><span class="tag">  <span class="attr">class</span>=<span class="string">"xx.BoExpVariant"</span>  </span></span><br><span class="line"><span class="tag">  <span class="attr">view</span>=<span class="string">"boExpVariant-wiht-boExperiment"</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">loader</span>/&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">instance</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">data</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在 UI 部分增加了一个新的控件，这个控件就是拥有显示 One entity 的 下拉列表，可以选择一个赋值给 Many entity 的关联属性。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">pickerField</span> <span class="attr">id</span>=<span class="string">"boExperimentField"</span> <span class="attr">property</span>=<span class="string">"boExperiment"</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">actions</span>&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">action</span> <span class="attr">id</span>=<span class="string">"lookup"</span> <span class="attr">type</span>=<span class="string">"picker_lookup"</span>/&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;<span class="name">action</span> <span class="attr">id</span>=<span class="string">"clear"</span> <span class="attr">type</span>=<span class="string">"picker_clear"</span>/&gt;</span>  </span><br><span class="line"> <span class="tag">&lt;/<span class="name">actions</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">pickerField</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="如何处理-one-to-many-的-Screen"><a href="#如何处理-one-to-many-的-Screen" class="headerlink" title="如何处理 one-to-many 的 Screen"></a>如何处理 one-to-many 的 Screen</h2><p>在 many-to-one 的 UI 实现的时候，实际上我们并没有自定义任何 UI，只是通过 View 就生成了所需要的 UI。但是对于 one-to-many 则需要我们自行添加 UI。</p>
+<p>这里基本原理就是：</p>
+<ol>
+<li>在 One （Customer） Entity Edit UI 增加一个 Collection 的 Data Component，用于加载 Many（Order） Entity</li>
+<li>SQL 控制 Collection 只显示和当前 Customer 关联的 Many Entities</li>
+<li>添加 Table 控制显示对应的 DataContainer</li>
+<li>代码控制在 UI 显示之前，需要将当前编辑的 Entity 信息传入到 DataLoader 用于筛选对象。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628090721.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628090844.png" alt=""></p>
+<h2 id="注意问题"><a href="#注意问题" class="headerlink" title="注意问题"></a>注意问题</h2><p>这里我们注意几个问题：</p>
+<h3 id="SQL-语句的属性含义"><a href="#SQL-语句的属性含义" class="headerlink" title="SQL 语句的属性含义"></a>SQL 语句的属性含义</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;![CDATA[select e from bo_BoExpVariant e where e.boExperiment = :experiment]]&gt;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>首先 from 后面的表名实际上是  Many Entity 注解的 name， <code>BoExpVariant</code> ，注意不是 Table的名称或者对象名称。这里我们理解为我们这里都是在 Entity 场景下操作，所以应该是 Entity</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091109.png" alt=""></p>
+<ol>
+<li>where 的 key 的属性，这个属性可能是 Many entity 的属性，其使用的名字应该是Entity 对象的属性名称</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091232.png" alt=""></p>
+<ol>
+<li>where 的 value ，这个名字比较特殊，并不是内置的，而是我们在代码中控制的，也就是我们上面的第 4 步</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images20200628091931.png" alt=""></p>
+<h3 id="如何理解-Edit-逻辑代码"><a href="#如何理解-Edit-逻辑代码" class="headerlink" title="如何理解 Edit 逻辑代码"></a>如何理解 Edit 逻辑代码</h3><p>因为我们手工添加的 Data Collection，而这个 Collection 原本是针对一个 Entity 的列表，但是我们并不希望显示所有的 Entity，而是只和当前关联的 One Entity 相关的 Many Entity。但是这个 One Entity 信息只有当我们点击了一个 One Entity 才能具体确定，所以我们必须动态的想这个 Data  Collection 的 Data Loader 传递当前选择的是哪个 One Entity 信息。只有这样这个 UI 才能和数据和逻辑解耦而通用。需要传递的数据就是当前要编辑的对象：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">boExpVariantsDl.setParameter(<span class="string">"experiment"</span>, editedEntity)  </span><br><span class="line">screenData.loadAll()</span><br></pre></td></tr></table></figure>
+<p>操作步骤如下：</p>
+<ol>
+<li>首先把页面的 DataLoader 注入到代码中，直观的说通过这个注入，我们可以在代码中操作这个对象，从而操作为 UI 关联的数据</li>
+<li>订阅一个事件，这个事件是 <code>BeforeShowEvent</code>，就是在显示这个 UI 之前需要完成某些操作</li>
+<li><code>boExpVariantsDl.setParameter(&quot;experiment&quot;, editedEntity)</code> 动态该 DataLoader 增加一个 parameter，这个 parameter 就是当前编辑的对象</li>
+<li>这个 parameter 用在了 SQL 语句来对 Many Entity 进行筛选</li>
+</ol>
+<p>当然这里还有一个问题，这个 <del>SQL</del> JPQL 语句究竟是如何执行？ 实际上是一个 JPQL</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> e <span class="keyword">from</span> bo_BoExpVariant e <span class="keyword">where</span> e.boExperiment = :experiment</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>JPQL supports named parameters, which begin with the colon (<code>:</code>). We could write a function returning a list of authors with the given last name as follows:<br>ref: <a href="https://www.objectdb.com/java/jpa/entity/fields" target="_blank" rel="noopener">https://www.objectdb.com/java/jpa/entity/fields</a></p>
+</blockquote>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过上面的介绍，我们基本掌握了 CUBA 逻辑和 UI 相互通信的原理，核心还是数据。通过实践，CUBA 创建一个基础的后台应用速度很快，而且具有一定的可定制性，而且整个框架比较成熟，在开发的过程中没有遇到太多的未知问题，所以对于某些应用场景推荐使用。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CubaFramework/" rel="tag"># CubaFramework</a>
+          
+            <a href="/tags/RAD/" rel="tag"># RAD</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/12/kotlin-note-sort-advance/" rel="next" title="Kotlin笔记之高级排序">
+                <i class="fa fa-chevron-left"></i> Kotlin笔记之高级排序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/07/20/facebook-deferred-deep-linking/" rel="prev" title="Facebook Deferred Deep Linking 详解">
+                Facebook Deferred Deep Linking 详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CUBA-简介"><span class="nav-number">1.</span> <span class="nav-text">CUBA 简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CUBA-开发过程简介"><span class="nav-number">2.</span> <span class="nav-text">CUBA 开发过程简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Local-属性的-Basic-Screen"><span class="nav-number">3.</span> <span class="nav-text">Local 属性的 Basic Screen</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览-Browser"><span class="nav-number">3.1.</span> <span class="nav-text">浏览 Browser</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑-Edit"><span class="nav-number">3.2.</span> <span class="nav-text">编辑 Edit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Entity-关联属性的-Screen"><span class="nav-number">4.</span> <span class="nav-text">Entity 关联属性的 Screen</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何处理-many-to-one-的-Screen"><span class="nav-number">4.1.</span> <span class="nav-text">如何处理 many-to-one 的 Screen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览-Browser-1"><span class="nav-number">4.2.</span> <span class="nav-text">浏览 Browser</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑-Edit-1"><span class="nav-number">4.3.</span> <span class="nav-text">编辑 Edit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何处理-one-to-many-的-Screen"><span class="nav-number">4.4.</span> <span class="nav-text">如何处理 one-to-many 的 Screen</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意问题"><span class="nav-number">4.5.</span> <span class="nav-text">注意问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL-语句的属性含义"><span class="nav-number">4.5.1.</span> <span class="nav-text">SQL 语句的属性含义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何理解-Edit-逻辑代码"><span class="nav-number">4.5.2.</span> <span class="nav-text">如何理解 Edit 逻辑代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2020/06/26/cuba-note-1-screen-with-entity/';
+          this.page.identifier = '2020/06/26/cuba-note-1-screen-with-entity/';
+          this.page.title = 'CUBA笔记1之Screen与Entity 关系';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

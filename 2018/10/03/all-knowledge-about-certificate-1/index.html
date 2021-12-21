@@ -1,0 +1,1150 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文力求从理论到工具，从工具到代码，从代码到实际应用介绍所有和 Certificate （广义）相关的知识。">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Certificate的一切-概念及工具">
+<meta property="og:url" content="https://notes.mengxin.science/2018/10/03/all-knowledge-about-certificate-1/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文力求从理论到工具，从工具到代码，从代码到实际应用介绍所有和 Certificate （广义）相关的知识。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/xmeng1/images/raw/master/images/certificate_getting_started.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于Certificate的一切-概念及工具">
+<meta name="twitter:description" content="摘要：本文力求从理论到工具，从工具到代码，从代码到实际应用介绍所有和 Certificate （广义）相关的知识。">
+<meta name="twitter:image" content="https://github.com/xmeng1/images/raw/master/images/certificate_getting_started.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/10/03/all-knowledge-about-certificate-1/"/>
+
+
+
+
+
+  <title> 关于Certificate的一切-概念及工具 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/10/03/all-knowledge-about-certificate-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                关于Certificate的一切-概念及工具
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-03T23:00:00+00:00">
+                2018-10-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/10/03/all-knowledge-about-certificate-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/10/03/all-knowledge-about-certificate-1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文力求从理论到工具，从工具到代码，从代码到实际应用介绍所有和 Certificate （广义）相关的知识。</p>
+<a id="more"></a>
+<h2 id="JKS-（Java-KeyStore）"><a href="#JKS-（Java-KeyStore）" class="headerlink" title="JKS （Java KeyStore）"></a>JKS （Java KeyStore）</h2><h3 id="KeyStore-介绍"><a href="#KeyStore-介绍" class="headerlink" title="KeyStore 介绍"></a>KeyStore 介绍</h3><p>从 <code>JKS</code> 说起 （<code>Java KeyStore</code>），首先我们看一下 Wiki：</p>
+<blockquote>
+<p>A Java KeyStore (JKS) is a repository of security certificates – either authorization certificates or public key certificates – plus corresponding private keys, used for instance in SSL encryption.</p>
+<p>In IBM WebSphere Application Server and Oracle WebLogic Server, a file with extension jks serves as keystore.</p>
+<p> The Java Development Kit maintains a CA keystore in folder jre/lib/security/cacerts. JDKs provide a tool named keytool[1] to manipulate the keystore. keytool has no functionality to extract the private key out of the keystore, but this is possible with third-party tools like jksExportKey, CERTivity,[2] Portecle[3] and KeyStore Explorer.[4]</p>
+</blockquote>
+<p>直观的说，<code>KeyStore</code> 只是一个载体，是 <code>Certificate</code> 的载体，在一个 <code>KeyStore</code> 文件中可以有多个公钥和私钥对。每对公私钥通过别名 <code>alias</code> 来区分。对于 <code>KeyStore</code>， 我们使用 <code>KeyTool</code> 工具来进行操作。</p>
+<p>关键点：</p>
+<ol>
+<li>keystore 包含若干对公私钥，通过别名区分及提取</li>
+<li>keystore 工具是 keytool</li>
+<li>keystore 本身有密码</li>
+</ol>
+<h3 id="使用-keytool-生成-JKS，并且生成公钥和私钥对："><a href="#使用-keytool-生成-JKS，并且生成公钥和私钥对：" class="headerlink" title="使用 keytool 生成 JKS，并且生成公钥和私钥对："></a>使用 <code>keytool</code> 生成 <code>JKS</code>，并且生成公钥和私钥对：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -<span class="built_in">alias</span>  mydomain  -keyalg RSA -keystore  keystore.jks -keysize 2048</span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<ol>
+<li>-genkey 生成公私钥</li>
+<li>-alias 指定公私钥对的别名</li>
+<li>-keyalg 指定算法</li>
+<li>-keystore 指定输出的文件名</li>
+<li>-keysize 指定密钥长度</li>
+</ol>
+<p>该命令是一个交互式的，需要用户指定以下内容，这里需要两个密码：</p>
+<ol>
+<li>keystore password （JKS 文件本身密码）</li>
+<li>key password （私钥密码）</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -<span class="built_in">alias</span> mengxin.science -keyalg RSA -keystore  mxsci.jks -keysize 2048</span><br><span class="line">Enter keystore password:  changeit</span><br><span class="line">Re-enter new password: changeit</span><br><span class="line">What is your first and last name?</span><br><span class="line">  [Unknown]:  Xin Meng</span><br><span class="line">What is the name of your organizational unit?</span><br><span class="line">  [Unknown]:  mengxin</span><br><span class="line">What is the name of your organization?</span><br><span class="line">  [Unknown]:  mengxin</span><br><span class="line">What is the name of your City or Locality?</span><br><span class="line">  [Unknown]:  London</span><br><span class="line">What is the name of your State or Province?</span><br><span class="line">  [Unknown]:  </span><br><span class="line">What is the two-letter country code <span class="keyword">for</span> this unit?</span><br><span class="line">  [Unknown]:  UK</span><br><span class="line">Is CN=Xin Meng, OU=mengxin, O=mengxin, L=London, ST=Unknown, C=UK correct?</span><br><span class="line">  [no]:  yes</span><br><span class="line"></span><br><span class="line">Enter key password <span class="keyword">for</span> &lt;mengxin.science&gt;</span><br><span class="line">    (RETURN <span class="keyword">if</span> same as keystore password):   changeitkey</span><br><span class="line">Re-enter new password: changeitkey</span><br><span class="line"></span><br><span class="line">Warning:</span><br><span class="line">The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 <span class="built_in">which</span> is an industry standard format using <span class="string">"keytool -importkeystore -srckeystore mxsci.jks -destkeystore mxsci.jks -deststoretype pkcs12"</span>.</span><br></pre></td></tr></table></figure>
+<h3 id="查看-keystore-内的公私钥信息"><a href="#查看-keystore-内的公私钥信息" class="headerlink" title="查看 keystore 内的公私钥信息"></a>查看 keystore 内的公私钥信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Check a stand-alone certificate**</span></span><br><span class="line">keytool -printcert -v -file  mydomain.crt</span><br><span class="line"></span><br><span class="line"><span class="comment"># Check which certificates are in a Java keystore**</span></span><br><span class="line">keytool -list -v -keystore  keystore.jks</span><br><span class="line"></span><br><span class="line"><span class="comment">#Check a particular keystore entry using an alias**</span></span><br><span class="line">keytool -list -v -keystore  keystore.jks  -<span class="built_in">alias</span> mydomain</span><br></pre></td></tr></table></figure>
+<h2 id="CSR-（Certificate-Signing-Request）"><a href="#CSR-（Certificate-Signing-Request）" class="headerlink" title="CSR （Certificate Signing Request）"></a>CSR （Certificate Signing Request）</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>In public key infrastructure (PKI) systems, a certificate signing request (also CSR or certification request) is <strong>a message sent from an applicant to a certificate authority in order to apply for a digital identity certificate</strong>. It usually contains the public key for which the certificate should be issued, identifying information (such as a domain name) and integrity protection (e.g., a digital signature). The most common format for CSRs is the <strong>PKCS #10 specification</strong> and another is the <strong>Signed Public Key and Challenge SPKAC format</strong> generated by some web browsers.</p>
+</blockquote>
+<p>也就是说 <code>CSR</code> 是一个概念，其通常承载的文件格式是 <code>PKCS #10</code> 和 <code>SPKAC</code>。<code>CSR</code> 本质上是一个消息，这个消息一般是包含公钥，唯一身份信息和数字签名，用来向 <code>CA</code> 申请数字认证的。</p>
+<p>我们要知道，一个证书 （或者说是一对公私钥），理论上只有被某个 <code>CA</code> 信任了，才能在实际中真正的发挥作用。</p>
+<h3 id="JKS-生成-CSR"><a href="#JKS-生成-CSR" class="headerlink" title="JKS 生成 CSR"></a>JKS 生成 CSR</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -certreq -<span class="built_in">alias</span>  mydomain  -keystore  keystore.jks  -file  mydomain.csr</span><br></pre></td></tr></table></figure>
+<p>说明</p>
+<ol>
+<li>certreq 表示生成 CSR</li>
+<li>alias 指定使用哪个key 对</li>
+<li>keystore 指定 jks 文件</li>
+<li>file 指定说出的额 csr 文件</li>
+</ol>
+<p>在执行过程中需要输入 keystore 和 key 的 password，如果输入错误，将会得到错误。比如 key 密码输入错误，则会报错： <code>keytool error: java.security.UnrecoverableKeyException: Cannot recover key</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">keytool -certreq -<span class="built_in">alias</span>  mengxin.science  -keystore  mxsci.jks  -file  mxsci.csr</span><br><span class="line">Enter keystore password:  </span><br><span class="line">Enter key password <span class="keyword">for</span> &lt;mengxin.science&gt;</span><br><span class="line"></span><br><span class="line">Warning:</span><br><span class="line">The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 <span class="built_in">which</span> is an industry standard format using <span class="string">"keytool -importkeystore -srckeystore mxsci.jks -destkeystore mxsci.jks -deststoretype pkcs12"</span>.</span><br></pre></td></tr></table></figure>
+<p>这时候生成的 <code>CSR</code> 为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat mxsci.csr </span></span><br><span class="line">-----BEGIN NEW CERTIFICATE REQUEST-----</span><br><span class="line">MIIC3DCCAcQCAQAwZzELMAkGA1UEBhMCVUsxEDAOBgNVBAgTB1Vua25vd24xDzAN</span><br><span class="line">BgNVBAcTBkxvbmRvbjEQMA4GA1UEChMHbWVuZ3hpbjEQMA4GA1UECxMHbWVuZ3hp</span><br><span class="line">bjERMA8GA1UEAxMIWGluIE1lbmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK</span><br><span class="line">AoIBAQDmIRw5CEHyjiGDbZvapGYeeGQ0tgMZB9ImZBv4p3mmhV1fZQ3Y0G7czJaa</span><br><span class="line">21X5y/tz/H5q97pjIm/SPICME5JH8xR1ZzOuLvpmGSlZ/YYMPGu8osAXm8g6UhJm</span><br><span class="line">tKZhVh1JM2bkysOW10GJKQdl2stdwq5wIqmqtTBtlVpDFfoDhCXEwciO6vQJt+8A</span><br><span class="line">vy4Wt2kX7Np5BtGSra6HRpySpZ3Fy2grWlkNw8OwRtl3PNpF5uloKi5QvcVzipNd</span><br><span class="line">g+UhfebWGW7BIm1/Q9l9o0EHnSGpCgA7NFpV+RUEGM+ITjb1kgOx/YCkQZfgH2pA</span><br><span class="line">/38fPzCKjwRwvcRQGhPJIlJ/DZWfAgMBAAGgMDAuBgkqhkiG9w0BCQ4xITAfMB0G</span><br><span class="line">A1UdDgQWBBTLMfWKkadT2P6bt7y9kRVgIAVwujANBgkqhkiG9w0BAQsFAAOCAQEA</span><br><span class="line">pbNaOemKIwI9sJmvmMY7EBlUc7g4KJlPt1CAYaUIhi32vRT+GutNmjFLgqXIt5lB</span><br><span class="line">F+jDXkTBD1JmqSmES1xcfa7+TPN9SL+fYSl0Z7fWI5A80RyjJj+Lp4EQsE95+u12</span><br><span class="line">H1jiX4iwtySLnu1fvU4+qzy0TmvFKzdPnRrzfZeZnGEMDT7sgyaFcR9Ac3nhswo5</span><br><span class="line">q8wVux0MDvSC/8NnVday15r71dAn3dpJyy+rs1ZkZEPhu7IfZ7UYJjw6X2wKBxbY</span><br><span class="line">gJj7cJfeL1hlrGrZ0FxVb6/xh5wMPQSPiPyiOPSs4KBy4hfsJn0w0lUM5eoO1wyo</span><br><span class="line">IJsTZhDtlDLL1mZAxm+Eog==</span><br><span class="line">-----END NEW CERTIFICATE REQUEST-----</span><br></pre></td></tr></table></figure>
+<h2 id="公私钥及证书系统"><a href="#公私钥及证书系统" class="headerlink" title="公私钥及证书系统"></a>公私钥及证书系统</h2><p>在开始介绍之前，我们需要首先明确，我们需要哪些知识，这些知识将会有什么用？</p>
+<ol>
+<li>需要知道各种文件格式的意义</li>
+<li>需要知道各种文件格式中包含的内容</li>
+<li>需要知道各种文件格式之间的转化</li>
+<li>需要知道各种文件格式一般的用途</li>
+</ol>
+<p>标准：</p>
+<ol>
+<li>PKCS stands for “Public Key Cryptography Standards”</li>
+</ol>
+<p>编码：</p>
+<ol>
+<li>PEM</li>
+<li>DER</li>
+</ol>
+<p>文件后缀</p>
+<ol>
+<li><code>jks</code>: Java KeyStore</li>
+<li><code>csr</code>: Certificate Signing Request (PKCS1 #10)</li>
+<li><code>p12</code>: (PKCS1 #12) same with pfx, change extention name, see <a href="https://stackoverflow.com/a/6821061/2000468" target="_blank" rel="noopener">this</a></li>
+<li><code>pfx</code>:  Personal Information Exchange Format (PFX)  </li>
+<li><code>pem</code>: Privacy-Enhanced Mail </li>
+<li><code>key</code>: The KEY extension is used both for public and private PKCS#8 keys. The keys may be encoded as binary DER or as ASCII PEM.</li>
+<li><code>key.unsecure</code></li>
+<li><code>crt</code>: certificate, The CRT extension is used for certificates. The certificates may be encoded as binary DER or as ASCII PEM. The CER and CRT extensions are nearly synonymous.  Most common among *nix systems</li>
+<li><code>srl</code>:</li>
+<li><code>cer</code>: certificate, alternate form of .crt (Microsoft Convention) You can use MS to convert .crt to .cer (.both DER encoded .cer, or base64[PEM] encoded .cer)  The .cer file extension is also recognized by IE as a command to run a MS cryptoAPI command (specifically rundll32.exe cryptext.dll,CryptExtOpenCER) which displays a dialogue for importing and/or viewing certificate contents.</li>
+<li><code>der</code>: Distinguished Encoding Rules, The DER file extension is primarily associated with a DER- (Distinguished Encoding Rules) encoded X509 digital certificate file.</li>
+</ol>
+<h3 id="crt-和-cer"><a href="#crt-和-cer" class="headerlink" title="crt 和 cer"></a>crt 和 cer</h3><blockquote>
+<p>.crt stands simply for certificate, usually an X509v3 certificate, again the encoding could be PEM or DER; a certificate contains the public key, but it contains much more information (most importantly the signature by the Certificate Authority over the data and public key, of course).</p>
+</blockquote>
+<p>这个就是 General 的 Certificate 文件，一般就是 <code>X509v3</code> 的证书 （只有公钥和签名等信息，没有私钥），其编码可以是 <code>PEM</code> 和 <code>DER</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">keytool -<span class="built_in">export</span> -<span class="built_in">alias</span> server-alias -storepass changeit</span><br><span class="line">-file server.cer -keystore keystore.jks</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">keytool -export -alias mengxin.science -storepass changeit -file mxsci.cer -keystore mxsci.jks</span><br><span class="line">Certificate stored in file &lt;mxsci.cer&gt;</span><br><span class="line"></span><br><span class="line">Warning:</span><br><span class="line">The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using &quot;keytool -importkeystore -srckeystore mxsci.jks -destkeystore mxsci.jks -deststoretype pkcs12&quot;.</span><br></pre></td></tr></table></figure>
+<p>这个 <code>cer</code> 是 <code>DER</code> 格式，我们可以用  <code>openssl</code> 来查看该证书：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.cer -inform der -text -noout</span><br><span class="line"></span><br><span class="line">Certificate:</span><br><span class="line">    Data:</span><br><span class="line">        Version: 3 (0x2)</span><br><span class="line">        Serial Number: 888298787 (0x34f25d23)</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">        Issuer: C = UK, ST = Unknown, L = London, O = mengxin, OU = mengxin, CN = Xin Meng</span><br><span class="line">        Validity</span><br><span class="line">            Not Before: Oct  4 09:05:47 2018 GMT</span><br><span class="line">            Not After : Jan  2 09:05:47 2019 GMT</span><br><span class="line">        Subject: C = UK, ST = Unknown, L = London, O = mengxin, OU = mengxin, CN = Xin Meng</span><br><span class="line">        Subject Public Key Info:</span><br><span class="line">            Public Key Algorithm: rsaEncryption</span><br><span class="line">                Public-Key: (2048 bit)</span><br><span class="line">                Modulus:</span><br><span class="line">                    00:e6:21:1c:39:08:41:f2:8e:21:83:6d:9b:da:a4:</span><br><span class="line">                    66:1e:78:64:34:b6:03:19:07:d2:26:64:1b:f8:a7:</span><br><span class="line">                    79:a6:85:5d:5f:65:0d:d8:d0:6e:dc:cc:96:9a:db:</span><br><span class="line">                    55:f9:cb:fb:73:<span class="built_in">fc</span>:7e:6a:f7:ba:63:22:6f:d2:3c:</span><br><span class="line">                    80:8c:13:92:47:f3:14:75:67:33:ae:2e:fa:66:19:</span><br><span class="line">                    29:59:fd:86:0c:3c:6b:bc:a2:c0:17:9b:c8:3a:52:</span><br><span class="line">                    12:66:b4:a6:61:56:1d:49:33:66:e4:ca:c3:96:d7:</span><br><span class="line">                    41:89:29:07:65:da:cb:5d:c2:ae:70:22:a9:aa:b5:</span><br><span class="line">                    30:6d:95:5a:43:15:fa:03:84:25:c4:c1:c8:8e:ea:</span><br><span class="line">                    f4:09:b7:ef:00:bf:2e:16:b7:69:17:ec:da:79:06:</span><br><span class="line">                    d1:92:ad:ae:87:46:9c:92:a5:9d:c5:cb:68:2b:5a:</span><br><span class="line">                    59:0d:c3:c3:b0:46:d9:77:3c:da:45:e6:e9:68:2a:</span><br><span class="line">                    2e:50:bd:c5:73:8a:93:5d:83:e5:21:7d:e6:d6:19:</span><br><span class="line">                    6e:c1:22:6d:7f:43:d9:7d:a3:41:07:9d:21:a9:0a:</span><br><span class="line">                    00:3b:34:5a:55:f9:15:04:18:cf:88:4e:36:f5:92:</span><br><span class="line">                    03:b1:fd:80:a4:41:97:e0:1f:6a:40:ff:7f:1f:3f:</span><br><span class="line">                    30:8a:8f:04:70:bd:c4:50:1a:13:c9:22:52:7f:0d:</span><br><span class="line">                    95:9f</span><br><span class="line">                Exponent: 65537 (0x10001)</span><br><span class="line">        X509v3 extensions:</span><br><span class="line">            X509v3 Subject Key Identifier:</span><br><span class="line">                CB:31:F5:8A:91:A7:53:D8:FE:9B:B7:BC:BD:91:15:60:20:05:70:BA</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">         62:70:b2:9b:35:5c:<span class="built_in">cd</span>:df:2e:bb:e0:fb:1c:6c:a8:fa:7c:e7:</span><br><span class="line">         49:82:c7:cf:1e:7e:99:d8:3e:dd:e4:8b:be:af:6e:1a:da:68:</span><br><span class="line">         f2:48:60:05:3c:9b:d6:be:3e:e0:e3:60:ae:6d:fe:f6:6c:7f:</span><br><span class="line">         8e:1a:6a:a3:65:f5:0e:ea:e6:74:dc:8f:59:8b:39:2c:49:36:</span><br><span class="line">         49:51:40:4f:bc:0a:01:0d:56:4a:e7:0a:b8:8b:11:27:7c:98:</span><br><span class="line">         31:53:40:a7:f7:8c:a9:59:41:f9:67:a1:41:7c:bc:2f:4d:18:</span><br><span class="line">         7c:32:84:a1:ee:9b:9a:6a:8a:c2:df:f8:6d:27:d1:ae:9c:07:</span><br><span class="line">         76:8d:1d:b5:10:81:9d:d5:c2:06:f8:5f:fe:23:<span class="built_in">cd</span>:3f:de:73:</span><br><span class="line">         de:4e:91:85:8f:ab:84:01:85:25:81:ff:dd:32:33:24:89:e0:</span><br><span class="line">         72:b1:90:b8:88:71:6a:7d:52:c0:<span class="built_in">fc</span>:10:f1:a1:82:9b:ec:05:</span><br><span class="line">         ed:6e:1b:b5:d7:38:7b:26:62:76:b2:9d:f6:f1:c4:3c:ec:a2:</span><br><span class="line">         8c:42:d4:b8:c3:60:51:f9:fb:f8:d2:9f:4b:87:ea:28:d4:15:</span><br><span class="line">         dc:28:65:7e:90:86:b1:3b:02:e6:69:d8:13:f6:a9:47:f1:b4:</span><br><span class="line">         90:e5:d9:d6:73:01:05:63:b7:e9:01:c7:df:84:7b:58:88:55:</span><br><span class="line">         3a:7b:d6:5c</span><br></pre></td></tr></table></figure>
+<p>我们参考<a href="http://www.gtopia.org/blog/2010/02/der-vs-crt-vs-cer-vs-pem-certificates/" target="_blank" rel="noopener">该文章</a>，可以转换格式 </p>
+<h4 id="DER-exchange-PEM"><a href="#DER-exchange-PEM" class="headerlink" title="DER exchange PEM"></a>DER exchange PEM</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.cer -inform der -outform pem -out mxsci.pem</span><br><span class="line"><span class="comment"># cat mxsci.pem</span></span><br><span class="line">-----BEGIN CERTIFICATE-----</span><br><span class="line">MIIDbTCCAlWgAwIBAgIENPJdIzANBgkqhkiG9w0BAQsFADBnMQswCQYDVQQGEwJV</span><br><span class="line">SzEQMA4GA1UECBMHVW5rbm93bjEPMA0GA1UEBxMGTG9uZG9uMRAwDgYDVQQKEwdt</span><br><span class="line">ZW5neGluMRAwDgYDVQQLEwdtZW5neGluMREwDwYDVQQDEwhYaW4gTWVuZzAeFw0x</span><br><span class="line">ODEwMDQwOTA1NDdaFw0xOTAxMDIwOTA1NDdaMGcxCzAJBgNVBAYTAlVLMRAwDgYD</span><br><span class="line">VQQIEwdVbmtub3duMQ8wDQYDVQQHEwZMb25kb24xEDAOBgNVBAoTB21lbmd4aW4x</span><br><span class="line">EDAOBgNVBAsTB21lbmd4aW4xETAPBgNVBAMTCFhpbiBNZW5nMIIBIjANBgkqhkiG</span><br><span class="line">9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5iEcOQhB8o4hg22b2qRmHnhkNLYDGQfSJmQb</span><br><span class="line">+Kd5poVdX2UN2NBu3MyWmttV+cv7c/x+ave6YyJv0jyAjBOSR/MUdWczri76Zhkp</span><br><span class="line">Wf2GDDxrvKLAF5vIOlISZrSmYVYdSTNm5MrDltdBiSkHZdrLXcKucCKpqrUwbZVa</span><br><span class="line">QxX6A4QlxMHIjur0CbfvAL8uFrdpF+zaeQbRkq2uh0ackqWdxctoK1pZDcPDsEbZ</span><br><span class="line">dzzaRebpaCouUL3Fc4qTXYPlIX3m1hluwSJtf0PZfaNBB50hqQoAOzRaVfkVBBjP</span><br><span class="line">iE429ZIDsf2ApEGX4B9qQP9/Hz8wio8EcL3EUBoTySJSfw2VnwIDAQABoyEwHzAd</span><br><span class="line">BgNVHQ4EFgQUyzH1ipGnU9j+m7e8vZEVYCAFcLowDQYJKoZIhvcNAQELBQADggEB</span><br><span class="line">AGJwsps1XM3fLrvg+xxsqPp850mCx88efpnYPt3ki76vbhraaPJIYAU8m9a+PuDj</span><br><span class="line">YK5t/vZsf44aaqNl9Q7q5nTcj1mLOSxJNklRQE+8CgENVkrnCriLESd8mDFTQKf3</span><br><span class="line">jKlZQflnoUF8vC9NGHwyhKHum5pqisLf+G0n0a6cB3aNHbUQgZ3Vwgb4X/4jzT/e</span><br><span class="line">c95OkYWPq4QBhSWB/90yMySJ4HKxkLiIcWp9UsD8EPGhgpvsBe1uG7XXOHsmYnay</span><br><span class="line">nfbxxDzsooxC1LjDYFH5+/jSn0uH6ijUFdwoZX6QhrE7AuZp2BP2qUfxtJDl2dZz</span><br><span class="line">AQVjt+kBx9+Ee1iIVTp71lw=</span><br><span class="line">-----END CERTIFICATE-----</span><br></pre></td></tr></table></figure>
+<p>查看 <code>PEM</code> 证书信息，该信息和上面的是一致的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.pem -text -noout</span><br><span class="line"></span><br><span class="line">Certificate:</span><br><span class="line">    Data:</span><br><span class="line">        Version: 3 (0x2)</span><br><span class="line">        Serial Number: 888298787 (0x34f25d23)</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">        Issuer: C = UK, ST = Unknown, L = London, O = mengxin, OU = mengxin, CN = Xin Meng</span><br><span class="line">        Validity</span><br><span class="line">            Not Before: Oct  4 09:05:47 2018 GMT</span><br><span class="line">            Not After : Jan  2 09:05:47 2019 GMT</span><br><span class="line">        Subject: C = UK, ST = Unknown, L = London, O = mengxin, OU = mengxin, CN = Xin Meng</span><br><span class="line">        Subject Public Key Info:</span><br><span class="line">            Public Key Algorithm: rsaEncryption</span><br><span class="line">                Public-Key: (2048 bit)</span><br><span class="line">                Modulus:</span><br><span class="line">                    00:e6:21:1c:39:08:41:f2:8e:21:83:6d:9b:da:a4:</span><br><span class="line">                    ...</span><br><span class="line">                Exponent: 65537 (0x10001)</span><br><span class="line">        X509v3 extensions:</span><br><span class="line">            X509v3 Subject Key Identifier:</span><br><span class="line">                CB:31:F5:8A:91:A7:53:D8:FE:9B:B7:BC:BD:91:15:60:20:05:70:BA</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">         62:70:b2:9b:35:5c:<span class="built_in">cd</span>:df:2e:bb:e0:fb:1c:6c:a8:fa:7c:e7:</span><br><span class="line">         ...</span><br></pre></td></tr></table></figure>
+<p>同理我们也可以把 <code>PEM</code> 转化为 <code>DER</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.pem -inform pem -outform der  -out mxsci-from-pem.der</span><br><span class="line"><span class="comment"># view generate der file</span></span><br><span class="line">openssl x509 -<span class="keyword">in</span> mxsci-from-pem.der -inform der -text -noout</span><br></pre></td></tr></table></figure>
+<p>我们会发现 <code>mxsci-from-pem.der</code> 实际上和原来的 <code>mxsci.cer</code> 是一样的。 </p>
+<h4 id="crt-和-cer-的转化"><a href="#crt-和-cer-的转化" class="headerlink" title="crt 和 cer 的转化"></a>crt 和 cer 的转化</h4><p>参考该<a href="https://stackoverflow.com/a/642346/2000468" target="_blank" rel="noopener">回答</a></p>
+<blockquote>
+<p>File extensions for cryptographic certificates aren’t really as standardized as you’d expect. Windows by default treats double-clicking a .crt file as a request to import the certificate into the Windows Root Certificate store, but treats a .cer file as a request just to view the certificate. So, they’re different in that sense, at least, that Windows has some inherent different meaning for what happens when you double click each type of file.</p>
+<p>But the way that Windows handles them when you double-click them is about the only difference between the two. Both extensions just represent that it contains a public certificate. You can rename a file or use one in place of the other in any system or configuration file that I’ve seen. And on non-Windows platforms (and even on Windows), people aren’t particularly careful about which extension they use, and treat them both interchangeably, as there’s no difference between them as long as the contents of the file are correct.</p>
+</blockquote>
+<p>实际上这两个文件是一样的，只是不同的操作系统的传统定义方式和打开方式的动作有所不同，我们同样可以用  <code>openssl</code> 来转化，这里我们可以针对 <code>pem</code> 和 <code>der</code> 两个格式转化。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.cer -inform DER -outform DER -out mxsci.crt</span><br></pre></td></tr></table></figure>
+<p>同样生成的 <code>mxsci.crt</code> 和 <code>mxsci.cer</code> 也是完全一样的文件。</p>
+<p>我们也可以直接转化为 <code>pem</code> 格式的 <code>crt</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> mxsci.cer -inform DER -outform PEM -out mxsci.pem.crt</span><br></pre></td></tr></table></figure>
+<p>然后我们会发现，这个文件 <code>mxsci.pem.crt</code> 和之前的 <code>mxsci.pem</code> 是一样的。</p>
+<p>总之我们需要区分来</p>
+<ol>
+<li>PEM 和 DER：编码格式，在 <code>openssl</code> 工具中，需要通过 <code>-inform</code> 指定 （PEM 默认， DER 需要显式的指定）</li>
+<li>CRT 和 CER：都是 x509 certificate，基本是相同，理论上改个后缀就行了。</li>
+</ol>
+<h3 id="key"><a href="#key" class="headerlink" title="key"></a>key</h3><p>该文件一般存放私钥</p>
+<p>我们可以通过 <code>keytool</code> 从 <code>jks</code> 中提取出私钥。</p>
+<p>这里需要指出，之前我们在使用 <code>keytool</code> 总是会有一个警告，这是告诉我们，<code>jks</code>不是一个标准，而 <code>PKCS12</code> 才是一个标准，<code>keytool</code> 推荐我们将其转化为标准文件，这样可以使用其他工具，比如 <code>openssl</code> 对其进行进一步操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Warning:</span><br><span class="line">The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using &quot;keytool -importkeystore -srckeystore mxsci.jks -destkeystore mxsci.jks -deststoretype pkcs12&quot;.</span><br></pre></td></tr></table></figure>
+<p>这里还需要说明一个问题，就是 <code>jks</code> 支持 <code>store</code> 的 <code>password</code> 和 <code>key</code> 的 <code>password</code> 是两个密码，但是 <code>PKCS12</code> 理论上并不支持，因为这个文件被其他工具使用的时候，只接受一样的密码，所以 <code>keytool</code> 在转化 <code>jsk</code> 到 <code>pkcs12</code> 的时候，如果密码不一样，会报错，这一点，我们可以参考该 <a href="https://bugs.openjdk.java.net/browse/JDK-8008292" target="_blank" rel="noopener">issue</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">keytool error: java.lang.Exception: The destination pkcs12 keystore has different storepass and keypass. Please retry with -destkeypass specified.</span><br><span class="line">[mengxin@xin Certificates]$ keytool -importkeystore -srckeystore mxsci.jks -storepass changeit -destkeystore mxsci.jks -deststoretype pkcs12 -destkeypass changeitkey</span><br><span class="line">Enter source keystore password:</span><br><span class="line">Warning:  Different store and key passwords not supported for PKCS12 KeyStores. Ignoring user-specified -destkeypass value.</span><br></pre></td></tr></table></figure>
+<p>所以我们需要将密码改成一致，这里改 key 或者 store 的 password 都可以。</p>
+<h4 id="修改-jks-的-key-和-keystore-的密码"><a href="#修改-jks-的-key-和-keystore-的密码" class="headerlink" title="修改 jks 的 key 和 keystore 的密码"></a>修改 jks 的 key 和 keystore 的密码</h4><h5 id="keystore-密码"><a href="#keystore-密码" class="headerlink" title="keystore 密码"></a>keystore 密码</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">keytool -storepasswd -new newpassword -keystore server.keystore</span><br><span class="line">-storepass changeit</span><br></pre></td></tr></table></figure>
+<h5 id="key-密码"><a href="#key-密码" class="headerlink" title="key 密码"></a>key 密码</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -keypasswd -<span class="built_in">alias</span> server -keypass changeit -new newpassword -keystore server.keystore -storepass newpassword</span><br></pre></td></tr></table></figure>
+<h5 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">keytool -storepasswd -new changeit1 -keystore mxsci.jks -storepass changeit</span><br><span class="line">keytool -keypasswd -<span class="built_in">alias</span> mengxin.science -keypass changeitkey -new changeit1 -keystore mxsci.jks -storepass changeit1</span><br></pre></td></tr></table></figure>
+<h4 id="jks-生成-key"><a href="#jks-生成-key" class="headerlink" title="jks 生成 key"></a>jks 生成 key</h4><p>这时候，两个密码都改为了 <code>changeit1</code>，下面我们就可以开始将其转化为  <code>pkcs12</code> 进而生成 <code>key</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore mxsci.jks -storepass changeit1 -destkeystore mxsci.jks -deststoretype pkcs12</span><br><span class="line"></span><br><span class="line">keytool -importkeystore -srckeystore mxsci.jks -storepass changeit1 -destkeystore mxsci.p12 -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+<p>通过这两个命令发现，其目标的keystore 可以是任意文件扩展，虽然扩展名一样 （都是 jks），但是实际上内容格式已经不一样，因为如果使用 <code>keytool</code> 查看该 <code>jks</code> 发现，旧的 jks 会有一个警告，但是新的 jks 没有警告，然后我们还可以指定成  <code>p12</code> 格式的文件。</p>
+<p>有了 <code>p12</code>，我们就可以使用  <code>openssl</code> 生成 <code>key</code> 了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># concert PKCS12 key to unencrypted PEM:</span></span><br><span class="line">openssl pkcs12 -<span class="keyword">in</span> keystore.p12 -nodes -nocerts -out mydomain.key</span><br></pre></td></tr></table></figure>
+<p>生成的 <code>key</code> 是非加密的私钥，并且是 <code>PEM</code> 格式，生成过程需要输入密码。</p>
+<p>当然这里我们还可以生成 <code>crt</code> 证书文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl pkcs12 -<span class="keyword">in</span> keystore.p12 -nokeys -out my_key_store.crt</span><br></pre></td></tr></table></figure>
+<p>我们会发现这个生成的 <code>crt</code> 也是 <code>PEM</code> 格式的，比之前生成的 <code>crt</code> 多了个头部信息，证书的 base64 字符串是一样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Bag Attributes</span><br><span class="line">    friendlyName: mengxin.science</span><br><span class="line">    localKeyID: 54 69 6D 65 20 31 35 33 38 37 36 38 35 34 37 34 33 33</span><br><span class="line">subject=/C=UK/ST=Unknown/L=London/O=mengxin/OU=mengxin/CN=Xin Meng</span><br><span class="line">issuer=/C=UK/ST=Unknown/L=London/O=mengxin/OU=mengxin/CN=Xin Meng</span><br></pre></td></tr></table></figure>
+<p><a href="https://serverfault.com/a/715856/398427" target="_blank" rel="noopener">https://serverfault.com/a/715856/398427</a></p>
+<h2 id="Nginx-配置-SSL"><a href="#Nginx-配置-SSL" class="headerlink" title="Nginx 配置 SSL"></a>Nginx 配置 SSL</h2><p>公私钥的使用场景最典型的就是 SSL （TSL） 安全套接字，其构建了整个网络世界的安全基础。</p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html</a></p>
+<p><a href="https://www.cnblogs.com/chjbbs/p/5748369.html" target="_blank" rel="noopener">https://www.cnblogs.com/chjbbs/p/5748369.html</a></p>
+<p>一般在 Nginx 配置文件中配置 SSL 的时候，需要分别配置 <code>key</code> 和 <code>certificate</code></p>
+<figure class="highlight nginxconf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;  </span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">listen</span> [::]:<span class="number">80</span> ssl ipv6only=<span class="literal">on</span>; </span><br><span class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl;</span><br><span class="line">    <span class="attribute">listen</span> [::]:<span class="number">443</span> ssl ipv6only=<span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">server_name</span> example.com;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">ssl</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">ssl_certificate</span> /etc/ssl/private/example_com.crt;</span><br><span class="line">    <span class="attribute">ssl_certificate_key</span> /etc/ssl/private/example_com.key;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>key</code> 需要保密，而 <code>crt</code> 是需要公开出去的。一般情况下，这个 <code>crt</code> 是需要某个权威的 <code>CA</code> 认证的，从而保证这个证书无法被篡改。对于如何使用这对公私钥保证数据传输安全保密，参考<a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html" target="_blank" rel="noopener">该文</a>，概括的讲就是浏览器需要从服务器获取证书也就是公钥，首先验证公钥的有效性，然后使用公钥对数据进行加密再传输到服务器，服务器使用私钥解密获取明文。当然这个过程需要考虑很多细节，比如加密本身资源消耗大，所以采用和对称加密结合的方式，只是用公钥加密对称密钥，然后数据使用对称密钥加密，而服务通过私钥获取对称密钥，然后在解密密文。</p>
+<p>刚才我们提到 <code>crt</code> 一般是通过某个 <code>CA</code> 认证，这个认证过程是通过使用 <code>csr</code> 文件向 <code>CA</code> 申请的。</p>
+<h2 id="CA-签发证书"><a href="#CA-签发证书" class="headerlink" title="CA 签发证书"></a>CA 签发证书</h2><p>首先我们先生成一个 <code>CA</code> 证书。</p>
+<p>Subject: C = UK, ST = London, L = London, O = Deepnet Security Ltd, OU = Certificate Authority, CN = Deepnet CA</p>
+<p><a href="https://gist.github.com/Soarez/9688998#ca-key-and-self-signed-certificate" target="_blank" rel="noopener">https://gist.github.com/Soarez/9688998#ca-key-and-self-signed-certificate</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out ca.key 2048</span><br><span class="line">openssl req -new -x509 -key ca.key -out ca.crt</span><br><span class="line">openssl x509 -req -in example.org.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out example.org.crt</span><br></pre></td></tr></table></figure>
+<h3 id="key-crt-to-pfx"><a href="#key-crt-to-pfx" class="headerlink" title="key + crt to pfx"></a>key + crt to pfx</h3><p><a href="https://www.ssl.com/how-to/create-a-pfx-p12-certificate-file-using-openssl/" target="_blank" rel="noopener">https://www.ssl.com/how-to/create-a-pfx-p12-certificate-file-using-openssl/</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl pkcs12 -<span class="built_in">export</span> -out certificate.pfx -inkey privateKey.key -<span class="keyword">in</span> certificate.crt -certfile more.crt</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.sslshopper.com/article-most-common-openssl-commands.html" target="_blank" rel="noopener">https://www.sslshopper.com/article-most-common-openssl-commands.html</a></p>
+<h2 id="NetScaler-Certificate"><a href="#NetScaler-Certificate" class="headerlink" title="NetScaler Certificate"></a>NetScaler Certificate</h2><p><img src="https://github.com/xmeng1/images/raw/master/images/certificate_getting_started.png" alt="enter description here"></p>
+<p>对于 NetScaler 的配置，配置面板中给出了一张图，我们可以看到它所需要的 <code>certificate-key pair</code> 文件，所以我们需要自己生成这个问题。 </p>
+<h2 id="openssl-keytool-总结"><a href="#openssl-keytool-总结" class="headerlink" title="openssl/keytool 总结"></a>openssl/keytool 总结</h2><p>实际中，我们最常用的主要是通过命令查看转换证书文件等。下面我们对这些命令进行一下总结：</p>
+<h3 id="openssl"><a href="#openssl" class="headerlink" title="openssl"></a>openssl</h3><p>该命令有二级子命令，目前我们用到的有： x509，rsa，req，genrsa，pkcs12。下面我们总结一下每个子命令通用的选项：</p>
+<ol>
+<li>-in  输入的文件</li>
+<li>-inform 主要制定输入的格式 PEM/DER</li>
+<li>-out 输出的文件</li>
+<li>-outform 主要制定输出的格式 PEM/DER</li>
+<li>-text 用于输出内容，和 -noout 组合使用查看</li>
+<li>-noout 不输出任何文件</li>
+</ol>
+<p>典型应用</p>
+<ol>
+<li>openssl x509 -in mxsci.cer -inform der -text -noout</li>
+</ol>
+<ol>
+<li>DER 转 PEM：<code>openssl x509 -in mxsci.cer -inform der -outform pem -out mxsci.pem</code></li>
+<li>查看 PEM：<code>openssl x509 -in mxsci.pem -text -noout</code></li>
+<li>PEM 转 DER：<code>openssl x509 -in mxsci.pem -inform pem -outform der  -out mxsci-from-pem.der</code></li>
+<li>查看 DER：<code>openssl x509 -in mxsci-from-pem.der -inform der -text -noout</code></li>
+<li>生成 key：<code>openssl genrsa -out ca.key 2048</code></li>
+<li>生成 self sign 证书：<code>openssl req -new -x509 -key ca.key -out ca.crt</code></li>
+<li>通过 csr 签发 crt <code>openssl x509 -req -in example.org.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out example.org.crt</code></li>
+<li>crt+key 生成 pfx：<code>openssl pkcs12 -export -out certificate.pfx -inkey privateKey.key -in certificate.crt -certfile more.crt</code></li>
+<li>pfx 生成 key：<code>openssl pkcs12 -in keystore.p12 -nodes -nocerts -out mydomain.key</code></li>
+<li>pfx 生成 crt：<code>openssl pkcs12 -in keystore.p12 -nokeys -out my_key_store.crt</code></li>
+</ol>
+<h3 id="keytool"><a href="#keytool" class="headerlink" title="keytool"></a>keytool</h3><p>主要是各个选项的组合使用</p>
+<ol>
+<li>-keystore  keystore.jks  指定 keystore 文件，一般为 jks 或 p12</li>
+<li>-alias mydomain 指定别名</li>
+<li>-storepass changeit 指定 store password</li>
+<li>-export 输出证书 </li>
+<li>-file 输出文件名</li>
+<li>-storepasswd -new 修改 store password</li>
+<li>-keypasswd 修改 key password</li>
+<li>-keypass 指定 key password</li>
+<li>-importkeystore 用于转换 keystore 格式，import</li>
+<li>-destkeystore  用于转换 keystore 格式，destination 文件名</li>
+<li>-deststoretype 用于转换 keystore 格式，destination store 类型，比如 pkcs12</li>
+<li>-genkey 生成 key pair</li>
+<li>-keyalg 生成使用的算法</li>
+<li>-keysize 生成 key 的 size</li>
+<li>-printcert 打印 certificate</li>
+<li>-v  it signifies “verbose” mode; more information will be output.</li>
+<li>-list Prints (to stdout) the contents of the keystore entry identified by alias. If no alias is specified, the contents of the entire keystore are printed.</li>
+<li>-certreq 创建 csr</li>
+</ol>
+<p>典型应用</p>
+<ol>
+<li>生成 key： <code>keytool -genkey -alias  mydomain  -keyalg RSA -keystore  keystore.jks -keysize 2048</code></li>
+<li>导出证书： <code>keytool -printcert -v -file  mydomain.crt</code></li>
+<li>查看所有：<code>keytool -list -v -keystore  keystore.jks</code></li>
+<li>查看某一个： <code>keytool -list -v -keystore  keystore.jks  -alias mydomain</code></li>
+<li>创建 csr：<code>keytool -certreq -alias  mydomain  -keystore  keystore.jks  -file  mydomain.csr</code></li>
+<li>都出 cer：<code>keytool -export -alias server-alias -storepass changeit -file server.cer -keystore keystore.jks</code></li>
+<li>修改 store pass： <code>keytool -storepasswd -new newpassword -keystore server.keystore -storepass</code></li>
+<li>修改 key pass： <code>keytool -keypasswd -alias mengxin.science -keypass changeitkey -new changeit1 -keystore mxsci.jks -storepass changeit1</code></li>
+<li>生成 p12： <code>keytool -importkeystore -srckeystore mxsci.jks -storepass changeit1 -destkeystore mxsci.p12 -deststoretype pkcs12</code></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/28/study-driving-licence-in-uk-14/" rel="next" title="英国学车记第十四课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第十四课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/08/dockerfile-maven-in-practice/" rel="prev" title="dockerfile-maven 使用 实践">
+                dockerfile-maven 使用 实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JKS-（Java-KeyStore）"><span class="nav-number">1.</span> <span class="nav-text">JKS （Java KeyStore）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KeyStore-介绍"><span class="nav-number">1.1.</span> <span class="nav-text">KeyStore 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-keytool-生成-JKS，并且生成公钥和私钥对："><span class="nav-number">1.2.</span> <span class="nav-text">使用 keytool 生成 JKS，并且生成公钥和私钥对：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-keystore-内的公私钥信息"><span class="nav-number">1.3.</span> <span class="nav-text">查看 keystore 内的公私钥信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSR-（Certificate-Signing-Request）"><span class="nav-number">2.</span> <span class="nav-text">CSR （Certificate Signing Request）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍"><span class="nav-number">2.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JKS-生成-CSR"><span class="nav-number">2.2.</span> <span class="nav-text">JKS 生成 CSR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公私钥及证书系统"><span class="nav-number">3.</span> <span class="nav-text">公私钥及证书系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#crt-和-cer"><span class="nav-number">3.1.</span> <span class="nav-text">crt 和 cer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DER-exchange-PEM"><span class="nav-number">3.1.1.</span> <span class="nav-text">DER exchange PEM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#crt-和-cer-的转化"><span class="nav-number">3.1.2.</span> <span class="nav-text">crt 和 cer 的转化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key"><span class="nav-number">3.2.</span> <span class="nav-text">key</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改-jks-的-key-和-keystore-的密码"><span class="nav-number">3.2.1.</span> <span class="nav-text">修改 jks 的 key 和 keystore 的密码</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#keystore-密码"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">keystore 密码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#key-密码"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">key 密码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#实践"><span class="nav-number">3.2.1.3.</span> <span class="nav-text">实践</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#jks-生成-key"><span class="nav-number">3.2.2.</span> <span class="nav-text">jks 生成 key</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-配置-SSL"><span class="nav-number">4.</span> <span class="nav-text">Nginx 配置 SSL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CA-签发证书"><span class="nav-number">5.</span> <span class="nav-text">CA 签发证书</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#key-crt-to-pfx"><span class="nav-number">5.1.</span> <span class="nav-text">key + crt to pfx</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NetScaler-Certificate"><span class="nav-number">6.</span> <span class="nav-text">NetScaler Certificate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#openssl-keytool-总结"><span class="nav-number">7.</span> <span class="nav-text">openssl/keytool 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#openssl"><span class="nav-number">7.1.</span> <span class="nav-text">openssl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#keytool"><span class="nav-number">7.2.</span> <span class="nav-text">keytool</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/10/03/all-knowledge-about-certificate-1/';
+          this.page.identifier = '2018/10/03/all-knowledge-about-certificate-1/';
+          this.page.title = '关于Certificate的一切-概念及工具';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

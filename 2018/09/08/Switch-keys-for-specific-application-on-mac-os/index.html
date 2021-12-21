@@ -1,0 +1,994 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mac,karabiner," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文介绍在 Mac 系统下如何解决不同应用 Ctrl 和 Command 按键的自由切换。">
+<meta name="keywords" content="mac,karabiner">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac OS 应用级别按键转换">
+<meta property="og:url" content="https://notes.mengxin.science/2018/09/08/Switch-keys-for-specific-application-on-mac-os/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文介绍在 Mac 系统下如何解决不同应用 Ctrl 和 Command 按键的自由切换。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/9-Xnip2018-09-09_21-07-11.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/9-Xnip2018-09-09_21-08-56.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mac OS 应用级别按键转换">
+<meta name="twitter:description" content="摘要：本文介绍在 Mac 系统下如何解决不同应用 Ctrl 和 Command 按键的自由切换。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/9-Xnip2018-09-09_21-07-11.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/09/08/Switch-keys-for-specific-application-on-mac-os/"/>
+
+
+
+
+
+  <title> Mac OS 应用级别按键转换 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/09/08/Switch-keys-for-specific-application-on-mac-os/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Mac OS 应用级别按键转换
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-08T23:00:00+00:00">
+                2018-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/08/Switch-keys-for-specific-application-on-mac-os/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/09/08/Switch-keys-for-specific-application-on-mac-os/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文介绍在 <code>Mac</code> 系统下如何解决不同应用 <code>Ctrl</code> 和 <code>Command</code> 按键的自由切换。</p>
+<a id="more"></a>
+<p>众所周知，<code>Mac</code> 系统的独特的键位设计给需要在不同的操作系统之间切换的人来说实在是痛苦。小小的一个 <code>Ctrl</code> 和 <code>Command</code> 让人无比难受。这里我们使用 <code>Karabiner</code> 优雅的解决这个问题。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>本人经常在 <code>Windows</code> 和 <code>Mac</code> 之间切换使用，因为 <code>Mac</code> 散热问题，我总是喜欢把 <code>CPU</code> 繁重的任务丢给 <code>Windows</code> 机器，而且一般把 <code>Windows</code> 机器放远一点，通过 <code>Microsoft</code> 提供的高端 <code>RDP</code> 应用远程登录。 （微软的这个 <code>Mac</code> 版的 <code>RDP</code> 应用真心良心之作，能够在 <code>RDP</code> 中使用所有屏幕这一项就比 VNC 好很多）。</p>
+<p>这样基本就是在 <code>Mac</code> 和 <code>Windows</code> 上穿插使用，再加上偶尔 <code>VNC</code> 到远程的 <code>Fedora</code>，基本三个系统都会涉及到。</p>
+<p>在操作的过程中莫过于按键不一致带来了很多不便。其中最关键的就是 <code>Ctrl</code> 和 <code>Command</code>，再加上使用外接的机械 <code>PC</code> 键盘，感觉操作起来经常误操作。</p>
+<h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><ol>
+<li>将 Mac 的 <code>Control</code> 和 <code>Command</code> 对调。这样首先很多快捷键就和 <code>Windows</code> 上一致了，比如拷贝和粘贴。</li>
+<li>安装 <code>Karabinar</code> 可以解决大部分外接键盘布局在 Mac 系统下不准确的问题</li>
+<li>安装一个第三方的组件，让 <code>Karabinar</code> 支持动态为不同的应用使用不同的 <code>Profile</code></li>
+<li>配置 RDP 软件独立的按键修改方案。</li>
+</ol>
+<h2 id="Karabinar-支持不同应用自动加载不同-Profile"><a href="#Karabinar-支持不同应用自动加载不同-Profile" class="headerlink" title="Karabinar 支持不同应用自动加载不同 Profile"></a>Karabinar 支持不同应用自动加载不同 Profile</h2><p>在 <a href="https://github.com/tekezo/Karabiner-Elements/issues/137" target="_blank" rel="noopener"><code>GitHub</code> 上有一个 <code>issue</code></a> 专门讨论这个问题，其中有一个人自己写了一个应用 <a href="https://github.com/nriley/Karabiner-Elements-App-Profiles" target="_blank" rel="noopener">Karabinar Elements App Profile</a> 解决了这个问题。</p>
+<p>讨论中给出了多种解决方法，这里给出一种最方便的实现</p>
+<h3 id="安装运行相关服务"><a href="#安装运行相关服务" class="headerlink" title="安装运行相关服务"></a>安装运行相关服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">brew cask install karabiner-elements</span><br><span class="line">brew install https://raw.githubusercontent.com/toonetown/homebrew-extras/master/Formula/karabiner-elements-app-profiles.rb</span><br><span class="line">brew services start karabiner-elements-app-profiles</span><br></pre></td></tr></table></figure>
+<p>如果已经安装了最新的 karabiner 就不需要第一步了。按照讨论中的说法，需要 <code>Log Off</code> 在 <code>Log In</code> 才能生效。</p>
+<blockquote>
+<p>I ended up building this myself tonight — it’s a separate daemon, with<br>right now no documentation, but if you’re sufficiently technical, here<br>you go:</p>
+<p><a href="https://github.com/nriley/Karabiner-Elements-App-Profiles" target="_blank" rel="noopener">https://github.com/nriley/Karabiner-Elements-App-Profiles</a></p>
+<p>If a profile is named after an app’s bundle identifier, it’ll<br>automatically switch to the profile when you bring that app to the<br>front (and the first/default profile otherwise).</p>
+<p>Obviously this would be better built into Karabiner-Elements!</p>
+</blockquote>
+<p>根据作者的简单介绍我们可以知道该服务的用法如下：</p>
+<p>首先 <code>Karabinar</code> 需要有一个默认的 <code>Profile</code>，没有被指定的应用都会使用这个默认的 <code>Profile</code>，然后用户可以自己添加其他 <code>Profile</code>，如果这个 <code>Profile</code> 和某个应用的 <code>Bundle Identifier</code> 一致，那么当该应用切换到前台的时候，这个 <code>Profile</code> 将会自动被加载。</p>
+<p>比如，<code>Karabinar</code> 配置如下的 <code>Profile</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Default Profile</span><br><span class="line">com.microsoft.rdc.osx.beta</span><br><span class="line">com.barebones.bbedit</span><br><span class="line">com.apple.Safari</span><br></pre></td></tr></table></figure>
+<p>那么当打开应用 <code>com.microsoft.rdc.osx.beta</code> 的时候，将会自动切换对应的 <code>Profile</code></p>
+<h3 id="定位目标应用"><a href="#定位目标应用" class="headerlink" title="定位目标应用"></a>定位目标应用</h3><p>下面的工作就是定位我们需要特定按键的应用的 <code>Bundle Identifier</code>。</p>
+<p>作者给出了两种方法，在命令行工具中获取 <code>Bundler Identifier</code></p>
+<h4 id="launch"><a href="#launch" class="headerlink" title="launch"></a>launch</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">% launch -f /Applications/Mail.app </span><br><span class="line">/Applications/Mail.app: scriptable OS X application package </span><br><span class="line">	<span class="built_in">type</span>: <span class="string">'APPL'</span>	creator: <span class="string">'emal'</span></span><br><span class="line">	display name: Mail</span><br><span class="line">	architecture: Intel x86-64</span><br><span class="line">	bundle ID: com.apple.mail</span><br></pre></td></tr></table></figure>
+<h4 id="mdls"><a href="#mdls" class="headerlink" title="mdls"></a>mdls</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mdls -name kMDItemCFBundleIdentifier /Applications/Mail.app </span><br><span class="line">kMDItemCFBundleIdentifier = <span class="string">"com.apple.mail"</span></span><br></pre></td></tr></table></figure>
+<h4 id="常用的应用"><a href="#常用的应用" class="headerlink" title="常用的应用"></a>常用的应用</h4><p>Windows Remote Desktop （新版，图标为圆形图标）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mdls -name kMDItemCFBundleIdentifier /Applications/Microsoft\ Remote\ Desktop.app/</span><br><span class="line">kMDItemCFBundleIdentifier = <span class="string">"com.microsoft.rdc.macos"</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/9-Xnip2018-09-09_21-07-11.png" alt="enter description here"></p>
+<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>我们配置完成后会发现，默认的时候，<code>Karabinar</code> 的 <code>Profile</code> 为默认的，但是一旦切换到其他配置了独立的 <code>Profile</code> 的应用，<code>Karabinar</code> 的 <code>Profile</code>将会自动切换到对应的 <code>Profile</code>。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/9-Xnip2018-09-09_21-08-56.png" alt="enter description here"></p>
+<h2 id="其他注意点"><a href="#其他注意点" class="headerlink" title="其他注意点"></a>其他注意点</h2><p>这种更改方案还有一点不完美就是，在切换到目标的应用后，由于键位更改，某些快捷键这时候就也会变化，比如我们常用的切换应用：<code>Command + Tab</code>，如果我们在交换了键位的应用上，就会变为 <code>Ctrl + Tab</code>，所以尽可以将常用快捷键不要依赖于应用修改的键位。</p>
+<p>比如将 <code>Move Left a place</code> 和 <code>Move Right a place</code> 由默认的 <code>Control + Left</code> 变为 <code>Option + Left</code>，这样可以统一切换 <code>RDP</code> 屏幕和 Mac 自己的屏幕。</p>
+<h3 id="增加新的-Profile"><a href="#增加新的-Profile" class="headerlink" title="增加新的 Profile"></a>增加新的 Profile</h3><p>最近增加新的 Profile 发现每次增加，一旦启动了自动切换 Profile 的应用，就是把新加入的 Profile 删除掉。后来发现了解决方法：</p>
+<ol>
+<li>stop karabiner-elements-app-profiles：<code>brew services stop karabiner-elements-app-profiles</code></li>
+<li>增加新的 profile</li>
+<li>start karabiner-elements-app-profiles： <code>brew services start karabiner-elements-app-profiles</code></li>
+</ol>
+<p>这样就不会自动删除了。</p>
+<h3 id="keyboard-检测失效"><a href="#keyboard-检测失效" class="headerlink" title="keyboard 检测失效"></a>keyboard 检测失效</h3><p>可以通过删除已经存在的配置文件充值键盘检测</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rm /Library/Preferences/com.apple.keyboardtype.plist</span><br></pre></td></tr></table></figure>
+<p>然后重启系统</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mac/" rel="tag"># mac</a>
+          
+            <a href="/tags/karabiner/" rel="tag"># karabiner</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/08/vim-movement-key-explaination/" rel="next" title="vim movement key explaination">
+                <i class="fa fa-chevron-left"></i> vim movement key explaination
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/11/study-driving-licence-in-uk-12/" rel="prev" title="英国学车记第十二课">
+                英国学车记第十二课 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用场景"><span class="nav-number">1.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决思路"><span class="nav-number">2.</span> <span class="nav-text">解决思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Karabinar-支持不同应用自动加载不同-Profile"><span class="nav-number">3.</span> <span class="nav-text">Karabinar 支持不同应用自动加载不同 Profile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装运行相关服务"><span class="nav-number">3.1.</span> <span class="nav-text">安装运行相关服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定位目标应用"><span class="nav-number">3.2.</span> <span class="nav-text">定位目标应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#launch"><span class="nav-number">3.2.1.</span> <span class="nav-text">launch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mdls"><span class="nav-number">3.2.2.</span> <span class="nav-text">mdls</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常用的应用"><span class="nav-number">3.2.3.</span> <span class="nav-text">常用的应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#效果"><span class="nav-number">3.3.</span> <span class="nav-text">效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他注意点"><span class="nav-number">4.</span> <span class="nav-text">其他注意点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#增加新的-Profile"><span class="nav-number">4.1.</span> <span class="nav-text">增加新的 Profile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#keyboard-检测失效"><span class="nav-number">4.2.</span> <span class="nav-text">keyboard 检测失效</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/09/08/Switch-keys-for-specific-application-on-mac-os/';
+          this.page.identifier = '2018/09/08/Switch-keys-for-specific-application-on-mac-os/';
+          this.page.title = 'Mac OS 应用级别按键转换';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

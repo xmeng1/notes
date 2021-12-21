@@ -1,0 +1,997 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala,for-expression," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文详细介绍 Scala 的 For 推导式的内部原理">
+<meta name="keywords" content="scala,for-expression">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala For 推导式介绍及最佳实践">
+<meta property="og:url" content="https://notes.mengxin.science/2018/09/06/scala-for-comprehension-introduction-in-practice/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文详细介绍 Scala 的 For 推导式的内部原理">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala For 推导式介绍及最佳实践">
+<meta name="twitter:description" content="摘要：本文详细介绍 Scala 的 For 推导式的内部原理">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/09/06/scala-for-comprehension-introduction-in-practice/"/>
+
+
+
+
+
+  <title> Scala For 推导式介绍及最佳实践 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/09/06/scala-for-comprehension-introduction-in-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala For 推导式介绍及最佳实践
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-06T23:00:00+00:00">
+                2018-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/06/scala-for-comprehension-introduction-in-practice/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/09/06/scala-for-comprehension-introduction-in-practice/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文详细介绍 <code>Scala</code> 的 <code>For</code> 推导式的内部原理</p>
+<a id="more"></a>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/main/scala/progscala2/forcomps/RemoveBlanks.scala</span></span><br><span class="line"><span class="keyword">package</span> progscala2.forcomps</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">RemoveBlanks</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Remove blank lines from the specified input file.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(path: <span class="type">String</span>, compressWhiteSpace: <span class="type">Boolean</span> = <span class="literal">false</span>): <span class="type">Seq</span>[<span class="type">String</span>] =</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">      <span class="comment">// 这是一个生成器</span></span><br><span class="line">      line &lt;- scala.io.<span class="type">Source</span>.fromFile(path).getLines.toSeq          <span class="comment">// &lt;1&gt;</span></span><br><span class="line">      <span class="keyword">if</span> line.matches(<span class="string">""</span><span class="string">"^\s*$"</span><span class="string">""</span>) == <span class="literal">false</span>                          <span class="comment">// &lt;2&gt;</span></span><br><span class="line">      line2 = <span class="keyword">if</span> (compressWhiteSpace) line replaceAll (<span class="string">"\\s+"</span>, <span class="string">" "</span>)  <span class="comment">// &lt;3&gt;</span></span><br><span class="line">              <span class="keyword">else</span> line</span><br><span class="line">    &#125; <span class="keyword">yield</span> line2                                                    <span class="comment">// &lt;4&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Remove blank lines from the specified input files and echo the remaining</span></span><br><span class="line"><span class="comment">   * lines to standard output, one after the other.</span></span><br><span class="line"><span class="comment">   * @param args list of file paths. Prefix each with an optional "-" to</span></span><br><span class="line"><span class="comment">   *             compress remaining whitespace in the file.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) = <span class="keyword">for</span> &#123;</span><br><span class="line">    path2 &lt;- args                                                    <span class="comment">// &lt;5&gt;</span></span><br><span class="line">    (compress, path) = <span class="keyword">if</span> (path2 startsWith <span class="string">"-"</span>) (<span class="literal">true</span>, path2.substring(<span class="number">1</span>))</span><br><span class="line">                       <span class="keyword">else</span> (<span class="literal">false</span>, path2)                           <span class="comment">// &lt;6&gt;</span></span><br><span class="line">    line &lt;- apply(path, compress)</span><br><span class="line">  &#125; println(line)                                                    <span class="comment">// &lt;7&gt;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><1> 由于 for 推导式无法返回 Iterator 对象， for 推导式的返回类型由初始的生成器所决定，因此我们必须将其转化成一个序列。</1></p>
+<p><2> 过滤空行，也就是说这句话是使用上一句的输出结果</2></p>
+<p><3> 是一个 guard， 通过某个条件对进过进行处理，并赋值给另外的临时变量</3></p>
+<p><4> 输出最后的结果</4></p>
+<h2 id="For-推导式原理"><a href="#For-推导式原理" class="headerlink" title="For 推导式原理"></a>For 推导式原理</h2><p>For 推导式实际上是语法糖，是组合了 map withFilter flatMap 的基础操作，下面给出一个等价的表示方法：</p>
+<h3 id="案例1"><a href="#案例1" class="headerlink" title="案例1"></a>案例1</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> lara = <span class="type">Person</span>(<span class="string">"Lara"</span>, isMale = <span class="literal">false</span>)</span><br><span class="line"><span class="keyword">val</span> bob = <span class="type">Person</span>(<span class="string">"Bob"</span>, isMale = <span class="literal">true</span>)</span><br><span class="line"><span class="keyword">val</span> julie = <span class="type">Person</span>(<span class="string">"Julie"</span>, <span class="literal">false</span>, lara, bob)</span><br><span class="line"><span class="keyword">val</span> persons = <span class="type">List</span>(lara, bob, julie)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> temp1 = persons filter (p =&gt; !p.isMale)</span><br><span class="line"><span class="keyword">var</span> temp11 = temp1 flatMap (k =&gt; k.name)</span><br><span class="line"><span class="keyword">var</span> temp12 = temp1 flatMap (k =&gt; k.children)</span><br><span class="line"><span class="keyword">var</span> temp2 = temp1 flatMap (p =&gt; p.children map (c =&gt; (p.name, c.name)))</span><br><span class="line"></span><br><span class="line">println(temp1)</span><br><span class="line">println(temp11)</span><br><span class="line">println(temp12)</span><br><span class="line">println(temp2)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp3 = persons withFilter (p =&gt; !p.isMale) flatMap (p =&gt; p.children map (c =&gt; (p.name, c.name)))</span><br><span class="line">println(temp3)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp4 = <span class="keyword">for</span> &#123;</span><br><span class="line">	p &lt;- persons</span><br><span class="line">	<span class="keyword">if</span> !p.isMale</span><br><span class="line">	c &lt;- p.children</span><br><span class="line">&#125; <span class="keyword">yield</span> (p.name, c.name)</span><br><span class="line">println(temp4)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp5 = <span class="keyword">for</span> &#123;</span><br><span class="line">	p &lt;- persons <span class="comment">// a generator</span></span><br><span class="line">	n = p.name <span class="comment">// a definition</span></span><br><span class="line">	<span class="keyword">if</span> n startsWith <span class="string">"To"</span> <span class="comment">// a filter</span></span><br><span class="line">&#125; <span class="keyword">yield</span> n</span><br><span class="line">println(temp5)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp6 = <span class="keyword">for</span> (</span><br><span class="line">	x &lt;- <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">	y &lt;- <span class="type">List</span>(<span class="string">"one"</span>, <span class="string">"two"</span>);</span><br><span class="line">) <span class="keyword">yield</span> (x, y)</span><br><span class="line">println(temp6)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp6Equivalence = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>) flatMap (p =&gt; &#123; <span class="type">List</span>(<span class="string">"one"</span>, <span class="string">"two"</span>) map ( k =&gt; (p,k))&#125;)</span><br><span class="line"></span><br><span class="line">println(temp6Equivalence)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp7 = <span class="keyword">for</span> (</span><br><span class="line">	x &lt;- <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">	y &lt;- <span class="type">List</span>(<span class="string">"one"</span>, <span class="string">"two"</span>);</span><br><span class="line">	z &lt;- <span class="type">List</span>(<span class="string">"a"</span>, <span class="string">"b"</span>)</span><br><span class="line">) <span class="keyword">yield</span> (x, y, z)</span><br><span class="line">println(temp7)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> temp7Equivalence = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>) flatMap (p =&gt; &#123; <span class="type">List</span>(<span class="string">"one"</span>, <span class="string">"two"</span>) flatMap  ( k =&gt; &#123; <span class="type">List</span>(<span class="string">"a"</span>, <span class="string">"b"</span>) map (l =&gt; (p,k,l))&#125;)&#125;)</span><br><span class="line"></span><br><span class="line">println(temp7Equivalence)</span><br></pre></td></tr></table></figure>
+<h3 id="案例2"><a href="#案例2" class="headerlink" title="案例2"></a>案例2</h3><h4 id="没有-yield"><a href="#没有-yield" class="headerlink" title="没有 yield"></a>没有 <code>yield</code></h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> states = <span class="type">List</span>(<span class="string">"Alabama"</span>, <span class="string">"Alaska"</span>, <span class="string">"Virginia"</span>, <span class="string">"Wyoming"</span>)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">s &lt;- states</span><br><span class="line">&#125; println(s)</span><br><span class="line"><span class="comment">// 结果值:</span></span><br><span class="line"><span class="comment">// Alabama</span></span><br><span class="line"><span class="comment">// Alaska</span></span><br><span class="line"><span class="comment">// Virginia</span></span><br><span class="line"><span class="comment">// Wyoming</span></span><br><span class="line">states foreach println</span><br></pre></td></tr></table></figure>
+<h4 id="含有-yield"><a href="#含有-yield" class="headerlink" title="含有 yield"></a>含有 <code>yield</code></h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> states = <span class="type">List</span>(<span class="string">"Alabama"</span>, <span class="string">"Alaska"</span>, <span class="string">"Virginia"</span>, <span class="string">"Wyoming"</span>)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">s &lt;- states</span><br><span class="line">&#125; <span class="keyword">yield</span> s.toUpperCase</span><br><span class="line"><span class="comment">// 结果值: List(ALABAMA, ALASKA, VIRGINIA, WYOMING)</span></span><br><span class="line">states map (_.toUpperCase)   <span class="comment">// 有点类似于  Java Lambda 的 ::Method 操作，如果在 `map` 操作中只执行了一个方法。</span></span><br><span class="line"><span class="comment">// 结果值: List(ALABAMA, ALASKA, VIRGINIA, WYOMING)</span></span><br></pre></td></tr></table></figure>
+<h4 id="多个生成器"><a href="#多个生成器" class="headerlink" title="多个生成器"></a>多个生成器</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> states = <span class="type">List</span>(<span class="string">"Alabama"</span>, <span class="string">"Alaska"</span>, <span class="string">"Virginia"</span>, <span class="string">"Wyoming"</span>)</span><br><span class="line"><span class="keyword">val</span> temp8 = <span class="keyword">for</span> &#123;</span><br><span class="line">	s &lt;- states</span><br><span class="line">	c &lt;- s</span><br><span class="line">&#125; <span class="keyword">yield</span> <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span></span><br><span class="line"><span class="comment">// 结果值: List("A-A", "l-L", "a-A", "b-B", ...)</span></span><br><span class="line"><span class="keyword">val</span> temp8Equivalence = states flatMap (_.toSeq map (c =&gt; <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span>))</span><br><span class="line"><span class="keyword">val</span> temp8Equivalence2 = states flatMap (p =&gt; p map (c =&gt; <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span>))</span><br><span class="line"><span class="comment">// 结果值: List("A-A", "l-L", "a-A", "b-B", ...)</span></span><br><span class="line">println(temp8)</span><br><span class="line">println(temp8Equivalence)</span><br><span class="line">println(temp8Equivalence2)</span><br></pre></td></tr></table></figure>
+<h4 id="加入保护式"><a href="#加入保护式" class="headerlink" title="加入保护式"></a>加入保护式</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> temp9 = <span class="keyword">for</span> &#123;</span><br><span class="line">	s &lt;- states</span><br><span class="line">	c &lt;- s</span><br><span class="line">	<span class="keyword">if</span> c.isLower</span><br><span class="line">&#125; <span class="keyword">yield</span> <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span></span><br><span class="line"><span class="comment">// 结果值: List("l-L", "a-A", "b-B", ...)</span></span><br><span class="line"><span class="keyword">val</span> temp9Equivalence = states flatMap (_.toSeq withFilter (_.isLower) map (c =&gt; <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span>))</span><br><span class="line"><span class="keyword">val</span> temp9Equivalence2 = states flatMap (p =&gt; p withFilter (k =&gt; k.isLower) map (c =&gt; <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span>))</span><br><span class="line"><span class="keyword">val</span> temp9Equivalence3 = states flatMap (p =&gt; p filter (k =&gt; k.isLower) map (c =&gt; <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span>"</span>))</span><br><span class="line">println(temp9)</span><br><span class="line">println(temp9Equivalence)</span><br><span class="line">println(temp9Equivalence2)</span><br><span class="line">println(temp9Equivalence3)</span><br><span class="line"><span class="comment">// 结果值: List("l-L", "a-A", "b-B", ...)</span></span><br></pre></td></tr></table></figure>
+<h4 id="加入定义"><a href="#加入定义" class="headerlink" title="加入定义"></a>加入定义</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> states = <span class="type">List</span>(<span class="string">"Alabama"</span>, <span class="string">"Alaska"</span>, <span class="string">"Virginia"</span>, <span class="string">"Wyoming"</span>)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">	s &lt;- states</span><br><span class="line">	c &lt;- s</span><br><span class="line">	<span class="keyword">if</span> c.isLower</span><br><span class="line">	c2 = <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span> "</span></span><br><span class="line">&#125; <span class="keyword">yield</span> c2</span><br><span class="line"><span class="comment">// 结果值: List("l-L", "a-A", "b-B", ...)</span></span><br><span class="line">states flatMap (_.toSeq withFilter (_.isLower) map &#123; c =&gt;</span><br><span class="line">	<span class="keyword">val</span> c2 = <span class="string">s"<span class="subst">$c</span>-<span class="subst">$&#123;c.toUpper&#125;</span> "</span></span><br><span class="line">	c2</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 结果值: List("l-L", "a-A", "b-B", ...)</span></span><br></pre></td></tr></table></figure>
+<h3 id="总结内部机制"><a href="#总结内部机制" class="headerlink" title="总结内部机制"></a>总结内部机制</h3><p>结合 《Scala 程序设计第2版》 7.2章节和上面的例子，我们总结 for 推导式的内部机制如下：</p>
+<ol>
+<li><code>withFilter</code> 效率比 <code>filter</code> 高， 因为它不会生成一次中间的临时的容器，而是和后续操作结合使用。而且 <code>withFilter</code> 会限制传递给后续组合器的元素类型域。</li>
+<li><code>yield</code> 实际是一次 <code>map</code> 操作，具体 <code>map</code> 的操作方法是根据 <code>yield</code> 的表达式，比如案例1中是<code>yield</code> 元组，而案例2中是 <code>yield</code> 一个 <code>toUpperCase</code> 操作。</li>
+<li>多个生成器，除了最后一个，其他的生成器都会转化为 <code>flatMap</code>，最后一个生成器对应这 <code>map</code> 调用。</li>
+<li>toSeq 可以用来简化针对 Seq 的 map 后面的操作，实际上就是 p =&gt; p do something</li>
+<li>定义变量将会在 map 表达式中定义 （flatmap 也可以吗？）</li>
+</ol>
+<h3 id="深层理解"><a href="#深层理解" class="headerlink" title="深层理解"></a>深层理解</h3><p>在像 pat &lt;- expr 这样的生成器表达式中，pat 实际上是一个模式表达式（ pattern expression），例如： (x,y) &lt;- List((1,2),(3,4))。 Scala 会以类似的方式对值定义语句 pat2 = expr 进行处理，该语句也会被视为某一模式。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pat &lt;- expr</span></span><br><span class="line">pat &lt;- expr.withFilter &#123; <span class="keyword">case</span> pat =&gt; <span class="literal">true</span>; <span class="keyword">case</span> _ =&gt; <span class="literal">false</span> &#125;</span><br></pre></td></tr></table></figure>
+<p>Scala 在转化 for 推导式时，要做的第一件事便是将 pat &lt;- expr 语句转化为上述语句，然后， Scala 将重复执行下列转化规则，直到所有的推导表达式都被替换掉。值得一提的是，某些转化会生成新的 for 推导式，而后续的迭代则会负责对这些推导式进行转化。</p>
+<p>如果 for 推导式中包含了一个生成器和一个 yield 表达式，那么该表达式将被转化为下列<br>语句：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// for ( pat &lt;- expr1 ) yield expr2</span></span><br><span class="line">expr map &#123; <span class="keyword">case</span> pat =&gt; expr2 &#125;</span><br></pre></td></tr></table></figure>
+<p>如果 for 循环中未使用 yield 语句，但执行的代码具有副作用，那么该语句将被转化为：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// for ( pat &lt;- expr1 ) expr2</span></span><br><span class="line">expr foreach &#123; <span class="keyword">case</span> pat =&gt; expr2 &#125;</span><br></pre></td></tr></table></figure>
+<p>包含多个生成器（同时包含 yield 表达式）的 for 推导式将被转化成下列语句：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// for ( pat1 &lt;- expr1; pat2 &lt;- expr2; ... ) yield exprN</span></span><br><span class="line">expr1 flatMap &#123; <span class="keyword">case</span> pat1 =&gt; <span class="keyword">for</span> (pat2 &lt;- expr2 ...) <span class="keyword">yield</span> exprN &#125;</span><br></pre></td></tr></table></figure>
+<p>请留意，嵌套的生成器会被转化成嵌套的 for 推导式。这些嵌套的 for 推导式会在下一次执行转化规则时被转化成方法调用。上面示例中 (…) 代表了省略的表达式，这些表达式可能是其他的生成器，也可能是值定义或保护式（ guard）。</p>
+<p>包含多个生成器的 for 循环将被翻译成下列语句：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// for ( pat1 &lt;- expr1; pat2 &lt;- expr2; ... ) exprN</span></span><br><span class="line">expr1 foreach &#123; <span class="keyword">case</span> pat1 =&gt; <span class="keyword">for</span> (pat2 &lt;- expr2 ...) <span class="keyword">yield</span> exprN &#125;</span><br></pre></td></tr></table></figure>
+<p>我们之前所见的示例中包含保护式（ guard）表达式，该表达式被编写在单独的一行中。事实上， guard 以及上一行中的代码可以编写在一行中，例如： pat1 &lt;- expr1 if guard。</p>
+<p>后面跟着保护式的生成器会被翻译成下列语句：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pat1 &lt;- expr1 if guard</span></span><br><span class="line">pat1 &lt;- expr1 withFilter ((arg1, arg2, ...) =&gt; guard)</span><br></pre></td></tr></table></figure>
+<p>此处，变量 argN 代表了传递给 withFilter 方法的参数。对于大多数的容器而言，传入的方法中只含有一个参数</p>
+<h3 id="生成器后尾随一个值定义"><a href="#生成器后尾随一个值定义" class="headerlink" title="生成器后尾随一个值定义"></a>生成器后尾随一个值定义</h3><p>如果生成器后面尾随着一个值定义，那么转化这个生成器的复杂度会令人惊奇。如下所示：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pat1 &lt;- expr1; pat2 = expr2</span></span><br><span class="line">(pat1, pat2) &lt;- <span class="keyword">for</span> &#123; <span class="comment">// ➊</span></span><br><span class="line">	x1 @ pat1 &lt;- expr1 <span class="comment">// ➋ </span></span><br><span class="line">&#125; <span class="keyword">yield</span> &#123;</span><br><span class="line">	<span class="keyword">val</span> x2 @ pat2 = expr2 <span class="comment">// ➌</span></span><br><span class="line">	(x1, x2) <span class="comment">// ➍</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>➊     for 推导式将返回包含两个模式的 pair 对象。<br>➋     x1 @ pat1 语句会将整个表达式中 pat1 所匹配的值赋给变量 x1，该值可能包含另一个<br>变量的某一部分。假如 pat1 是一个不可变变量名， x1 和 pat1 的赋值将会是冗余的。<br>➌     将 pat2 值赋给 x2。<br>➍     返回元组。</p>
+<p>下面的 REPL 会话中包含了 x @ pat = expr 语句的对应示例：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> z @ (x, y) = (<span class="number">1</span> -&gt; <span class="number">2</span>)</span><br><span class="line">z: (<span class="type">Int</span>, <span class="type">Int</span>) = (<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line">x: <span class="type">Int</span> = <span class="number">1</span></span><br><span class="line">y: <span class="type">Int</span> = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>变量 z 的值为元组 (1,2)，而变量 x 和变量 y 则对应了元组中各个组成部分的值。</p>
+<h4 id="一个具体案例"><a href="#一个具体案例" class="headerlink" title="一个具体案例"></a>一个具体案例</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> map = <span class="type">Map</span>(<span class="string">"one"</span> -&gt; <span class="number">1</span>, <span class="string">"two"</span> -&gt; <span class="number">2</span>)</span><br><span class="line"><span class="keyword">val</span> list1 = <span class="keyword">for</span> &#123;</span><br><span class="line">	(key, value) &lt;- map <span class="comment">// 本行和下一行将会被翻译成什么语句呢？</span></span><br><span class="line">	i10 = value + <span class="number">10</span></span><br><span class="line">&#125; <span class="keyword">yield</span> (i10)</span><br><span class="line"><span class="comment">// 执行结果值: list1: scala.collection.immutable.Iterable[Int] = List(11, 12)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 翻译后的语句:</span></span><br><span class="line"><span class="keyword">val</span> list2 = <span class="keyword">for</span> &#123;</span><br><span class="line">(i, i10) &lt;- <span class="keyword">for</span> &#123;</span><br><span class="line">x1 @ (key, value) &lt;- map</span><br><span class="line">&#125; <span class="keyword">yield</span> &#123;</span><br><span class="line"><span class="keyword">val</span> x2 @ i10 = value + <span class="number">10</span></span><br><span class="line">(x1, x2)</span><br><span class="line">&#125;</span><br><span class="line">&#125; <span class="keyword">yield</span> (i10)</span><br><span class="line"><span class="comment">// 执行结果: list2: scala.collection.immutable.Iterable[Int] = List(11, 12)</span></span><br></pre></td></tr></table></figure>
+<p>书中给出的解释就到这一步，这实际上还是一个嵌套的 for 表达式，下面我们进一步把它转化为 map。 </p>
+<p>首先我们需要知道如何把 map 中的元素映射为元组，很简答，只需要使用 <code>val (x,y) = p</code>，其中 p 是 map 的元素，x和y就是元组值，后面就可以使用 x 和 y 进一步计算了。</p>
+<p>我们这里分两步转化，首先转化内部的 for 推导式</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list2Inter = <span class="keyword">for</span> &#123;</span><br><span class="line">        x1@(key, value) &lt;- map</span><br><span class="line">&#125; <span class="keyword">yield</span> &#123;</span><br><span class="line">	<span class="keyword">val</span> x2<span class="meta">@i</span>10 = value + <span class="number">10</span></span><br><span class="line">	(x1, x2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> z@(x, y) = <span class="number">1</span> -&gt; <span class="number">2</span></span><br><span class="line">println(<span class="string">"z: "</span> + z)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> list2InterEqual = map map &#123; p =&gt; &#123;</span><br><span class="line">	<span class="keyword">val</span> (x, y) = p</span><br><span class="line">	(x, y) -&gt; (y + <span class="number">10</span>)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> list2InterEqual2 = map map &#123; p =&gt; &#123;</span><br><span class="line">	<span class="keyword">val</span> (x, y) = p</span><br><span class="line">	((x, y), y + <span class="number">10</span>)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">println(list2Inter)</span><br><span class="line">println(list2InterEqual)</span><br><span class="line">println(list2InterEqual2)</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，内部的推导式 yield 了一个元组，所以还是返回了一个 map，所以我们的 map 的返回值也应是一个map 或元组 （代码中有两个等价表达式）。</p>
+<p>在内部的 for 推导式的基础上，我们进一步映射</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list2Equal = map map &#123; p =&gt; &#123;</span><br><span class="line">	<span class="keyword">val</span> (x, y) = p</span><br><span class="line">	(x, y) -&gt; (y + <span class="number">10</span>)</span><br><span class="line">&#125;</span><br><span class="line">&#125; map &#123; k =&gt; &#123;</span><br><span class="line">	<span class="keyword">val</span> (m, n) = k</span><br><span class="line">	n</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> list2Equal2 = map map &#123; p =&gt; &#123;</span><br><span class="line">	<span class="keyword">val</span> (_, y) = p</span><br><span class="line">	y + <span class="number">10</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一个是纯粹使用上一步的的内部推导式的转换结果再次进行 map 得到的。外层的 for 推导式只是将元组的第二个值返回。所以我们第二个表达式简化了过程，直接在内部的 map 就只返回元组的第二个值。当然如果第二层 for 推导式更加复杂，就仍然需要使用第一个表达式来等价翻译，而且对于 <code>scala</code> 本身应该也是使用第一个表达式进行翻译。</p>
+<h2 id="For-的应用容器"><a href="#For-的应用容器" class="headerlink" title="For 的应用容器"></a>For 的应用容器</h2><p>一般我们都是使用明显的容器，比如 List, Array 以及 Map，实际上只要容器支持 <code>foreach</code>，<code>map</code>，<code>flat</code> 和 <code>withFilter</code> 的操作都可以使用 <code>for</code> 推导式。比如 <code>Option</code>， <code>Either</code>， <code>Try</code> 等等。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+            <a href="/tags/for-expression/" rel="tag"># for-expression</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/04/study-driving-licence-in-uk-11/" rel="next" title="英国学车记第十一课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第十一课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/07/scala-special-symbol-usage/" rel="prev" title="Scala 特殊符号操作符汇总">
+                Scala 特殊符号操作符汇总 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础知识"><span class="nav-number">1.</span> <span class="nav-text">基础知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#For-推导式原理"><span class="nav-number">2.</span> <span class="nav-text">For 推导式原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例1"><span class="nav-number">2.1.</span> <span class="nav-text">案例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例2"><span class="nav-number">2.2.</span> <span class="nav-text">案例2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#没有-yield"><span class="nav-number">2.2.1.</span> <span class="nav-text">没有 yield</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#含有-yield"><span class="nav-number">2.2.2.</span> <span class="nav-text">含有 yield</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多个生成器"><span class="nav-number">2.2.3.</span> <span class="nav-text">多个生成器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入保护式"><span class="nav-number">2.2.4.</span> <span class="nav-text">加入保护式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入定义"><span class="nav-number">2.2.5.</span> <span class="nav-text">加入定义</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结内部机制"><span class="nav-number">2.3.</span> <span class="nav-text">总结内部机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#深层理解"><span class="nav-number">2.4.</span> <span class="nav-text">深层理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成器后尾随一个值定义"><span class="nav-number">2.5.</span> <span class="nav-text">生成器后尾随一个值定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一个具体案例"><span class="nav-number">2.5.1.</span> <span class="nav-text">一个具体案例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#For-的应用容器"><span class="nav-number">3.</span> <span class="nav-text">For 的应用容器</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/09/06/scala-for-comprehension-introduction-in-practice/';
+          this.page.identifier = '2018/09/06/scala-for-comprehension-introduction-in-practice/';
+          this.page.title = 'Scala For 推导式介绍及最佳实践';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

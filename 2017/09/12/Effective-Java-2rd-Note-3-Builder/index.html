@@ -1,0 +1,1000 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog,java,effective-java," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：Effective-Java 第二条-遇到多个构造器参数时要考虑用构建器">
+<meta name="keywords" content="blog,java,effective-java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective-Java读书笔记3-Builder">
+<meta property="og:url" content="https://notes.mengxin.science/2017/09/12/Effective-Java-2rd-Note-3-Builder/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：Effective-Java 第二条-遇到多个构造器参数时要考虑用构建器">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/builder.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Effective-Java读书笔记3-Builder">
+<meta name="twitter:description" content="摘要：Effective-Java 第二条-遇到多个构造器参数时要考虑用构建器">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/builder.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/09/12/Effective-Java-2rd-Note-3-Builder/"/>
+
+
+
+
+
+  <title> Effective-Java读书笔记3-Builder | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/09/12/Effective-Java-2rd-Note-3-Builder/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Effective-Java读书笔记3-Builder
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-12T23:00:00+00:00">
+                2017-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/12/Effective-Java-2rd-Note-3-Builder/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/12/Effective-Java-2rd-Note-3-Builder/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：<code>Effective-Java</code> 第二条-遇到多个构造器参数时要考虑用构建器</p>
+<a id="more"></a>
+<h2 id="Item"><a href="#Item" class="headerlink" title="Item"></a>Item</h2><blockquote>
+<p>ITEM 2: CONSIDER A BUILDER WHEN FACED WITH MANY CONSTRUCTOR PARAMETERS</p>
+</blockquote>
+<p>遇到多个构造器参数时要考虑用构建器</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><p>参数较多的构造函数的解决方法1</p>
+<ol>
+<li><code>telescoping constructor</code> (重叠构造器): 就是通过不同的参数构造器来实现不同的可选参数构造方法。但是一旦参数增加，构造器的数量会大幅度增加。</li>
+<li><code>javabeans pattern</code>：使用 <code>setter</code> 来设置对象的属性。导致对象的不一致。</li>
+</ol>
+<p>这时候我们可以考虑使用<strong>构造器模式</strong>（<code>Build Pattern</code>）来解决这个问题. 对于该模式的实现，后面和设计模式对比中详细描述。</p>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ol>
+<li>构造器本身有开销，因为是另外一个类</li>
+<li>代码更加冗长</li>
+</ol>
+<h2 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h2><ol>
+<li>如果类的构造器或者錚态工厂中具有多个参数，设计这种类时，<code>Builder</code> 模式就是种不错的选择，特别是当大多数参数都是可选的时候。</li>
+<li>如果使用 <code>Builder</code>，最好一开始就是用。</li>
+</ol>
+<h2 id="关于该模式和生成器设计模式的区别"><a href="#关于该模式和生成器设计模式的区别" class="headerlink" title="关于该模式和生成器设计模式的区别"></a>关于该模式和生成器设计模式的区别</h2><p>通过 Effective Java 2 中的 <code>Builder Pattern</code> （以下我们简称为 <strong>BP</strong>）和设计模式中的 <code>Builder Design Pattern</code> （一下我们简称为 <strong>BDP</strong>）进行对比。我们可以总结一下内容，方便今后开发中灵活使用。</p>
+<h3 id="相似之处"><a href="#相似之处" class="headerlink" title="相似之处"></a>相似之处</h3><ol>
+<li>两种模式的目标就是在客户端更加清晰简洁实例化类。传统的实例化方法可以使用构造函数，通过传入参数来实现，也可以先实例化空的对象，再使用 <code>setter</code> 进行赋值。但是这两种方式有很大的缺点，增加了客户端的工作量，同时增加了出错的概率。</li>
+<li>两种模式都利用另外一个类来与客户端交互。<strong>BP</strong> 是使用了内部静态类 <code>Builder</code>，<strong>BDP</strong> 是使用了一个抽象类 <code>Builder</code>。</li>
+<li>两种模式都可以构造不同默认值的对象，但是方法不同。<strong>BP</strong> 通过在 <code>Builder</code> 中创建新的方法来实现，而 <strong>BDP</strong> 通过创建新的 <code>Concrete Builder</code> 继承并实现其方法来实现。</li>
+</ol>
+<h3 id="不同之处"><a href="#不同之处" class="headerlink" title="不同之处"></a>不同之处</h3><ol>
+<li><strong>BP</strong> 一般要求目标对象（也可以成为产品）为成员变量为 <code>final</code>，及该对象被 build 出来后是不能变的。</li>
+<li>两者把 <code>builder</code> 转化为对象的过程逻辑是不一样的，<strong>BP</strong> 由于目标对象的成员变量一般为 <code>final</code>，所以把 <code>builder</code> 转化为对象一般通过构造函数，直接将 <code>builder</code> 值赋给对象的成员变量。而 <strong>BDP</strong> 在 <code>builder</code> 中有一个专门的方法来创建对象，也就是依靠目标对象提供的方法，创建目标对象。最后由 <code>Director</code> 来调用这个方法完成目标对象的创建。可以说 <strong>BDP</strong> 能够更加灵活的构造对象。</li>
+</ol>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>简单的说， <strong>BP</strong> 更适合逻辑简单的目标对象的构造，而 <strong>BDP</strong> 更适合复杂产品的构造，同时 <strong>BDP</strong> 适合典型的生产不同类型的产品。比如生产汽车，有很多型号，但是整体汽车的配件基本一致，只是配件的型号可能不同。而开发中可能有些类虽然不复杂，但是有非常多的参数，而需要灵活的创建。</p>
+<h3 id="两种模式的实现方法总结"><a href="#两种模式的实现方法总结" class="headerlink" title="两种模式的实现方法总结"></a>两种模式的实现方法总结</h3><h4 id="Builder-Pattern"><a href="#Builder-Pattern" class="headerlink" title="Builder Pattern"></a>Builder Pattern</h4><ol>
+<li>目标对象成员变量为 <code>final</code>，构造函数通过 <code>Builder</code> 传递所有的成员变量</li>
+<li>包含一个内部的静态类 <code>Builder</code>，其中成员变量和目标对象一致，不过如果成员变量是 <code>optional</code> 的，不能加 <code>final</code>。</li>
+<li><code>Builder</code> 有一个构造函数，该构造函数传入必须的成员变量（带 <code>final</code> 的）。其他可选成员变量可以任意组合创建函数来实现类似于 <code>setter</code> 的方法，但是方法名称和参数可以根据实际需求进行组合。最灵活的方式是每个可选参数都对应一个方法来设置。这些方法需要返回 <code>Builder</code>，也就是本身 <code>this</code>。</li>
+<li><code>Builder</code> 中需要有一个方法来返回目标对象，实际上就是使用目标对象的构造函数，然后传入 <code>Builder</code> 本身并实例化得到。</li>
+</ol>
+<p>step by step：查看代码中的注释，代码可以查看 <a href="https://github.com/xmeng1/effective-java" target="_blank" rel="noopener">Github 仓库</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NutritionFactsBuilder</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//step 1: change member properties</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servingSize; <span class="comment">// (mL) required</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servings; <span class="comment">// (per container) required</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> calories; <span class="comment">// optional</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> fat; <span class="comment">// (g) optional</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> sodium; <span class="comment">// (mg) optional</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> carbohydrate; <span class="comment">// (g) optional</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StringBuilder()</span><br><span class="line">                .append(<span class="string">" servingSize: "</span>).append(servingSize)</span><br><span class="line">                .append(<span class="string">" servings: "</span>).append(servings)</span><br><span class="line">                .append(<span class="string">" calories: "</span>).append(calories)</span><br><span class="line">                .append(<span class="string">" fat: "</span>).append(fat)</span><br><span class="line">                .append(<span class="string">" sodium: "</span>).append(sodium)</span><br><span class="line">                .append(<span class="string">" carbohydrate: "</span>).append(carbohydrate).toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//step 3: create the corresponding constructor to use builder inner class object to make target class object</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NutritionFactsBuilder</span><span class="params">(Builder builder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.servingSize = builder.servingSize;</span><br><span class="line">        <span class="keyword">this</span>.servings = builder.servings;</span><br><span class="line">        <span class="keyword">this</span>.calories = builder.calories;</span><br><span class="line">        <span class="keyword">this</span>.fat = builder.fat;</span><br><span class="line">        <span class="keyword">this</span>.sodium = builder.sodium;</span><br><span class="line">        <span class="keyword">this</span>.carbohydrate = builder.carbohydrate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//step 2: create inner static class for transfer information as builder</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//step2-1: required parameters are final</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servingSize; <span class="comment">// (mL) required</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> servings; <span class="comment">// (per container) required</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//step2-2: optional paramters are not final</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> calories; <span class="comment">// optional</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> fat; <span class="comment">// (g) optional</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> sodium; <span class="comment">// (mg) optional</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> carbohydrate; <span class="comment">// (g) optional</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//step2-3: create constructor to initial the final properties (The Intellij will automatically choose the two parameters.)</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Builder</span><span class="params">(<span class="keyword">int</span> servingSize, <span class="keyword">int</span> servings)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.servingSize = servingSize;</span><br><span class="line">            <span class="keyword">this</span>.servings = servings;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//step2-4: create method to set the other optional properties, these method should return this, which is the builder itself which used for chain operation.</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Builder <span class="title">calories</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            calories = val;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Builder <span class="title">fat</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            fat = val;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Builder <span class="title">carbohydrate</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            carbohydrate = val;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Builder <span class="title">sodium</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            sodium = val;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//step2-5: we can also make some predefined method</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Builder <span class="title">preTrainingSet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            calories = <span class="number">1000</span>;</span><br><span class="line">            fat = <span class="number">50</span>;</span><br><span class="line">            carbohydrate = <span class="number">40</span>;</span><br><span class="line">            sodium = <span class="number">10</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//step2-6: create public build method to return the target class by using this builder</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> NutritionFactsBuilder <span class="title">build</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> NutritionFactsBuilder(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Builder-Design-Pattern"><a href="#Builder-Design-Pattern" class="headerlink" title="Builder Design Pattern"></a>Builder Design Pattern</h4><ol>
+<li>目标对象 <code>Product</code></li>
+<li>抽象构造器 <code>Abstract Builder</code></li>
+<li><code>Director</code></li>
+<li><code>Concrete Builder</code></li>
+<li>Client Usage<code>enter code here</code></li>
+</ol>
+<p>类图：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/builder.png" alt="Builder Design Pattern Class Diagram" title="builder"></p>
+<h5 id="Product"><a href="#Product" class="headerlink" title="Product"></a>Product</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This class is "Product", the target we need to build.</span></span><br><span class="line"><span class="comment">// There is no constructor for the class. we can set several setter for the properties.</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pizza</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String dough = <span class="string">""</span>;</span><br><span class="line">    <span class="keyword">private</span> String sauce = <span class="string">""</span>;</span><br><span class="line">    <span class="keyword">private</span> String topping = <span class="string">""</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDough</span><span class="params">(String dough)</span>     </span>&#123; <span class="keyword">this</span>.dough = dough; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSauce</span><span class="params">(String sauce)</span>     </span>&#123; <span class="keyword">this</span>.sauce = sauce; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTopping</span><span class="params">(String topping)</span> </span>&#123; <span class="keyword">this</span>.topping = topping; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Pizza with"</span> + <span class="string">" dough:"</span> + dough + <span class="string">" sauce:"</span> + sauce + <span class="string">" topping:"</span> + topping;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Abstract-Builder"><a href="#Abstract-Builder" class="headerlink" title="Abstract Builder"></a>Abstract Builder</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> *     this class is the Abstract Builder. For this class we need have 2 method and 1 property at least.</span></span><br><span class="line"><span class="comment"> *     &lt;ul&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;Product object&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;Product object getter&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;Product instance creation method&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *     &lt;/ul&gt;</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Then it can add other abstract method to build parts for the product.&lt;/p&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">PizzaBuilder</span> </span>&#123;</span><br><span class="line">    <span class="comment">//1.</span></span><br><span class="line">    <span class="keyword">protected</span> Pizza pizza;</span><br><span class="line">    <span class="comment">//2.</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Pizza <span class="title">getPizza</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pizza;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//3/</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createNewPizzaProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza = <span class="keyword">new</span> Pizza();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//build parts abstract methods</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildDough</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildSauce</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">buildTopping</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Concrete-Builbder"><a href="#Concrete-Builbder" class="headerlink" title="Concrete Builbder"></a>Concrete Builbder</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// The concrete builder which need to extend the abstract builder and implement the abstract methods that build parts.</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HawaiianPizzaBuilder</span> <span class="keyword">extends</span> <span class="title">PizzaBuilder</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildDough</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setDough(<span class="string">"cross"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildSauce</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setSauce(<span class="string">"mild"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildTopping</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setTopping(<span class="string">"ham+pineapple"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpicyPizzaBuilder</span> <span class="keyword">extends</span> <span class="title">PizzaBuilder</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildDough</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setDough(<span class="string">"pan baked"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildSauce</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setSauce(<span class="string">"hot"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buildTopping</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizza.setTopping(<span class="string">"pepperoni+salami"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Director"><a href="#Director" class="headerlink" title="Director"></a>Director</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Description: Waiter.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> *     This class is Director which use the builder to build the product. This class is decouple the</span></span><br><span class="line"><span class="comment"> *     concrete builder by dependencies on the abstract builder.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     There are 3 methods and 1 property at least</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     &lt;ul&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;abstract builder object&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;abstract builder setter, which can be set with concrete builder&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;method to get the product by builder, use the get product method in the abstract builder&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *         &lt;li&gt;the process to construct the products by using the create parts methods</span></span><br><span class="line"><span class="comment"> *         in abstract builder that need to implemented in concrete builder.&lt;/li&gt;</span></span><br><span class="line"><span class="comment"> *     &lt;/ul&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Waiter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> PizzaBuilder pizzaBuilder;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPizzaBuilder</span><span class="params">(PizzaBuilder pizzaBuilder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.pizzaBuilder = pizzaBuilder;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Pizza <span class="title">getPizza</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.pizzaBuilder.getPizza();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">constructPizza</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pizzaBuilder.createNewPizzaProduct();</span><br><span class="line">        pizzaBuilder.buildDough();</span><br><span class="line">        pizzaBuilder.buildSauce();</span><br><span class="line">        pizzaBuilder.buildTopping();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Client-Example"><a href="#Client-Example" class="headerlink" title="Client Example"></a>Client Example</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BuilderExample</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Waiter waiter = <span class="keyword">new</span> Waiter();</span><br><span class="line">        PizzaBuilder hawaiianPizzaBuilder = <span class="keyword">new</span> HawaiianPizzaBuilder();</span><br><span class="line">        PizzaBuilder spicyPizzaBuilder = <span class="keyword">new</span> SpicyPizzaBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// someone ask for the hawaiian pizza.</span></span><br><span class="line">        <span class="comment">// waiter take out of the hawaiian pizza builder</span></span><br><span class="line">        waiter.setPizzaBuilder( hawaiianPizzaBuilder );</span><br><span class="line">        <span class="comment">// waiter use the builder to construct the pizza.</span></span><br><span class="line">        waiter.constructPizza();</span><br><span class="line">        <span class="comment">// get the pizza from the waiter</span></span><br><span class="line">        Pizza pizza = waiter.getPizza();</span><br><span class="line">        System.out.println(<span class="string">"HawaiianPizza: "</span> + pizza);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// someone ask for the spicy pizza.</span></span><br><span class="line">        <span class="comment">// waiter take out of the spicy pizza builder</span></span><br><span class="line">        waiter.setPizzaBuilder( spicyPizzaBuilder );</span><br><span class="line">        <span class="comment">// waiter use the builder to construct the pizza.</span></span><br><span class="line">        waiter.constructPizza();</span><br><span class="line">        <span class="comment">// get the pizza from the waiter</span></span><br><span class="line">        Pizza spicyPizza = waiter.getPizza();</span><br><span class="line">        System.out.println(<span class="string">"SpicyPizza: "</span> + spicyPizza);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/effective-java/" rel="tag"># effective-java</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/12/english-pod-lesson-21/" rel="next" title="English Pod Study Note Lesson 21">
+                <i class="fa fa-chevron-left"></i> English Pod Study Note Lesson 21
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/13/english-pod-lesson-22/" rel="prev" title="English Pod Study Note Lesson 22">
+                English Pod Study Note Lesson 22 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Item"><span class="nav-number">1.</span> <span class="nav-text">Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">2.</span> <span class="nav-text">解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缺点"><span class="nav-number">3.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用注意点"><span class="nav-number">4.</span> <span class="nav-text">使用注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于该模式和生成器设计模式的区别"><span class="nav-number">5.</span> <span class="nav-text">关于该模式和生成器设计模式的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相似之处"><span class="nav-number">5.1.</span> <span class="nav-text">相似之处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同之处"><span class="nav-number">5.2.</span> <span class="nav-text">不同之处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用场景"><span class="nav-number">5.3.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两种模式的实现方法总结"><span class="nav-number">5.4.</span> <span class="nav-text">两种模式的实现方法总结</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Builder-Pattern"><span class="nav-number">5.4.1.</span> <span class="nav-text">Builder Pattern</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Builder-Design-Pattern"><span class="nav-number">5.4.2.</span> <span class="nav-text">Builder Design Pattern</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Product"><span class="nav-number">5.4.2.1.</span> <span class="nav-text">Product</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Abstract-Builder"><span class="nav-number">5.4.2.2.</span> <span class="nav-text">Abstract Builder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Concrete-Builbder"><span class="nav-number">5.4.2.3.</span> <span class="nav-text">Concrete Builbder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Director"><span class="nav-number">5.4.2.4.</span> <span class="nav-text">Director</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Client-Example"><span class="nav-number">5.4.2.5.</span> <span class="nav-text">Client Example</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/09/12/Effective-Java-2rd-Note-3-Builder/';
+          this.page.identifier = '2017/09/12/Effective-Java-2rd-Note-3-Builder/';
+          this.page.title = 'Effective-Java读书笔记3-Builder';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

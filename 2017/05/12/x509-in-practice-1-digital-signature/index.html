@@ -1,0 +1,1024 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="x509,security," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="由于最近在开发单点登录SSO相关系统，所以对证书系统，数字签名以及SAML协议进行了深入的研究，阅读了大量的官方标准文档。希望通过一些列文章把自己学习的知识进行总结并记录，一方面留作备忘，另一方面也能进一步巩固加深记忆。">
+<meta name="keywords" content="x509,security">
+<meta property="og:type" content="article">
+<meta property="og:title" content="X509证书从理论到实践之数字签名理论基础">
+<meta property="og:url" content="https://notes.mengxin.science/2017/05/12/x509-in-practice-1-digital-signature/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="由于最近在开发单点登录SSO相关系统，所以对证书系统，数字签名以及SAML协议进行了深入的研究，阅读了大量的官方标准文档。希望通过一些列文章把自己学习的知识进行总结并记录，一方面留作备忘，另一方面也能进一步巩固加深记忆。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E7%9A%84%E6%BC%8F%E6%B4%9E.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E6%94%B9%E8%BF%9B.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E7%AE%97%E6%B3%95%E5%AE%89%E5%85%A8.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E4%BC%A0%E8%BE%93%E7%AF%A1%E6%94%B9%E6%BC%8F%E6%B4%9E.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AF%A1%E6%94%B9%E6%BC%8F%E6%B4%9E.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E8%A7%A3%E5%86%B3%E4%BC%A0%E8%BE%93%E7%AF%A1%E6%94%B9%E9%97%AE%E9%A2%98.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="X509证书从理论到实践之数字签名理论基础">
+<meta name="twitter:description" content="由于最近在开发单点登录SSO相关系统，所以对证书系统，数字签名以及SAML协议进行了深入的研究，阅读了大量的官方标准文档。希望通过一些列文章把自己学习的知识进行总结并记录，一方面留作备忘，另一方面也能进一步巩固加深记忆。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E7%9A%84%E6%BC%8F%E6%B4%9E.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/05/12/x509-in-practice-1-digital-signature/"/>
+
+
+
+
+
+  <title> X509证书从理论到实践之数字签名理论基础 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/05/12/x509-in-practice-1-digital-signature/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                X509证书从理论到实践之数字签名理论基础
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-12T23:00:00+00:00">
+                2017-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/开发笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">开发笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/12/x509-in-practice-1-digital-signature/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/12/x509-in-practice-1-digital-signature/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由于最近在开发单点登录<code>SSO</code>相关系统，所以对证书系统，数字签名以及<code>SAML</code>协议进行了深入的研究，阅读了大量的官方标准文档。希望通过一些列文章把自己学习的知识进行总结并记录，一方面留作备忘，另一方面也能进一步巩固加深记忆。</p>
+<a id="more"></a>
+<p>系列文章计划，该系列文章可以总称为网络信息安全相关标准。</p>
+<ol>
+<li>X509证书从理论到实践<ul>
+<li>数字签名理论基础</li>
+<li>数字证书理论基础</li>
+<li>PKI理论基础</li>
+<li>X509证书标准详解</li>
+<li>X509证书Java相关实现</li>
+<li>X509应用场景介绍</li>
+</ul>
+</li>
+<li>SAML协议从理论到实践<ul>
+<li>SAML协议标准详解</li>
+<li>SAML与SSO理论基础</li>
+<li>使用OpenSAML进行SAML相关开发</li>
+<li>开源项目推荐</li>
+</ul>
+</li>
+<li>OAuth协议从理论到实践</li>
+<li>OpenID Connect协议从理论到实践</li>
+</ol>
+<p>这个系列的文章的逻辑顺序可以这样描述。首先从需要解决的问题开始，在网络环境中，我们希望有些信息不能被篡改，有些信息不能被窃听，有些信息不能被伪造，再这样的目的下，数字签名被引入来防止篡改和伪造。数字证书进一步加强了数字签名的真实性，进而引出公钥基础设施（<code>PKI</code>）来规范管理数字证书。作为证书其标准最为重要，也就是X509标准。有了X509证书，除了刚才提到应用实际上还有很多其他的用户，从而讨论使用场景。其中<code>TSL</code>和<code>SAML</code>都是其重要的应用。</p>
+<p>关于数字签名其实大家并不陌生，已经有很多文章做过介绍，</p>
+<p>比如这篇<a href="http://www.youdzone.com/signature.html" target="_blank" rel="noopener">英文文章</a>用一些简单的图片介绍了数字签名，然后<a href="http://www.ruanyifeng.com/blog/2011/08/what_is_a_digital_signature.html" target="_blank" rel="noopener">这篇博文</a>对其进行了翻译与拓展。在理解了整体的原理后，<a href="http://www.enkichen.com/2016/02/26/digital-certificate-based/" target="_blank" rel="noopener">该篇文章</a>简要介绍了数字签名中涉及的算法。基本这些文章能够覆盖数字签名的理论知识。本文作为系列的开始，简单的进行总结概括。</p>
+<h2 id="非对称加密"><a href="#非对称加密" class="headerlink" title="非对称加密"></a>非对称加密</h2><p>非对称加密算法应该算是数字签名以及以后的PKI系统的根基。一切后面谈到的安全机制基本都是建立在非对称加密算法安全基础上。非对称加密很好理解，就是加密和解密所使用的密钥不一样，也就是加密和解密的过程不是对称的。这和传统的对称加解密机制不同。</p>
+<p>以下对称加密的案例：</p>
+<ol>
+<li>ZIP压缩包加密：我们给文件压缩包加密，输入一个密码，然后拿到压缩包的人只要知道了这个密码就可以解密。</li>
+<li>Wifi信号加密，我们在路由配置Wifi密码，然后接入Wifi的人需要输入密码才能连接路由。</li>
+</ol>
+<p>在计算机网络中对称加密就有了局限性，也就是 <strong>这个对称的密钥如何安全的传输</strong>，非对称密钥就是解决这个问题的。</p>
+<p>比如ZIP压缩包加密，我们需要通过网络传送给其他人，我们加密的目的就是在传输中担心别人截获，但是我同样需要将密钥传送给这个人，虽然可以将文件和密钥分开发送，但是在如今的黑客技术，很容易获取两者从而拿到明文。</p>
+<p>带着这个问题我们开始解释非对称密钥。</p>
+<p>非对称密钥分为配对的公钥和私钥，公钥加密后其只有其配对私钥能够解密，反之亦然。在这个基础上我们就可以解决上面提到的密钥传输问题。下面我们通过以下几张图阐述非对称密钥的所解决的问题。</p>
+<h3 id="对称密钥系统的漏洞"><a href="#对称密钥系统的漏洞" class="headerlink" title="对称密钥系统的漏洞"></a>对称密钥系统的漏洞</h3><p><img src="https://www.github.com/xmeng1/images/raw/master/%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E7%9A%84%E6%BC%8F%E6%B4%9E.png" alt="对称密钥的漏洞" title="对称密钥的漏洞"></p>
+<p>通过上图可以发现，在网络应用中，对称密钥存在很大的漏洞，那就是密钥需要传递给接受者，只要密钥通过网络传输，就存在理论上被截获的危险。所以在网络传输中很少使用对称密钥，即使使用也需要很多加强的技术来确保对称密钥不会被窃取。</p>
+<h3 id="非对称密钥系统的改进"><a href="#非对称密钥系统的改进" class="headerlink" title="非对称密钥系统的改进"></a>非对称密钥系统的改进</h3><p><img src="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E6%94%B9%E8%BF%9B.png" alt="非对称密钥系统的改进" title="非对称密钥改进"></p>
+<p>非对称密钥的优势就在于加密与解密的密钥不同。所以接受者Alice可以在网上公布她自己的公钥，而私钥自己需要在本地保管好。这样发送者Bob在准备给Alice发送密文前，首先获取Alice的公钥，然后用Alice的公钥对明文进行加密，然后再发送给Alice，Alice收到密文后，使用自己本地保管好的私钥进行解密就可以得到明文了。</p>
+<p>对于攻击者V来说，虽然可以在网络上截获密文，但是攻击者V没有Alice的私钥，该私钥妥善的保管在Alice的本地，网络上无法获取，所以他无法解开密文。这样就简单的解决上一节对称密钥的漏洞，只需要用户妥善保管自己的私钥即可。</p>
+<h3 id="非对称密钥算法"><a href="#非对称密钥算法" class="headerlink" title="非对称密钥算法"></a>非对称密钥算法</h3><p>现在我们已经知道了非对称密钥在网络传输中的作用，而这个改进的基础就是非对称密钥算法的安全性。</p>
+<p>1977年，三位数学家 Rivest、Shamir 和 Adleman 设计了一种算法名字叫做RSA，该算法在当代仍然担任着重要的角色。目前超过768位密钥的RSA还没有公开的破解方法。所以常见的1024位和2048位RSA算法都是安全的。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%AF%86%E9%92%A5%E7%AE%97%E6%B3%95%E5%AE%89%E5%85%A8.png" alt="非对称密钥算法安全" title="非对称密钥算法安全"></p>
+<p>对于具体的RSA算法，大家可以参考这两篇博文研究：<a href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html" target="_blank" rel="noopener">RSA算法原理（一）</a> 和 <a href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html" target="_blank" rel="noopener">RSA算法原理（二）</a>，未来我也会专门文章使用更加形象的方法来解释RSA。</p>
+<h2 id="数字签名理论"><a href="#数字签名理论" class="headerlink" title="数字签名理论"></a>数字签名理论</h2><p>本人参考最前面提到的若干文章，对其理论以及其做法的目的进行详细讨论。</p>
+<p>上一章我们在介绍非对称加密所使用的案例是：</p>
+<blockquote>
+<p>Bob 向 Alice 发送保密信息，这些信息不能被其他人获取</p>
+</blockquote>
+<p>而数字签名所解决的问题是：</p>
+<blockquote>
+<p>Bob 向 Alice 发送消息，确保这些消息不能被其他人篡改</p>
+</blockquote>
+<p>当然这里的消息同样也可以使保密消息，也就是两个问题结合起来就是</p>
+<blockquote>
+<p>Bob 向 Alice 发送保密消息，确保这些消息不能被其他人获取，也不能被其他人篡改</p>
+</blockquote>
+<p>我们首先介绍如何解决第二个问题，然后将前两个解决方案结合来解决第三个问题。</p>
+<h3 id="非对称加密的被篡改漏洞"><a href="#非对称加密的被篡改漏洞" class="headerlink" title="非对称加密的被篡改漏洞"></a>非对称加密的被篡改漏洞</h3><p>我们在网络中传输数据，有的时候会遭到攻击者的篡改，这样接受者就会收到错误的消息，有时候这种攻击别泄密危害更大。</p>
+<p>具体攻击漏洞如下图，比如Bob发送一个软件安装包给Alice，攻击者截获安装包在加入或者替换为自己的病毒安装包发给Alice，Alice无法识别信息是否已经被替换或篡改，就会错误的安装病毒软件。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E4%BC%A0%E8%BE%93%E7%AF%A1%E6%94%B9%E6%BC%8F%E6%B4%9E.png" alt="消息传递的被篡改漏洞" title="网络信息传输篡改漏洞"></p>
+<p>及时我们采用上面提到的使用Alice的公钥加密的机制，仍然无法防止攻击者直接替换原来需要发送的文件，因为攻击者不需要解密，只需要用公钥再重新把病毒文件进行加密伪装即可。具体原理见下图：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AF%A1%E6%94%B9%E6%BC%8F%E6%B4%9E.png" alt="非对称加密的被篡改漏洞" title="非对称加密篡改漏洞"></p>
+<p>虽然Bob对需要传送的数据文件使用Alice的公钥进行了加密，但是由于Alice的公钥是在网络上传输或者公开的，攻击截获了Bob向Alice发送的密文后，虽然攻击者无法得知明文，但他无需对其进行解密，只需要使用Alice的公钥对自己的病毒的文件进行重新加密，再发给Alice，这时候Alice无法辨别接收到的文件是否真正是Bob发送的，因为两种文件Alice都可用她的私钥解开获取到明文。这样攻击者就达到了攻击的目的。</p>
+<h3 id="数字签名解决被篡改漏洞"><a href="#数字签名解决被篡改漏洞" class="headerlink" title="数字签名解决被篡改漏洞"></a>数字签名解决被篡改漏洞</h3><p>数字签名就是用来解决上面的这种伪造或篡改的攻击的。原理很简单，就是把前面提到的使用<strong>公钥加密私钥解密</strong>进行颠倒<strong>私钥加密公钥解密</strong>，这样只有拥有私钥的人才能创造出可以用对应公钥解开的密文。攻击者虽然能够用公钥解开加密的内容，但是他不能在修改完或者替换完内容后重新生成一个能用公钥解开的密文，因为攻击者没有私钥。具体原理参见下图：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E8%A7%A3%E5%86%B3%E4%BC%A0%E8%BE%93%E7%AF%A1%E6%94%B9%E9%97%AE%E9%A2%98.png" alt="数字签名解决被篡改漏洞" title="数字签名解决传输篡改问题"></p>
+<p>Bob在发送文件给Alice前，使用自己的私钥对文件进行加密，也就是所谓为文件签名，这个签名不能是内容不被别人窃取，因为公钥是可以在网络上传输的，但是攻击者没有Bob的私钥就不能伪造Bob的签名，所以说这个签名只有Bob本人能够生成。这样Bob放心的把签过名的文件和自己的公钥发送给Alice，Alice在收到后使用公钥解密签名获取签字的内容，确定Bob的身份。这时候即使攻击者截获了Bob发送的消息，也无法伪造出Bob的签名。当然如果攻击者能够伪造Bob的公钥，让Alice误认为攻击者的公钥就是Bob的公钥也能达到攻击的目的，这一问题我们会在数字证书处解决。</p>
+<p>至此，本文将非对称加密和数字签名理论进行详细的解释，这里进行总结：</p>
+<ol>
+<li>保护信息不被窃取： 公钥加密，私钥解密</li>
+<li>保护信息不被篡改： 私钥加密，公钥解密验证  — 实际上就是数字签名</li>
+</ol>
+<p>往往两者互相配合使用，最大限度的保护消息在网络中传输。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/x509/" rel="tag"># x509</a>
+          
+            <a href="/tags/security/" rel="tag"># security</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/10/atlassian-licence-crack/" rel="next" title="Atlassian授权研究备忘录">
+                <i class="fa fa-chevron-left"></i> Atlassian授权研究备忘录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/15/gae-opensaml-v3-java-exception/" rel="prev" title="关于GAE上使用OpenSAMLV3的Java运行权限问题">
+                关于GAE上使用OpenSAMLV3的Java运行权限问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#非对称加密"><span class="nav-number">1.</span> <span class="nav-text">非对称加密</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对称密钥系统的漏洞"><span class="nav-number">1.1.</span> <span class="nav-text">对称密钥系统的漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非对称密钥系统的改进"><span class="nav-number">1.2.</span> <span class="nav-text">非对称密钥系统的改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非对称密钥算法"><span class="nav-number">1.3.</span> <span class="nav-text">非对称密钥算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数字签名理论"><span class="nav-number">2.</span> <span class="nav-text">数字签名理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#非对称加密的被篡改漏洞"><span class="nav-number">2.1.</span> <span class="nav-text">非对称加密的被篡改漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数字签名解决被篡改漏洞"><span class="nav-number">2.2.</span> <span class="nav-text">数字签名解决被篡改漏洞</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/05/12/x509-in-practice-1-digital-signature/';
+          this.page.identifier = '2017/05/12/x509-in-practice-1-digital-signature/';
+          this.page.title = 'X509证书从理论到实践之数字签名理论基础';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

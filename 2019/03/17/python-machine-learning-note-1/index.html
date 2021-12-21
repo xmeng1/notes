@@ -1,0 +1,1017 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="python,machine-learning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本系列学习笔记将会详细记录 《Python Machine Learning Second Edition》学习过程。">
+<meta name="keywords" content="python,machine-learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python机器学习笔记1">
+<meta property="og:url" content="https://notes.mengxin.science/2019/03/17/python-machine-learning-note-1/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本系列学习笔记将会详细记录 《Python Machine Learning Second Edition》学习过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images/20190323145121.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images/20190323165541.png">
+<meta property="og:image" content="http://104.236.88.249/wp-content/uploads/2016/10/Pandas-selections-and-indexing.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python机器学习笔记1">
+<meta name="twitter:description" content="摘要：本系列学习笔记将会详细记录 《Python Machine Learning Second Edition》学习过程。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/xmeng1/images/master/images/20190323145121.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2019/03/17/python-machine-learning-note-1/"/>
+
+
+
+
+
+  <title> Python机器学习笔记1 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2019/03/17/python-machine-learning-note-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Python机器学习笔记1
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-17T00:00:00+00:00">
+                2019-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/17/python-machine-learning-note-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/03/17/python-machine-learning-note-1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本系列学习笔记将会详细记录 《Python Machine Learning Second Edition》学习过程。</p>
+<a id="more"></a>
+<h2 id="神经网络概述"><a href="#神经网络概述" class="headerlink" title="神经网络概述"></a>神经网络概述</h2><p>参考章节： <code>Chapter 2： Artificial neurons – a brief glimpse into the early history of machine learning （P18</code></p>
+<p>这里我们通俗的解释一下神经网络过程的直观原理：</p>
+<p>目标：实际上神经网络的目标很简单，我们给定一组训练样本，每个训练样本有若干的特征，然后每个样本有实际的分类类别。我们的目标找出一个方程式，通过输入每个样本的特征值，最后得到分类结果和实际分类结果一致。</p>
+<p>有点像解方程组，但是样本数量巨大，也就是多元方程组，很难求出解析解。</p>
+<p>这里通过另外一种途径来实现，首先初始化一个方程，在没有样本的情况下，我们就认为这个方程是最后的目标，实际上如果没有样本，也就是没有任何信息的情况下，任意的方程都可以被认为是目标函数。</p>
+<p>然后依次出入样本来检验我们的初始化函数，如果样本碰巧符合，那就继续下一个样本，如果样本结果不符合，我们就需要修正我们当前的目标函数，怎么修正，这个实际上是不确定的，这里给出一种方案，通过学习速率控制修正的尺度，修正的目标是让当前样本的结果符合实际，但是不能过激。</p>
+<p>我们可以看出，这种方法可行的两个条件：</p>
+<ol>
+<li>样本集合可以近似线性分类的，否则我们会发现需要不停的来回调整权值</li>
+<li>学习速率尽可能小，否则同样会出现来回摇摆的情况。</li>
+</ol>
+<h2 id="神经网络感知机学习实现"><a href="#神经网络感知机学习实现" class="headerlink" title="神经网络感知机学习实现"></a>神经网络感知机学习实现</h2><p>Implementing a perceptron learning algorithm</p>
+<h3 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h3><p>首先我们需要理解，算法实现中的约定，我们将下划线(<code>_</code>)附加到属性，这些属性不是在对象初始化时创建的，而是通过调用对象的其他方法创建的，例如 <code>self.w_</code>。</p>
+<p>其次算法中语法的参考：</p>
+<blockquote>
+<p>• NumPy: <a href="https://sebastianraschka.com/pdf/books/dlb/appendix_f_numpy-intro.pdf" target="_blank" rel="noopener">https://sebastianraschka.com/pdf/books/dlb/appendix_f_numpy-intro.pdf</a></p>
+<p>• Pandas: <a href="https://pandas.pydata.org/pandas-docs/stable/10min.html" target="_blank" rel="noopener">https://pandas.pydata.org/pandas-docs/stable/10min.html</a></p>
+<p>• Matplotlib: <a href="http://matplotlib.org/users/beginner.html" target="_blank" rel="noopener">http://matplotlib.org/users/beginner.html</a></p>
+</blockquote>
+<p>理解算法，我们先从其使用方法开始：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">df = pd.read_csv(<span class="string">'https://archive.ics.uci.edu/ml/'</span> <span class="string">'machine-learning-databases/iris/iris.data'</span>, header=<span class="keyword">None</span>)</span><br><span class="line">ppn = Perceptron(eta=<span class="number">0.1</span>, n_iter=<span class="number">10</span>)</span><br><span class="line">y = df.iloc[<span class="number">0</span>:<span class="number">100</span>, <span class="number">4</span>].values</span><br><span class="line">y = np.where(y == <span class="string">'Iris-setosa'</span>, <span class="number">-1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="comment"># extract sepal length and petal length</span></span><br><span class="line">X = df.iloc[<span class="number">0</span>:<span class="number">100</span>, [<span class="number">0</span>, <span class="number">2</span>]].values</span><br><span class="line">ppn.fit(X, y)</span><br></pre></td></tr></table></figure>
+<p>这里主要有两个步骤：</p>
+<ol>
+<li>初始化：<code>ppn = Perceptron(eta=0.1, n_iter=10)</code></li>
+<li>调用 <code>fit</code> 方法：<code>ppn.fit(X, y)</code></li>
+</ol>
+<h4 id="输入的数据"><a href="#输入的数据" class="headerlink" title="输入的数据"></a>输入的数据</h4><p>首先我们看一下输入的数据：</p>
+<p><code>X</code>：这是一个二维数组，其中使用了两个 feature，参考书第9页，也就是这里矩阵下标所表示的范围。一共有100个样本，也就是矩阵上标的范围, 矩阵可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+x_1^{(1)} &x_2^{(1)} \\ 
+x_1^{(2)} &x_2^{(2)} \\
+...&... \\
+x_1^{(100)} &x_2^{(100)} \\ 
+\end{bmatrix}</script><p><code>y</code>：是一个一维数组，表示样本的实际分类。</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+y^{(1)}  \\ 
+y^{(2)} \\
+... \\
+y^{(100)} \\ 
+\end{bmatrix}</script><h4 id="初始权值"><a href="#初始权值" class="headerlink" title="初始权值"></a>初始权值</h4><p>算法的开始是初始化一组数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rgen = np.random.RandomState(self.random_state)</span><br><span class="line">self.w_ = rgen.normal(loc=<span class="number">0.0</span>, scale=<span class="number">0.01</span>, size=<span class="number">1</span> + X.shape[<span class="number">1</span>])</span><br><span class="line">self.errors_ = []</span><br></pre></td></tr></table></figure>
+<p>这里 <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.RandomState.html" target="_blank" rel="noopener"><code>numpy.random.RandomState</code></a> 是一个伪随机生成器，用于生成符合各种分布的随机数。通过这个生成器，我们初始化了 <code>self.w_</code> 权值数组。</p>
+<blockquote>
+<p>Via the fit method, we initialize the weights in self.w<em> to a vector » <code>m+1</code> , where m stands for the number of dimensions (features) in the dataset, where we add 1 for the first element in this vector that represents the bias unit. Remember that the first element in this vector, `self.w</em>[0]`, represents the so-called bias unit that we discussed earlier.</p>
+</blockquote>
+<p><code>rgen.normal(loc=0.0, scale=0.01, size=1 + X.shape[1])</code> 生成正态分布的随机数，<code>loc</code> 表示是分布的中心位置，<code>scale</code> 标准方差，用于描述分布的集中程度。最后一个参数表示输出的形态：<code>X.shape[1]</code> 是2， 这里生成了3个数，其中下标为0的数是 <code>bias unit</code> 。</p>
+<h4 id="什么是-bias-unit？"><a href="#什么是-bias-unit？" class="headerlink" title="什么是 bias unit？"></a>什么是 <code>bias unit</code>？</h4><p>参考原书的第 19 页，这里详细介绍了 <code>bias unit</code>的概念。书中描述的解释十分简单，一开始定义了预测的阈值，通过 阈值来进行分类，为了简单起见，在原来的决定方程中加入一项 $w_0x_0$，然后最后将阈值调整为 0，方便比较。其中加入的这一项就是<strong>偏置单元</strong>。在实现的时候，我们初始化 $w_0$ 的时候，多初始化了一个值，这个值就是这里的<strong>偏置单元</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images/20190323145121.png" alt="bias unit"></p>
+<p>根据这篇文章 <a href="https://www.jiqizhixin.com/articles/2018-07-05-18" target="_blank" rel="noopener">神经网络中的偏置项b到底是什么？</a> 我们知道这样做的还有另外一个原因就是，这个配置项也可以根据样本进行更新，从而在不同维度上更新。</p>
+<p><a href="https://www.cnblogs.com/shuaishuaidefeizhu/p/6832541.html" target="_blank" rel="noopener">浅谈神经网络中的bias</a></p>
+<h4 id="使用样本修正权值"><a href="#使用样本修正权值" class="headerlink" title="使用样本修正权值"></a>使用样本修正权值</h4><p>有了初始化的权值，下面就需要根据训练数据集来修正权值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(self.n_iter):</span><br><span class="line">	errors = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> xi, target <span class="keyword">in</span> zip(X, y):</span><br><span class="line">		update = self.eta * (target - self.predict(xi))</span><br><span class="line">		self.w_[<span class="number">1</span>:] += update * xi</span><br><span class="line">		self.w_[<span class="number">0</span>] += update</span><br><span class="line">		errors += int(update != <span class="number">0.0</span>)</span><br><span class="line">	self.errors_.append(errors)</span><br><span class="line"><span class="keyword">return</span> self</span><br></pre></td></tr></table></figure>
+<p>这段代码是算法的核心，对应的理论基础就是第21页的<strong>感知学习规则</strong>（perceptron learning rule）。感知学习规则的原理非常简单，只需要遵循两个规则：</p>
+<ol>
+<li>初始化权值为 0 或者是一个很小的随机值</li>
+<li>然后根据训练的样本 $x^{(i)}$，和代价函数，计算预测的分类，然后根据实际的分类和学习速率更新权值</li>
+</ol>
+<p>通过第二个规则和大量的样本不断的迭代，从而获取到一组权值可以很好的对已知的样本进行正确的分类。</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/images/20190323165541.png" alt="perceptron learning rule"></p>
+<p>代码中为了保证所有 feature 的权值同时更新，首先定义了一个 <code>update</code>： <code>update = self.eta * (target - self.predict(xi))</code>，然后根据这个 <code>update</code> 来更新所有的权值 <code>w_[]</code>。<code>self.w_[1:]</code> 表示是一个数组。也就是每个 <code>feature</code> 的权值都要使用 <code>update</code> 乘以 <code>feature</code> 值。然后还要更新 <code>bias unit</code>。最后的 <code>errors</code> 为了统计每次迭代后预测值是否错误的结果，比如我们迭代10后，这个数组为 <code>[1, 3, 3, 2, 1, 0, 0, 0, 0, 0]</code>，表明从第6次迭代就没有错误了，实际上当没有错误的时候，权值也就不会再更新了。</p>
+<p>综合上面的分析，我们可以发现感知学习规则是非常简单的，其实现代码也很短，核心代码不超过30行。</p>
+<h3 id="数据处理-Pandas"><a href="#数据处理-Pandas" class="headerlink" title="数据处理 Pandas"></a>数据处理 Pandas</h3><p>下面我们根据这个具体的算法实现，再详细介绍一下，在实现算法是所涉及到的数据处理的技术，为以后学习奠定一定的基础。</p>
+<h4 id="从-CSV-中读取数据："><a href="#从-CSV-中读取数据：" class="headerlink" title="从 CSV 中读取数据："></a>从 CSV 中读取数据：</h4><p><code>df = pd.read_csv(&#39;https://archive.ics.uci.edu/ml/&#39; &#39;machine-learning-databases/iris/iris.data&#39;, header=None)</code></p>
+<h4 id="数据选择"><a href="#数据选择" class="headerlink" title="数据选择"></a>数据选择</h4><p><img src="http://104.236.88.249/wp-content/uploads/2016/10/Pandas-selections-and-indexing.png" alt="enter image description here"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df = pd.read_csv(<span class="string">'https://archive.ics.uci.edu/ml/'</span> <span class="string">'machine-learning-databases/iris/iris.data'</span>, header=<span class="keyword">None</span>)</span><br><span class="line">X = df.iloc[<span class="number">0</span>:<span class="number">100</span>, [<span class="number">0</span>, <span class="number">2</span>]].values</span><br></pre></td></tr></table></figure>
+<p><code>X</code> 从读取的数据集中截取需要的数据，0-100 行，0和2列。这样得到的 <code>X</code> 是一个2x100 的矩阵。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/machine-learning/" rel="tag"># machine-learning</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/27/sbt-native-packager-basic-theory/" rel="next" title="sbt-native-packager 基础理论基础">
+                <i class="fa fa-chevron-left"></i> sbt-native-packager 基础理论基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/24/python-machine-learning-note-2-data-visual/" rel="prev" title="Python机器学习笔记2:简单数据可视化">
+                Python机器学习笔记2:简单数据可视化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络概述"><span class="nav-number">1.</span> <span class="nav-text">神经网络概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络感知机学习实现"><span class="nav-number">2.</span> <span class="nav-text">神经网络感知机学习实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法实现"><span class="nav-number">2.1.</span> <span class="nav-text">算法实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#输入的数据"><span class="nav-number">2.1.1.</span> <span class="nav-text">输入的数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#初始权值"><span class="nav-number">2.1.2.</span> <span class="nav-text">初始权值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是-bias-unit？"><span class="nav-number">2.1.3.</span> <span class="nav-text">什么是 bias unit？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用样本修正权值"><span class="nav-number">2.1.4.</span> <span class="nav-text">使用样本修正权值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据处理-Pandas"><span class="nav-number">2.2.</span> <span class="nav-text">数据处理 Pandas</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#从-CSV-中读取数据："><span class="nav-number">2.2.1.</span> <span class="nav-text">从 CSV 中读取数据：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据选择"><span class="nav-number">2.2.2.</span> <span class="nav-text">数据选择</span></a></li></ol></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2019/03/17/python-machine-learning-note-1/';
+          this.page.identifier = '2019/03/17/python-machine-learning-note-1/';
+          this.page.title = 'Python机器学习笔记1';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

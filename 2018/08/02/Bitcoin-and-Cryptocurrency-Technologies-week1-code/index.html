@@ -1,0 +1,1018 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Bitcoin,Blockchain," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文对第一周编程作业的代码分析">
+<meta name="keywords" content="Bitcoin,Blockchain">
+<meta property="og:type" content="article">
+<meta property="og:title" content="比特币与数字加密技术学习笔记week1-scrooge-coin代码分析">
+<meta property="og:url" content="https://notes.mengxin.science/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文对第一周编程作业的代码分析">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201883-overall.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201883-overall-dependency.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="比特币与数字加密技术学习笔记week1-scrooge-coin代码分析">
+<meta name="twitter:description" content="摘要：本文对第一周编程作业的代码分析">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/201883-overall.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/"/>
+
+
+
+
+
+  <title> 比特币与数字加密技术学习笔记week1-scrooge-coin代码分析 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                比特币与数字加密技术学习笔记week1-scrooge-coin代码分析
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-02T23:00:00+00:00">
+                2018-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文对第一周编程作业的代码分析</p>
+<a id="more"></a>
+<h2 id="基础数据结构"><a href="#基础数据结构" class="headerlink" title="基础数据结构"></a>基础数据结构</h2><p>类图</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201883-overall.png" alt="UML"></p>
+<p>类之间的依赖图</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201883-overall-dependency.png" alt="uml-dependency"></p>
+<p>在理解整个代码之前，我们需要理解基础的数据结构，并且将代码和课程理论相结合。</p>
+<h3 id="Transaction"><a href="#Transaction" class="headerlink" title="Transaction"></a>Transaction</h3><p>这个类是核心的业务类，对应于理论部分的 <code>Transaction</code>，这里没有定义类型，作业的研究对象只是针对于 <code>PayCoins</code>，也就是消费交易。</p>
+<p><code>Transaction</code> 中有两个内部类， <code>Input</code> 和 <code>Output</code>。而其本身就是有一个 <code>hash</code> 字节数组，一个 <code>Input</code> 的列表和一个 <code>Output</code> 的列表，以及一个 <code>rawTx</code> 的 <code>getter</code>。</p>
+<p>下面我们分别根据理论对这些类进行分析，</p>
+<p><code>Transaction</code> 中的 <code>hash</code> 应该是其 <code>ID</code>，用于唯一标志交易。所以只要是和交易进行链接，都需要使用这个 <code>ID</code>。</p>
+<h4 id="Output"><a href="#Output" class="headerlink" title="Output"></a>Output</h4><p>我们先看 <code>Output</code>，该内部类很简单，只有两个字段 <code>value</code> 和 <code>address</code>，其中 <code>value</code> 是 <code>double</code> 而 <code>address</code> 是一个 <code>PublicKey</code>。这个 <code>Output</code> 就是理论部分中 <code>PayCoins</code> 类型的交易的 <code>CreatCoins</code> 部分， 也就是 <code>Coins</code> 被消费销毁后又重新创建再分配的记录。这里 <code>Output</code> 使用在交易中 <code>ArrayList</code> 的 <code>Index</code> 来表示每一条记录的 <code>ID</code>。这样唯一标志某个交易中的再分配记录需要：<code>Transaction</code> 中的 <code>hash</code> 和 <code>Output</code> 列表的 <code>Index</code> 来标识。</p>
+<h4 id="Input"><a href="#Input" class="headerlink" title="Input"></a>Input</h4><p>我们再看 <code>Input</code>，有三个字段：</p>
+<ol>
+<li><code>preTxHash</code>：前一个交易的 <code>hash</code> 值</li>
+<li><code>outputIndex</code>：前一个交易的 <code>output</code> 列表的下标</li>
+<li><code>signature</code>：签名</li>
+</ol>
+<p>这个 <code>Input</code> 就是理论部分的 <code>PayCoins</code> 类型的交易的消费部分，理论中使用 <code>TransID(num)</code> 的格式标识，这里完全类似，只是增加了一个 <code>Signature</code> 用于验证器合法性。</p>
+<h4 id="理解-Input-中的签名"><a href="#理解-Input-中的签名" class="headerlink" title="理解 Input 中的签名"></a>理解 Input 中的签名</h4><p>前面理论部分我们知道，一个交易需要有签名，这个签名做什么用呢？为了保证货币持有者对货币交易的授权是真实有效的。通过这个签名能够保证货币持有者和货币价值接受者的利益：</p>
+<ol>
+<li>一旦签名，不能抵赖</li>
+<li>一旦签名，不能篡改</li>
+</ol>
+<p>举个例子，在一个交易中处理了 <code>Alice</code> 和 <code>Bob</code> 两个人每个人各一个 <code>Coin</code> 的消费。那么为了得到两个人的确认，他们确实自己主观要消费各自的 <code>Coin</code>，他们需要使用自己的私钥对指定的内容进行前面，这个过程只能两个人本人持有私钥才能实现，所以他们自己是不能抵赖的。 </p>
+<p>但是需要对哪些内容进行签名呢？这里还需要防止篡改，比如 <code>Alice</code> 本来只想将一半的价值转移给其他人，但是被别人篡改为将全部转移给其他人。这个签名必须能够检测这种篡改，显然我们需要将所有的不能被篡改的数据提取出来，一起进行签名，这样一旦有人篡改，篡改者没有 <code>Alice</code> 的私钥，所以他无法生成一个能够被公钥正确验证的签名。</p>
+<p>这个所需要签字的内容在已有代码中已经提供了，就是 <code>getRawDataToSign(int index)</code>，一个交易有多个 <code>input</code>，每个 <code>Input</code> 分别进行签名：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="keyword">byte</span>[] getRawDataToSign(<span class="keyword">int</span> index) &#123;</span><br><span class="line">	<span class="comment">// ith input and all outputs</span></span><br><span class="line">	ArrayList&lt;Byte&gt; sigData = <span class="keyword">new</span> ArrayList&lt;Byte&gt;();</span><br><span class="line">	<span class="keyword">if</span> (index &gt; inputs.size())</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	<span class="comment">// 取出 Input	</span></span><br><span class="line">	Input in = inputs.get(index);</span><br><span class="line">	<span class="comment">// 获取前一个交易的 ID</span></span><br><span class="line">	<span class="keyword">byte</span>[] prevTxHash = in.prevTxHash;</span><br><span class="line">	<span class="comment">// input 中保存的 output 的 index</span></span><br><span class="line">	<span class="comment">// 注意这里，我们如果 想把 Integer 转化为 byte，需要做一下这样一组操作</span></span><br><span class="line">	<span class="comment">//     后面在处理 Double 类型的 output value，思路是一样的</span></span><br><span class="line">	ByteBuffer b = ByteBuffer.allocate(Integer.SIZE / <span class="number">8</span>);</span><br><span class="line">	b.putInt(in.outputIndex);</span><br><span class="line">	<span class="keyword">byte</span>[] outputIndex = b.array();</span><br><span class="line">	<span class="comment">// 签名数据： 前一个交易的 ID</span></span><br><span class="line">	<span class="keyword">if</span> (prevTxHash != <span class="keyword">null</span>)</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; prevTxHash.length; i++)</span><br><span class="line">			sigData.add(prevTxHash[i]);</span><br><span class="line">	<span class="comment">// 签名数据，output index		</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; outputIndex.length; i++)</span><br><span class="line">		sigData.add(outputIndex[i]);</span><br><span class="line">	<span class="comment">// 签名数据：所有的 output 的 value 和 address</span></span><br><span class="line">	<span class="keyword">for</span> (Output op : outputs) &#123;</span><br><span class="line">		ByteBuffer bo = ByteBuffer.allocate(Double.SIZE / <span class="number">8</span>);</span><br><span class="line">		bo.putDouble(op.value);</span><br><span class="line">		<span class="keyword">byte</span>[] value = bo.array();</span><br><span class="line">		<span class="keyword">byte</span>[] addressBytes = op.address.getEncoded();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; value.length; i++)</span><br><span class="line">			sigData.add(value[i]);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; addressBytes.length; i++)</span><br><span class="line">			sigData.add(addressBytes[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 将 ArrayList&lt;Byte&gt; 转化为 byte[]</span></span><br><span class="line">	<span class="keyword">byte</span>[] sigD = <span class="keyword">new</span> <span class="keyword">byte</span>[sigData.size()];</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (Byte sb : sigData)</span><br><span class="line">		sigD[i++] = sb;</span><br><span class="line">	<span class="keyword">return</span> sigD;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有了这个函数，我们就可以获取当前交易对应 input 需要签名的数据，也进而可以使用它反过来验证。</p>
+<h3 id="交易处理过程思考"><a href="#交易处理过程思考" class="headerlink" title="交易处理过程思考"></a>交易处理过程思考</h3><p>在介绍其他数据结构之前，我们先理解一下程序的目标，也就是怎么处理交易。通过前面的学习，我们知道 <code>Scrooge Coin</code> 主要目标就是解决 <code>Double Spending</code> 问题，所以我们这里的交易处理肯定是要能够避免双花，下面我们来看一下是如何避免的。</p>
+<p>理论中我们是把交易动作分解为两步，先消费销毁，再分配价值。通过这两步就能在再分配价值前，对其合法性进行验证。</p>
+<p>交易处理的切入点是再分配，也就是 <code>Output</code>，在实际中就是处理将价值分配到指定的人的钱包。但是在处理 <code>Output</code> 的时候会追溯到 <code>Input</code> 来验证这些 <code>Output</code> 是否合法。</p>
+<p>由于交易是链状的 （<code>input</code> 维护着指向前一个交易的 <code>output</code>），所以交易处理不是孤立的处理某一个交易，而必须有其相关联的所有交易的支持。这样我们必须引入一个交易池。</p>
+<p>我们再思考，交易和其他交易关联的重点是什么呢？也就是 <code>Input</code> 是和什么进行关联的呢？ 答案是 <code>Output</code>。所以我们不需要将交易放到池中，而是将 <code>Output</code> 放到池中，这样处理交易时，<code>Input</code> 就能找到相关联的前一个 <code>Output</code>。</p>
+<p>这样就引出了我们即将要介绍的 <code>UTXO</code> 和 <code>UTXOPoll</code>， 个人认为这种缩写有点扰乱理解，他们各自的含义是：</p>
+<ol>
+<li>UTXO：Unspent Transaction Output，就是我们前面说的还未被处理的 output</li>
+<li>UTXOPool: Pool of Unspent Transaction Output：这个就是还未被处理的 output 的交易池</li>
+</ol>
+<h3 id="UTXO-和-UTXOPool"><a href="#UTXO-和-UTXOPool" class="headerlink" title="UTXO 和 UTXOPool"></a>UTXO 和 UTXOPool</h3><p><code>UTXO</code> 包含两个字段： 交易的ID <code>txHash</code> 和  交易中 <code>output</code> 的 <code>index</code></p>
+<p><code>UTXO</code>，虽然称之为 <code>Unspent Transaction Output</code>，但实际上他只是一个索引，而并不包含 <code>output</code> 内容，需要通过这个索引找到 <code>output</code>。我们可以把交易的 <code>hash</code> 和 <code>output</code> 的索引进行组合看做一个索引，这个索引就是 <code>UTXO</code>。</p>
+<p>给出一个 <code>UTXO</code>，实际上就能唯一的确认一个 <code>output</code>，首先通过 <code>txHash</code> 找到交易，在通过 <code>index</code> 找到 <code>output</code>。</p>
+<p>这里有引入一个 <code>UTXOPool</code>，实际上就是把前面的 <code>UTXO</code> 和具体的 <code>output</code> 进行组合然后放到一个池中。具体实现就是维护一个 <code>HashMap&lt;UTXO, Transaction.Output&gt; H;</code>， <code>UTXO</code> 是索引，<code>Transaction.Output</code> 是具体内容。实际中，每次有未被处理的交易产生，都需要将所有的 <code>output</code> 放入到这个池中等待处理。</p>
+<h2 id="程序结构概述"><a href="#程序结构概述" class="headerlink" title="程序结构概述"></a>程序结构概述</h2><p>通过上面的分析，我们可以对该程序进行如下描述：</p>
+<p>该系统是处理 <code>Scrooge Coin</code> 系统的交易，其主要功能是验证交易的合法性并对交易进行处理生成账本记录。</p>
+<p>作为程序的数据，会有一批交易生成，这些交易生成之后，需要将 <code>Unspent Transaction Output</code> 放到池中来让处理器进行处理。 </p>
+<h2 id="交易验证过程"><a href="#交易验证过程" class="headerlink" title="交易验证过程"></a>交易验证过程</h2><p>课程的代码已经给出验证交易所需要的条件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> true if:</span></span><br><span class="line"><span class="comment">     * (1) all outputs claimed by &#123;<span class="doctag">@code</span> tx&#125; are in the current ScroogeCore.UTXO pool,</span></span><br><span class="line"><span class="comment">     * (2) the signatures on each input of &#123;<span class="doctag">@code</span> tx&#125; are valid,</span></span><br><span class="line"><span class="comment">     * (3) no ScroogeCore.UTXO is claimed multiple times by &#123;<span class="doctag">@code</span> tx&#125;,</span></span><br><span class="line"><span class="comment">     * (4) all of &#123;<span class="doctag">@code</span> tx&#125;s output values are non-negative, and</span></span><br><span class="line"><span class="comment">     * (5) the sum of &#123;<span class="doctag">@code</span> tx&#125;s input values is greater than or equal to the sum of its output</span></span><br><span class="line"><span class="comment">     * values; and false otherwise.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValidTx</span><span class="params">(Transaction tx)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们将代码和其对应的功能点一起进行说明</p>
+<h3 id="1-all-outputs-claimed-by-code-tx-are-in-the-current-ScroogeCore-UTXO-pool"><a href="#1-all-outputs-claimed-by-code-tx-are-in-the-current-ScroogeCore-UTXO-pool" class="headerlink" title="(1) all outputs claimed by {@code tx} are in the current ScroogeCore.UTXO pool"></a>(1) all outputs claimed by {@code tx} are in the current ScroogeCore.UTXO pool</h3><p>在交易 <code>tx</code> 中所有的 <code>output</code> 都必须在等钱的 <code>UTXO pool</code> 中，只有在 <code>Pool</code>，我们才能验证该 <code>output</code> 是否存在 <code>double spending</code> 问题。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// create unspent transaction output based on input information</span></span><br><span class="line">UTXO lastUTXO = <span class="keyword">new</span> UTXO(input.prevTxHash, input.outputIndex);</span><br><span class="line"><span class="comment">// check 1 - all output claimed by tx are in current utxopool</span></span><br><span class="line"><span class="keyword">if</span> (!pool.contains(lastUTXO)) &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"> <span class="comment">// pool contain the utxo, get the output</span></span><br><span class="line">Transaction.Output prevTx = pool.getTxOutput(lastUTXO);</span><br></pre></td></tr></table></figure>
+<h3 id="2-the-signatures-on-each-input-of-code-tx-are-valid"><a href="#2-the-signatures-on-each-input-of-code-tx-are-valid" class="headerlink" title="(2) the signatures on each input of {@code tx} are valid"></a>(2) the signatures on each input of {@code tx} are valid</h3><p><code>input</code> 中的 <code>signature</code> 必须是有效的，我们前面介绍了这个 <code>Signature</code> 的意思，这里很简单，使用已经提供验证方法来实现:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// check 2 - signatures of each input are valid</span></span><br><span class="line"><span class="keyword">if</span> (input.signature == <span class="keyword">null</span> || !Crypto.verifySignature(prevTx.address, tx.getRawDataToSign(i), input.signature)) &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法 <code>Crypto.verifySignature</code> 第一个参数是公钥，第二个参数是签名的数据，第三个就是签名。其过程如下，主要使用<code>JDK</code> 提供的 <code>Sigature</code> 类来完成这个工作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Signature sig = <span class="keyword">null</span>;</span><br><span class="line">sig = Signature.getInstance(<span class="string">"SHA256withRSA"</span>);</span><br><span class="line">sig.initVerify(pubKey);</span><br><span class="line">sig.update(message);</span><br><span class="line"><span class="keyword">return</span> sig.verify(signature);</span><br></pre></td></tr></table></figure>
+<h3 id="3-no-ScroogeCore-UTXO-is-claimed-multiple-times-by-code-tx"><a href="#3-no-ScroogeCore-UTXO-is-claimed-multiple-times-by-code-tx" class="headerlink" title="(3) no ScroogeCore.UTXO is claimed multiple times by {@code tx},"></a>(3) no ScroogeCore.UTXO is claimed multiple times by {@code tx},</h3><p>不能双花，这里使用一个临时的 <code>UTXO</code> 的 <code>HashSet</code> 来保存已经处理的 <code>UTXO</code>，最后通过该值数量和 <code>Input</code>的数量对比来确定是否有多次被花费。我们知道 <code>HashSet</code> 会自动去除重复值，使用该特性来巧妙的判断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// traverse all the input in the transaction,</span></span><br><span class="line">HashSet&lt;UTXO&gt; utxoSet = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (Transaction.Input input : tx.getInputs()) &#123;</span><br><span class="line">	<span class="comment">// create unspent transaction output based on input information</span></span><br><span class="line">	UTXO lastUTXO = <span class="keyword">new</span> UTXO(input.prevTxHash, input.outputIndex);</span><br><span class="line">				<span class="comment">// signature verify successfully, add it to spend set.</span></span><br><span class="line">	utxoSet.add(lastUTXO);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// check 3 - no utxo is claimed multiple times  ?</span></span><br><span class="line"><span class="keyword">if</span> (utxoSet.size() != tx.getInputs().size())</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="4-all-of-code-tx-s-output-values-are-non-negative-and"><a href="#4-all-of-code-tx-s-output-values-are-non-negative-and" class="headerlink" title="(4) all of {@code tx}s output values are non-negative, and"></a>(4) all of {@code tx}s output values are non-negative, and</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// check 4 - non negative output values</span></span><br><span class="line"><span class="keyword">for</span> (Transaction.Output output : tx.getOutputs()) &#123;</span><br><span class="line">	sumOfOutputVals += output.value;</span><br><span class="line">	<span class="keyword">if</span> (output.value &lt; <span class="number">0</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5-the-sum-of-code-tx-s-input-values-is-greater-than-or-equal-to-the-sum-of-its-output-values-and-false-otherwise"><a href="#5-the-sum-of-code-tx-s-input-values-is-greater-than-or-equal-to-the-sum-of-its-output-values-and-false-otherwise" class="headerlink" title="(5) the sum of {@code tx}s input values is greater than or equal to the sum of its output values; and false otherwise."></a>(5) the sum of {@code tx}s input values is greater than or equal to the sum of its output values; and false otherwise.</h3><p>我们需要从上一个 <code>Transaction</code> 中的 <code>output</code> 获取 <code>input</code> 所对应的 <code>value</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// statistic the sum of input value which will be used to check the balance of input and output</span></span><br><span class="line">sumOfInputVals += prevTx.value;</span><br><span class="line"></span><br><span class="line"><span class="comment">// check 5 - validating input values &gt;= sum of output values</span></span><br><span class="line"><span class="keyword">if</span> (sumOfInputVals &lt; sumOfOutputVals)</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="作业提交单元测试分析"><a href="#作业提交单元测试分析" class="headerlink" title="作业提交单元测试分析"></a>作业提交单元测试分析</h3><p>下面我们根据单元测试来确定我们代码的目标是否都满足</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Test 1: test isValidTx() with valid transactions</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 2: test isValidTx() with transactions containing signatures of incorrect data</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 3: test isValidTx() with transactions containing signatures using incorrect private keys</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 4: test isValidTx() with transactions whose total output value exceeds total input value</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 5: test isValidTx() with transactions that claim outputs not in the current utxoPool</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 6: test isValidTx() with transactions that claim the same UTXO multiple times</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 7: test isValidTx() with transactions that contain a negative output value</span><br><span class="line">==&gt; passed</span><br></pre></td></tr></table></figure>
+<p>至此我们就把如何验证一个 <code>Transaction</code> 介绍完了。下面介绍如何处理一组可能的 <code>Transaction</code></p>
+<h2 id="交易组处理"><a href="#交易组处理" class="headerlink" title="交易组处理"></a>交易组处理</h2><h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">Test 8: test handleTransactions() with simple and valid transactions</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 50</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 100</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 9: test handleTransactions() with simple but some invalid transactions because of invalid signatures</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 0</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 1</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 10: test handleTransactions() with simple but some invalid transactions because of inputSum &lt; outputSum</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 25</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 42</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 11: test handleTransactions() with simple and valid transactions with some double spends</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 1</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 21</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 42</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 12: test handleTransactions() with valid but some transactions are simple, some depend on other transactions</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 29</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 83</span><br><span class="line">Returned set is not a maximal set of transactions</span><br><span class="line">==&gt; FAILED</span><br><span class="line"></span><br><span class="line">Test 13: test handleTransactions() with valid and simple but some transactions take inputs from non-exisiting utxo&apos;s</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 1</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 12</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 57</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 14: test handleTransactions() with complex Transactions</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 10</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 30</span><br><span class="line">==&gt; passed</span><br><span class="line"></span><br><span class="line">Test 15: test handleTransactions() with simple, valid transactions being called again to check for changes made in the pool</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 2</span><br><span class="line">Total Transactions = 50</span><br><span class="line">Number of transactions returned valid by student = 48</span><br><span class="line">Total Transactions = 100</span><br><span class="line">Number of transactions returned valid by student = 52</span><br><span class="line">Returned set is not a maximal set of transactions</span><br><span class="line">==&gt; FAILED</span><br></pre></td></tr></table></figure>
+<h3 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h3><p>目前有两种方法</p>
+<h4 id="不动点算法"><a href="#不动点算法" class="headerlink" title="不动点算法"></a>不动点算法</h4><p><a href="https://blog.csdn.net/dylan_frank/article/details/80211095#t6" target="_blank" rel="noopener">参考介绍</a></p>
+<p>这一个是给你组乱序的交易 <code>TX[]</code> 让你返回其中有效的交易，注意只检查一遍是不够的，因为新交易的加入 UTXOPool可能会使得后面又有新的合法交易出现。最简单的做法就是不动点算法，每次遍历，看看是否结果有更新，如果有继续遍历，直到没有为止，最终一定会收敛到全部加入，而且每次至少会加入一个交易</p>
+<h4 id="checkIfMutuallyValid"><a href="#checkIfMutuallyValid" class="headerlink" title="checkIfMutuallyValid"></a>checkIfMutuallyValid</h4><p><a href="https://github.com/ramneekhanda/crypto---assignments/blob/master/scrooge-coin/src/ScroogeCore/TxHandler.java" target="_blank" rel="noopener">参考源码</a></p>
+<p><code>checkIfMutuallyValid</code> 貌似是检查一下 <code>Map&lt;ComparableTransactionInput, ArrayList&lt;Transaction&gt;&gt;</code> 一个 map 的映射关系是否唯一，这部分代码还需要好好理解一下。</p>
+<h2 id="附加题"><a href="#附加题" class="headerlink" title="附加题"></a>附加题</h2><blockquote>
+<p>Extra Credit: Create a second file called MaxFeeTxHandler.java whose handleTxs() method<br>finds a set of transactions with maximum total transaction fees — i.e. maximize the sum over all<br>transactions in the set of (sum of input values - sum of output values)). </p>
+</blockquote>
+<h3 id="单元测试-1"><a href="#单元测试-1" class="headerlink" title="单元测试"></a>单元测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Running 1 tests</span><br><span class="line"></span><br><span class="line">Test 1: test handleTransactions() with simple and valid transactions</span><br><span class="line">Total Transactions = 2</span><br><span class="line">Number of transactions returned valid by student = 1</span><br><span class="line">Correct, Returned fees 0.0017396507581575746 = maximum fees </span><br><span class="line">Total Transactions = 10</span><br><span class="line">Number of transactions returned valid by student = 3</span><br><span class="line">Returned set is not a maximum fees set of transactions</span><br><span class="line">Returned fees 0.010941092961145933, maximum fees 0.011991189987225814</span><br><span class="line">Total Transactions = 30</span><br><span class="line">Number of transactions returned valid by student = 10</span><br><span class="line">Returned set is not a maximum fees set of transactions</span><br><span class="line">Returned fees 0.029151874533288123, maximum fees 0.03345190404025702</span><br><span class="line">==&gt; FAILED</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Total:0/1 tests passed!</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Bitcoin/" rel="tag"># Bitcoin</a>
+          
+            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/" rel="next" title="比特币与数字加密技术学习笔记week1">
+                <i class="fa fa-chevron-left"></i> 比特币与数字加密技术学习笔记week1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/03/Scala-with-tail-recursive-function/" rel="prev" title="Scala 与尾递归">
+                Scala 与尾递归 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础数据结构"><span class="nav-number">1.</span> <span class="nav-text">基础数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Transaction"><span class="nav-number">1.1.</span> <span class="nav-text">Transaction</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Output"><span class="nav-number">1.1.1.</span> <span class="nav-text">Output</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Input"><span class="nav-number">1.1.2.</span> <span class="nav-text">Input</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#理解-Input-中的签名"><span class="nav-number">1.1.3.</span> <span class="nav-text">理解 Input 中的签名</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#交易处理过程思考"><span class="nav-number">1.2.</span> <span class="nav-text">交易处理过程思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UTXO-和-UTXOPool"><span class="nav-number">1.3.</span> <span class="nav-text">UTXO 和 UTXOPool</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序结构概述"><span class="nav-number">2.</span> <span class="nav-text">程序结构概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易验证过程"><span class="nav-number">3.</span> <span class="nav-text">交易验证过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-all-outputs-claimed-by-code-tx-are-in-the-current-ScroogeCore-UTXO-pool"><span class="nav-number">3.1.</span> <span class="nav-text">(1) all outputs claimed by {@code tx} are in the current ScroogeCore.UTXO pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-the-signatures-on-each-input-of-code-tx-are-valid"><span class="nav-number">3.2.</span> <span class="nav-text">(2) the signatures on each input of {@code tx} are valid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-no-ScroogeCore-UTXO-is-claimed-multiple-times-by-code-tx"><span class="nav-number">3.3.</span> <span class="nav-text">(3) no ScroogeCore.UTXO is claimed multiple times by {@code tx},</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-all-of-code-tx-s-output-values-are-non-negative-and"><span class="nav-number">3.4.</span> <span class="nav-text">(4) all of {@code tx}s output values are non-negative, and</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-the-sum-of-code-tx-s-input-values-is-greater-than-or-equal-to-the-sum-of-its-output-values-and-false-otherwise"><span class="nav-number">3.5.</span> <span class="nav-text">(5) the sum of {@code tx}s input values is greater than or equal to the sum of its output values; and false otherwise.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#作业提交单元测试分析"><span class="nav-number">3.6.</span> <span class="nav-text">作业提交单元测试分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易组处理"><span class="nav-number">4.</span> <span class="nav-text">交易组处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单元测试"><span class="nav-number">4.1.</span> <span class="nav-text">单元测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现过程"><span class="nav-number">4.2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#不动点算法"><span class="nav-number">4.2.1.</span> <span class="nav-text">不动点算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#checkIfMutuallyValid"><span class="nav-number">4.2.2.</span> <span class="nav-text">checkIfMutuallyValid</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附加题"><span class="nav-number">5.</span> <span class="nav-text">附加题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单元测试-1"><span class="nav-number">5.1.</span> <span class="nav-text">单元测试</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/';
+          this.page.identifier = '2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/';
+          this.page.title = '比特币与数字加密技术学习笔记week1-scrooge-coin代码分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

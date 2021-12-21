@@ -1,0 +1,1057 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kubernetes,Kuberadm,Ansible," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文介绍如何使用 Kubeadm 手动搭建 Kubernetes 以及注意事项。">
+<meta name="keywords" content="Kubernetes,Kuberadm,Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于 Kubeadm 的 Kubernetes 搭建手册">
+<meta property="og:url" content="https://notes.mengxin.science/2018/12/13/Title/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文介绍如何使用 Kubeadm 手动搭建 Kubernetes 以及注意事项。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于 Kubeadm 的 Kubernetes 搭建手册">
+<meta name="twitter:description" content="摘要：本文介绍如何使用 Kubeadm 手动搭建 Kubernetes 以及注意事项。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/12/13/Title/"/>
+
+
+
+
+
+  <title> 基于 Kubeadm 的 Kubernetes 搭建手册 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/12/13/Title/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于 Kubeadm 的 Kubernetes 搭建手册
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-13T00:00:00+00:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/12/13/Title/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/12/13/Title/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文介绍如何使用 Kubeadm 手动搭建 Kubernetes 以及注意事项。</p>
+<a id="more"></a>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>研究了 MiniKube 之后，感觉如果想进一步深入的学习 Kubernetes， 还是需要自己搭建一个生产环境的集群。虽然现在云端产品有很多 Kubernetes 的服务，但是毕竟是收费的。</p>
+<p>通过学习和了解 Kubernetes 的官网，发现了很多的解决方法，但是尝试了几个发现其教程十分不完善，遇到问题没有什么支持。比如使用 Fedora 搭建就会有网络问题。使用 Ubuntu 的 MAAS 搭建，发现需要了解很多概念，比如 Juju 等等。最终通过搜索发现这篇教程十分详细 <a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-1-11-cluster-using-kubeadm-on-ubuntu-18-04" target="_blank" rel="noopener">How To Create a Kubernetes 1.11 Cluster Using Kubeadm on Ubuntu 18.04</a> 在搭建的过程中只遇到了几个小问题。并且最后进行了一些简单的扩展。</p>
+<p>下面简要列出搭建的大纲以及遇到的问题。</p>
+<h2 id="搭建概要"><a href="#搭建概要" class="headerlink" title="搭建概要"></a>搭建概要</h2><p>首先列出大纲</p>
+<ol>
+<li>Ubuntu 系统准备</li>
+<li>Ansible 安装</li>
+<li>Ansible Host file</li>
+<li>Initial Ubuntu by Ansible</li>
+<li>安装 Kubernetes 相关依赖 by Ansible</li>
+<li>配置 Master Node by Ansible</li>
+<li>配置 Worker Node by Ansible</li>
+<li>验证集群</li>
+<li>通过部署 Nginx 应用验证集群</li>
+<li>安装 Kubernetes DashBoard</li>
+</ol>
+<h3 id="Ubuntu-系统准备"><a href="#Ubuntu-系统准备" class="headerlink" title="Ubuntu 系统准备"></a>Ubuntu 系统准备</h3><p>使用 Ubuntu Server 18.04 LTS 版本，现在版本的安装十分简单，基本只需要配置一下网络。</p>
+<p>这里需要安装 3 台 <code>Ubuntu Server</code>，一台作为 <code>Master Node</code>，另外两台作为 <code>Worker Nodes</code>。</p>
+<h3 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h3><p>对于 <code>Linux Server</code> 的安装，基本 <code>SSHD</code> 是一个默认启动的服务，所以安装完成后，就可以直接通过用户名和密码 <code>SSH</code> 登陆到系统，但是如果希望使用 <code>Public Key</code> 登陆，就需要自己更改配置文件以及添加自己的 <code>Public Key</code> 到对应用户的 Home 目录下的 <code>~/.ssh/authorized_keys</code> 文件中。</p>
+<p>这里推荐使用一个叫做 <a href="https://launchpad.net/sshwebkeys" target="_blank" rel="noopener">LaunchPad</a> 的网站，由于 <code>Public Key</code> 是可以公开出去，所以我们可以把自己的 <code>Public Key</code> 发布到这个网站，然后在 <code>Ubunut</code> 安装的时候，在创建用户这一步，有一个选项，叫做导入 <code>SSH</code>，其中可以选择这个网站，然后安装过程中就会自动从这个网站上将我们的 <code>Public Key</code> 下载下来，然后询问是否添加到 <code>authorized_keys</code> 这个文件中，如果我们确认 <code>Public Key</code> 无误后，点击确定，这时候这个 <code>Public Key</code> 就会自动配置后，就可以直接通过 <code>Public Key</code> 登陆到系统了，十分方便。</p>
+<h3 id="Ansible-安装"><a href="#Ansible-安装" class="headerlink" title="Ansible 安装"></a>Ansible 安装</h3><p>十分简单，直接参考官方文档：  <a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-ansible-on-ubuntu-18-04#step-1-%E2%80%94-installing-ansible" target="_blank" rel="noopener">How to Install and Configure Ansible on Ubuntu 18.04</a> </p>
+<p>简单的了解 <code>Ansible</code> <a href="https://www.digitalocean.com/community/tutorials/configuration-management-101-writing-ansible-playbooks" target="_blank" rel="noopener">Configuration Management 101: Writing Ansible Playbooks</a>.</p>
+<p>这里我们可以把它想象成一个脚本命令执行器，我们定义好脚本执行的步骤，然后 <code>Ansible</code> 通过这个步骤，借助 SSH 在指定的服务器上执行对应的脚本命令，</p>
+<h3 id="Ansible-Host-file"><a href="#Ansible-Host-file" class="headerlink" title="Ansible Host file"></a>Ansible Host file</h3><p>创建文件  <code>touch ~/kube-cluster/hosts</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[masters]</span></span><br><span class="line"><span class="string">master</span> <span class="string">ansible_host=master_ip</span> <span class="string">ansible_user=root</span></span><br><span class="line"></span><br><span class="line"><span class="string">[workers]</span></span><br><span class="line"><span class="string">worker1</span> <span class="string">ansible_host=worker_1_ip</span> <span class="string">ansible_user=root</span></span><br><span class="line"><span class="string">worker2</span> <span class="string">ansible_host=worker_2_ip</span> <span class="string">ansible_user=root</span></span><br><span class="line"></span><br><span class="line"><span class="string">[all:vars]</span></span><br><span class="line"><span class="string">ansible_python_interpreter=/usr/bin/python3</span></span><br></pre></td></tr></table></figure>
+<p>这样我们在执行 <code>Ansible</code> 命令的时候只需要指定这个问题，就可以在指定的服务器上进行操作了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook -i hosts OTHER_CONFIG</span><br></pre></td></tr></table></figure>
+<h3 id="Initial-Ubuntu-by-Ansible"><a href="#Initial-Ubuntu-by-Ansible" class="headerlink" title="Initial Ubuntu by Ansible"></a>Initial Ubuntu by Ansible</h3><p>创建文件  <code>touch ~/kube-cluster/initial.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">create</span> <span class="string">the</span> <span class="string">'ubuntu'</span> <span class="string">user</span></span><br><span class="line"><span class="attr">      user:</span> <span class="string">name=ubuntu</span> <span class="string">append=yes</span> <span class="string">state=present</span> <span class="string">createhome=yes</span> <span class="string">shell=/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">allow</span> <span class="string">'ubuntu'</span> <span class="string">to</span> <span class="string">have</span> <span class="string">passwordless</span> <span class="string">sudo</span></span><br><span class="line"><span class="attr">      lineinfile:</span></span><br><span class="line"><span class="attr">        dest:</span> <span class="string">/etc/sudoers</span></span><br><span class="line"><span class="attr">        line:</span> <span class="string">'ubuntu ALL=(ALL) NOPASSWD: ALL'</span></span><br><span class="line"><span class="attr">        validate:</span> <span class="string">'visudo -cf %s'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">set</span> <span class="string">up</span> <span class="string">authorized</span> <span class="string">keys</span> <span class="string">for</span> <span class="string">the</span> <span class="string">ubuntu</span> <span class="string">user</span></span><br><span class="line"><span class="attr">      authorized_key:</span> <span class="string">user=ubuntu</span> <span class="string">key="&#123;&#123;item&#125;&#125;"</span></span><br><span class="line"><span class="attr">      with_file:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">~/.ssh/id_rsa.pub</span></span><br></pre></td></tr></table></figure>
+<p>这里就是创建了一个叫做 <code>ubuntu</code> 的用户，同时将当前默认 <code>public key</code> 添加到 <code>sshd</code> 的信任列表中。另外这里还将 <code>ubuntu</code> 用户的 <code>sudo</code> 命令设置为不需要密码，这样可以在执行 <code>sudo</code> 命令的时候不需要交互密码。</p>
+<h3 id="安装-Kubernetes-相关依赖-by-Ansible"><a href="#安装-Kubernetes-相关依赖-by-Ansible" class="headerlink" title="安装 Kubernetes 相关依赖 by Ansible"></a>安装 Kubernetes 相关依赖 by Ansible</h3><p>这里我们需要明白 <code>Kubernetes</code> 相关组件的用途：</p>
+<ul>
+<li><p><code>Docker</code> - a container runtime. It is the component that runs your containers. Support for other runtimes such as  <a href="https://coreos.com/rkt/" target="_blank" rel="noopener">rkt</a>  is under active development in Kubernetes.</p>
+</li>
+<li><p><code>kubeadm</code>  - a CLI tool that will install and configure the various components of a cluster in a standard way. 这是一个用于安装和配置 Kubernetes 的命令行工具</p>
+</li>
+<li><p><code>kubelet</code>  - a system service/program that runs on all nodes and handles node-level operations. 这是 Kubernetes 的 Node 运行的服务</p>
+</li>
+<li><p><code>kubectl</code>  - a CLI tool used for issuing commands to the cluster through its API Server. 这是 Kubernetes 的 Master 运行的服务</p>
+</li>
+</ul>
+<p>创建文件  <code>touch ~/kube-cluster/kube-dependencies.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">install</span> <span class="string">Docker</span></span><br><span class="line"><span class="attr">     apt:</span></span><br><span class="line"><span class="attr">       name:</span> <span class="string">docker.io</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br><span class="line"><span class="attr">       update_cache:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">install</span> <span class="string">APT</span> <span class="string">Transport</span> <span class="string">HTTPS</span></span><br><span class="line"><span class="attr">     apt:</span></span><br><span class="line"><span class="attr">       name:</span> <span class="string">apt-transport-https</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">add</span> <span class="string">Kubernetes</span> <span class="string">apt-key</span></span><br><span class="line"><span class="attr">     apt_key:</span></span><br><span class="line"><span class="attr">       url:</span> <span class="attr">https://packages.cloud.google.com/apt/doc/apt-key.gpg</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">add</span> <span class="string">Kubernetes'</span> <span class="string">APT</span> <span class="string">repository</span></span><br><span class="line"><span class="attr">     apt_repository:</span></span><br><span class="line"><span class="attr">      repo:</span> <span class="string">deb</span> <span class="attr">http://apt.kubernetes.io/</span> <span class="string">kubernetes-xenial</span> <span class="string">main</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">present</span></span><br><span class="line"><span class="attr">      filename:</span> <span class="string">'kubernetes'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">install</span> <span class="string">kubelet</span></span><br><span class="line"><span class="attr">     apt:</span></span><br><span class="line"><span class="attr">       name:</span> <span class="string">kubelet</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br><span class="line"><span class="attr">       update_cache:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">install</span> <span class="string">kubeadm</span></span><br><span class="line"><span class="attr">     apt:</span></span><br><span class="line"><span class="attr">       name:</span> <span class="string">kubeadm</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">master</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">   - name:</span> <span class="string">install</span> <span class="string">kubectl</span></span><br><span class="line"><span class="attr">     apt:</span></span><br><span class="line"><span class="attr">       name:</span> <span class="string">kubectl</span></span><br><span class="line"><span class="attr">       state:</span> <span class="string">present</span></span><br></pre></td></tr></table></figure>
+<p>所有节点： <code>Docker</code>，<code>kubelet</code>， <code>kubeadm</code><br>Master节点： <code>kubectl</code></p>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>作为这一步，需要做额外两步：</p>
+<ol>
+<li>需要解决 Docker 的权限问题，这时候使用 ubuntu 运行 <code>docker ps</code>，会出现权限问题，需要将 <code>ubuntu</code> 加入到 <code>docker</code> group 中，在 <code>ubuntu</code> 用户中执行命令： <code>sudo usermod -a -G docker $USER</code>，然后需要 logout 在 login 才会生效。</li>
+<li>需要关闭 swapoff，否则下面的 <code>kuberadm init</code> 会出错。 <code>sudo swapoff -a</code></li>
+</ol>
+<h3 id="配置-Master-Node-by-Ansible"><a href="#配置-Master-Node-by-Ansible" class="headerlink" title="配置 Master Node by Ansible"></a>配置 Master Node by Ansible</h3><p>创建文件 <code>touch ~/kube-cluster/master.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">master</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">initialize</span> <span class="string">the</span> <span class="string">cluster</span></span><br><span class="line"><span class="attr">      shell:</span> <span class="string">kubeadm</span> <span class="string">init</span> <span class="bullet">--pod-network-cidr=10.244.0.0/16</span> <span class="string">&gt;&gt;</span> <span class="string">cluster_initialized.txt</span></span><br><span class="line"><span class="attr">      args:</span></span><br><span class="line"><span class="attr">        chdir:</span> <span class="string">$HOME</span></span><br><span class="line"><span class="attr">        creates:</span> <span class="string">cluster_initialized.txt</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">create</span> <span class="string">.kube</span> <span class="string">directory</span></span><br><span class="line"><span class="attr">      become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">      become_user:</span> <span class="string">ubuntu</span></span><br><span class="line"><span class="attr">      file:</span></span><br><span class="line"><span class="attr">        path:</span> <span class="string">$HOME/.kube</span></span><br><span class="line"><span class="attr">        state:</span> <span class="string">directory</span></span><br><span class="line"><span class="attr">        mode:</span> <span class="number">0755</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">copy</span> <span class="string">admin.conf</span> <span class="string">to</span> <span class="string">user's</span> <span class="string">kube</span> <span class="string">config</span></span><br><span class="line"><span class="attr">      copy:</span></span><br><span class="line"><span class="attr">        src:</span> <span class="string">/etc/kubernetes/admin.conf</span></span><br><span class="line"><span class="attr">        dest:</span> <span class="string">/home/ubuntu/.kube/config</span></span><br><span class="line"><span class="attr">        remote_src:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">        owner:</span> <span class="string">ubuntu</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">install</span> <span class="string">Pod</span> <span class="string">network</span></span><br><span class="line"><span class="attr">      become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">      become_user:</span> <span class="string">ubuntu</span></span><br><span class="line"><span class="attr">      shell:</span> <span class="string">kubectl</span> <span class="string">apply</span> <span class="bullet">-f</span> <span class="attr">https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml</span> <span class="string">&gt;&gt;</span> <span class="string">pod_network_setup.txt</span></span><br><span class="line"><span class="attr">      args:</span></span><br><span class="line"><span class="attr">        chdir:</span> <span class="string">$HOME</span></span><br><span class="line"><span class="attr">        creates:</span> <span class="string">pod_network_setup.txt</span></span><br></pre></td></tr></table></figure>
+<p>主要就做了3件事情：</p>
+<ol>
+<li>kubeadm 初始化</li>
+<li>复制初始化后生成的配置文件到当前用户的目录，并设置环境变量</li>
+<li>配置网络</li>
+</ol>
+<p>这三个步骤完全和其他教程的 <code>kuberadm</code> 配置是一致的。</p>
+<p>执行完成后我们会有两个文件：</p>
+<ol>
+<li>root 用户目录：cluster_initialized.txt</li>
+<li>ubunut 用户目录： pod_network_setup.txt</li>
+</ol>
+<p>第一个文件十分重要，里面有 <code>kubuernet</code> 初始化的信息，以及后续操作指导，比如拷贝配置文件和如何将 <code>worker node</code> 加入到该集群。</p>
+<p>这时候我们就可以验证下 <code>Master Node</code> 是否启动成功 <code>kubectl get nodes</code>，状态需要是 <code>Ready</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NAME      STATUS    ROLES     AGE       VERSION</span><br><span class="line">master    Ready     master    1d        v1.11.1</span><br></pre></td></tr></table></figure>
+<h3 id="配置-Worker-Node-by-Ansible"><a href="#配置-Worker-Node-by-Ansible" class="headerlink" title="配置 Worker Node by Ansible"></a>配置 Worker Node by Ansible</h3><p>创建文件 <code>touch ~/kube-cluster/workers.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">master</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  gather_facts:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">get</span> <span class="string">join</span> <span class="string">command</span></span><br><span class="line"><span class="attr">      shell:</span> <span class="string">kubeadm</span> <span class="string">token</span> <span class="string">create</span> <span class="bullet">--print-join-command</span></span><br><span class="line"><span class="attr">      register:</span> <span class="string">join_command_raw</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">set</span> <span class="string">join</span> <span class="string">command</span></span><br><span class="line"><span class="attr">      set_fact:</span></span><br><span class="line"><span class="attr">        join_command:</span> <span class="string">"<span class="template-variable">&#123;&#123; join_command_raw.stdout_lines[0] &#125;&#125;</span>"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">- hosts:</span> <span class="string">workers</span></span><br><span class="line"><span class="attr">  become:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">    - name:</span> <span class="string">join</span> <span class="string">cluster</span></span><br><span class="line"><span class="attr">      shell:</span> <span class="string">"<span class="template-variable">&#123;&#123; hostvars['master'].join_command &#125;&#125;</span> &gt;&gt; node_joined.txt"</span></span><br><span class="line"><span class="attr">      args:</span></span><br><span class="line"><span class="attr">        chdir:</span> <span class="string">$HOME</span></span><br><span class="line"><span class="attr">        creates:</span> <span class="string">node_joined.txt</span></span><br></pre></td></tr></table></figure>
+<p>实际上我们通过上一步生成的问题中的命令在 <code>worker</code> 节点上执行一下就可以加入到集群，这里通过命令来重新获取 <code>token</code> 来自动化执行。</p>
+<p><code>kubeadm token create --print-join-command</code> 命令会创建 token，并且打印出加入节点的命令，然后使用 <code>Ansible</code> 将其存入变量：<code>join_command_raw</code>，然后在 <code>worker</code> 节点上直接执行该命令就可以了。</p>
+<h3 id="验证集群"><a href="#验证集群" class="headerlink" title="验证集群"></a>验证集群</h3><p>在 <code>Master</code> 节点： <code>kubectl get nodes</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NAME      STATUS    ROLES     AGE       VERSION</span><br><span class="line">master    Ready     master    1d        v1.11.1</span><br><span class="line">worker1   Ready     &lt;none&gt;    1d        v1.11.1 </span><br><span class="line">worker2   Ready     &lt;none&gt;    1d        v1.11.1</span><br></pre></td></tr></table></figure>
+<h3 id="通过部署-Nginx-应用验证集群"><a href="#通过部署-Nginx-应用验证集群" class="headerlink" title="通过部署 Nginx 应用验证集群"></a>通过部署 Nginx 应用验证集群</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">kubectl run nginx --image=nginx --port 80</span><br><span class="line"></span><br><span class="line">kubectl expose deploy nginx --port 80 --target-port 80 --<span class="built_in">type</span> NodePort</span><br><span class="line"></span><br><span class="line">kubectl get services</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">NAME         TYPE        CLUSTER-IP       EXTERNAL-IP           PORT(S)             AGE</span><br><span class="line">kubernetes   ClusterIP   10.96.0.1        &lt;none&gt;                443/TCP             1d</span><br><span class="line">nginx        NodePort    10.109.228.209   &lt;none&gt;                80:nginx_port/TCP   40m</span><br></pre></td></tr></table></figure>
+<h3 id="安装-Kubernetes-DashBoard"><a href="#安装-Kubernetes-DashBoard" class="headerlink" title="安装 Kubernetes DashBoard"></a>安装 Kubernetes DashBoard</h3><p>参考 <a href="https://github.com/kubernetes/dashboard" target="_blank" rel="noopener">Kubernetes DashBoard文档</a> ，安装 <code>Kubernetes DashBoard</code></p>
+<p>如果是本机运行，很简单，只需要两步：</p>
+<ol>
+<li>应用配置</li>
+<li>配置 proxy</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml</span><br><span class="line">kubectl proxy</span><br></pre></td></tr></table></figure>
+<p>这时候在 Master 节点，就可以直接访问 <code>http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/</code></p>
+<h4 id="Kubernetes-DashBoard-Access-Outside"><a href="#Kubernetes-DashBoard-Access-Outside" class="headerlink" title="Kubernetes DashBoard Access Outside"></a>Kubernetes DashBoard Access Outside</h4><p>参考：</p>
+<p>access outside： <a href="https://github.com/kubernetes/dashboard/wiki/Accessing-Dashboard---1.7.X-and-above" target="_blank" rel="noopener">https://github.com/kubernetes/dashboard/wiki/Accessing-Dashboard---1.7.X-and-above</a></p>
+<p>user and token： <a href="https://github.com/kubernetes/dashboard/wiki/Creating-sample-user" target="_blank" rel="noopener">https://github.com/kubernetes/dashboard/wiki/Creating-sample-user</a></p>
+<p>这里有两种方法：</p>
+<h5 id="proxy"><a href="#proxy" class="headerlink" title="proxy"></a>proxy</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl proxy --address 0.0.0.0 --accept-hosts <span class="string">'.*'</span> &amp;</span><br></pre></td></tr></table></figure>
+<p>也就是配置 proxy 为接受任何 host。但是这用方法暴露的是 <code>http</code>，所以不支持用户登陆。</p>
+<blockquote>
+<p>NOTE: Dashboard should not be exposed publicly over HTTP. For domains accessed over HTTP it will not be possible to sign in. Nothing will happen after clicking Sign in button on login page.</p>
+</blockquote>
+<h5 id="NodePort"><a href="#NodePort" class="headerlink" title="NodePort"></a>NodePort</h5><p>使用 NodePort 方法暴露 <code>Dashboard</code> 服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system edit service kubernetes-dashboard</span><br></pre></td></tr></table></figure>
+<p>修改配置文件中 spec 中的 <code>type: ClusterIP</code> 为 <code>type: NodePort</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  clusterIP:</span> <span class="number">10.100</span><span class="number">.124</span><span class="number">.90</span></span><br><span class="line"><span class="attr">  externalTrafficPolicy:</span> <span class="string">Cluster</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">  - port:</span> <span class="number">443</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">TCP</span></span><br><span class="line"><span class="attr">    targetPort:</span> <span class="number">8443</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    k8s-app:</span> <span class="string">kubernetes-dashboard</span></span><br><span class="line"><span class="attr">  sessionAffinity:</span> <span class="string">None</span></span><br><span class="line">  <span class="comment">#type: ClusterIP</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">NodePort</span></span><br></pre></td></tr></table></figure>
+<p>然后我们获取端口号</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system get service kubernetes-dashboard</span><br><span class="line"></span><br><span class="line">NAME                   CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes-dashboard   10.100.124.90   &lt;nodes&gt;       443:31707/TCP   21h</span><br></pre></td></tr></table></figure>
+<p>这时候我们就可以使用  Master 节点的 IP 加上上面的端口号 <code>31707</code> 来访问 <code>DashBoard</code>。</p>
+<h4 id="创建用户登陆"><a href="#创建用户登陆" class="headerlink" title="创建用户登陆"></a>创建用户登陆</h4><p>如果使用上面第二种方法暴露 <code>Dashboard</code> 服务，我们就可以使用登陆功能，<a href="https://github.com/kubernetes/dashboard/wiki/Creating-sample-user" target="_blank" rel="noopener">参考文档</a>创建用户并生成<code>token</code>。</p>
+<h5 id="创建用户配置文件"><a href="#创建用户配置文件" class="headerlink" title="创建用户配置文件"></a>创建用户配置文件</h5><p>用户名为： <code>admin-user</code></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">admin-user</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">kube-system</span></span><br></pre></td></tr></table></figure>
+<p>执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f dashboard-adminuser.yaml</span><br></pre></td></tr></table></figure>
+<h5 id="创建ClusterRoleBinding配置文件"><a href="#创建ClusterRoleBinding配置文件" class="headerlink" title="创建ClusterRoleBinding配置文件"></a>创建ClusterRoleBinding配置文件</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRoleBinding</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">admin-user</span></span><br><span class="line"><span class="attr">roleRef:</span></span><br><span class="line"><span class="attr">  apiGroup:</span> <span class="string">rbac.authorization.k8s.io</span></span><br><span class="line"><span class="attr">  kind:</span> <span class="string">ClusterRole</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">cluster-admin</span></span><br><span class="line"><span class="attr">subjects:</span></span><br><span class="line"><span class="attr">- kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">admin-user</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">kube-system</span></span><br></pre></td></tr></table></figure>
+<p>执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f dashboard-cluster-role-biding.yaml</span><br></pre></td></tr></table></figure>
+<h5 id="生成-token"><a href="#生成-token" class="headerlink" title="生成 token"></a>生成 token</h5><p>创建一个 shell 脚本： <code>genToken.sh</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep <span class="variable">$1</span>| awk <span class="string">'&#123;print $1&#125;'</span>)</span><br></pre></td></tr></table></figure>
+<p>使用脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./genToken admin-user &gt;&gt; admin-user.token</span><br></pre></td></tr></table></figure>
+<p>这时候就可以用这个 token 登陆了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/Kuberadm/" rel="tag"># Kuberadm</a>
+          
+            <a href="/tags/Ansible/" rel="tag"># Ansible</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/08/suffix-array-and-lcp-theory-application/" rel="next" title="后缀数组 Suffix Array 及最长公共前缀 LCP 理论及应用">
+                <i class="fa fa-chevron-left"></i> 后缀数组 Suffix Array 及最长公共前缀 LCP 理论及应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/13/Title/" rel="prev" title="Stock Span 问题及其延伸与应用">
+                Stock Span 问题及其延伸与应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建概要"><span class="nav-number">2.</span> <span class="nav-text">搭建概要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ubuntu-系统准备"><span class="nav-number">2.1.</span> <span class="nav-text">Ubuntu 系统准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSH"><span class="nav-number">2.2.</span> <span class="nav-text">SSH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible-安装"><span class="nav-number">2.3.</span> <span class="nav-text">Ansible 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ansible-Host-file"><span class="nav-number">2.4.</span> <span class="nav-text">Ansible Host file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Initial-Ubuntu-by-Ansible"><span class="nav-number">2.5.</span> <span class="nav-text">Initial Ubuntu by Ansible</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Kubernetes-相关依赖-by-Ansible"><span class="nav-number">2.6.</span> <span class="nav-text">安装 Kubernetes 相关依赖 by Ansible</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#注意事项"><span class="nav-number">2.6.1.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Master-Node-by-Ansible"><span class="nav-number">2.7.</span> <span class="nav-text">配置 Master Node by Ansible</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Worker-Node-by-Ansible"><span class="nav-number">2.8.</span> <span class="nav-text">配置 Worker Node by Ansible</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证集群"><span class="nav-number">2.9.</span> <span class="nav-text">验证集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过部署-Nginx-应用验证集群"><span class="nav-number">2.10.</span> <span class="nav-text">通过部署 Nginx 应用验证集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Kubernetes-DashBoard"><span class="nav-number">2.11.</span> <span class="nav-text">安装 Kubernetes DashBoard</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kubernetes-DashBoard-Access-Outside"><span class="nav-number">2.11.1.</span> <span class="nav-text">Kubernetes DashBoard Access Outside</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#proxy"><span class="nav-number">2.11.1.1.</span> <span class="nav-text">proxy</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NodePort"><span class="nav-number">2.11.1.2.</span> <span class="nav-text">NodePort</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建用户登陆"><span class="nav-number">2.11.2.</span> <span class="nav-text">创建用户登陆</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#创建用户配置文件"><span class="nav-number">2.11.2.1.</span> <span class="nav-text">创建用户配置文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#创建ClusterRoleBinding配置文件"><span class="nav-number">2.11.2.2.</span> <span class="nav-text">创建ClusterRoleBinding配置文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#生成-token"><span class="nav-number">2.11.2.3.</span> <span class="nav-text">生成 token</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/12/13/Title/';
+          this.page.identifier = '2018/12/13/Title/';
+          this.page.title = '基于 Kubeadm 的 Kubernetes 搭建手册';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

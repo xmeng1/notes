@@ -1,0 +1,1042 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Bitcoin,Blockchain," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文记录 Princeton 大学 MOOC 比特币与数字加密技术（BCT，Bitcoin and Cryptocurrency Technologies）的相关学习笔记。力求从代码层次深入的探讨原理。">
+<meta name="keywords" content="Bitcoin,Blockchain">
+<meta property="og:type" content="article">
+<meta property="og:title" content="比特币与数字加密技术学习笔记week1">
+<meta property="og:url" content="https://notes.mengxin.science/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文记录 Princeton 大学 MOOC 比特币与数字加密技术（BCT，Bitcoin and Cryptocurrency Technologies）的相关学习笔记。力求从代码层次深入的探讨原理。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-groofy-coint.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-double-spending.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-scrooge-coin-create-coins-id.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-scrooge-pay-coins.png">
+<meta property="og:image" content="https://notes.mengxin.science/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/attachments/1533158035561.drawio.html">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-pay-coin-detail.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="比特币与数字加密技术学习笔记week1">
+<meta name="twitter:description" content="摘要：本文记录 Princeton 大学 MOOC 比特币与数字加密技术（BCT，Bitcoin and Cryptocurrency Technologies）的相关学习笔记。力求从代码层次深入的探讨原理。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/201881-groofy-coint.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/"/>
+
+
+
+
+
+  <title> 比特币与数字加密技术学习笔记week1 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                比特币与数字加密技术学习笔记week1
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-31T23:00:00+00:00">
+                2018-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文记录 Princeton 大学 MOOC 比特币与数字加密技术（BCT，Bitcoin and Cryptocurrency Technologies）的相关学习笔记。力求从代码层次深入的探讨原理。</p>
+<a id="more"></a>
+<p>参考：</p>
+<ol>
+<li><a href="https://blog.csdn.net/column/details/22200.html" target="_blank" rel="noopener">比特币与数字加密技术</a> 该笔记系列目前第一周比较完善，供参考。</li>
+<li><a href="https://steemit.com/cn/@skenan/introduction-to-crypto-and-cryptocurrencies-week-1" target="_blank" rel="noopener">学习笔记</a> 该笔记进行了概要的介绍。</li>
+</ol>
+<p>第一周的课程主要是介绍如下几点内容</p>
+<ol>
+<li>哈希函数</li>
+<li>哈希指针和数据结构</li>
+<li>数字签名</li>
+<li>公钥身份体制</li>
+<li>简单加密货币设计</li>
+</ol>
+<p>本课程目前广受大家欢迎的原因应该是理论和实际紧密相连，理论学完马上就会进行编程实践。</p>
+<h2 id="哈希函数"><a href="#哈希函数" class="headerlink" title="哈希函数"></a>哈希函数</h2><p>通用Hash 函数的3个基本性质</p>
+<ol>
+<li>输入是任意长度的字符串</li>
+<li>输出是一个固定长度的串，比如 256bits </li>
+<li>计算高效 （efficiently computable ）。具体来说，对于一个输入为 n-bit的串计算时间应该是 O(n)</li>
+</ol>
+<p>足够安全的哈希函数：</p>
+<ol>
+<li>collision-free : 无冲突</li>
+<li>hiding: 隐藏</li>
+<li>puzzle-friendly</li>
+</ol>
+<p>关于特性可以参考<a href="https://www.jianshu.com/p/d827450e39d9" target="_blank" rel="noopener">该博文</a>：</p>
+<h3 id="无冲突"><a href="#无冲突" class="headerlink" title="无冲突"></a>无冲突</h3><p>这里的无冲突是相对而言的，或者在概率学角度无冲突。</p>
+<p>通过无冲突特性，我们可以根据哈希值相同从而推断原数据是相同的。其实这也是使用哈希进行摘要的原理，比如 MD5 摘要被广泛应用于文件下载校验是否被恶意篡改。</p>
+<h3 id="隐藏"><a href="#隐藏" class="headerlink" title="隐藏"></a>隐藏</h3><p>原数据无法通过哈希函数和散列值反推回去，所以元数据被哈希函数隐藏起来了。</p>
+<h3 id="puzzle-friendly"><a href="#puzzle-friendly" class="headerlink" title="puzzle-friendly"></a>puzzle-friendly</h3><blockquote>
+<p>难题友好性指的是没有便捷的方法产生一个满足特殊要求的哈希值。可以定义为：一个哈希函数H称为难题友好的，如果对于每个n位的输出y，若k是从一个具有较高不可预测性(高小熵high min-entropy)分布中选取的，不可能以小于2^n的时间找到一个x，使得H(k||x)=y。这意味着如果有人想通过锁定哈希函数来产生一些特殊的输出y，而部分输入值以随机方式选定，则很难找到另外一个值，使得其哈希值正好等于y。</p>
+<p>哈希函数的难题友好性构成了基于工作量证明的共识算法的基础。例如，给定字符串“blockchain”，并在这个字符串后面连接一个整数值串x，对连接后的字符串进行SHA256哈希运算，要求得到的哈希结果（十六进制）以若干个0开头。按照这个规则，由x=1出发，递增x的值，我们需要经过2688次哈希运算才能找到前3位均为0的哈希值，而要找到前6位均为0的哈希值，则需要进行620969次哈希运算。也就是说没有更快捷的方法来产生一个满足要求的哈希结果。这样通过哈希运算得出的符合特定要求的哈希值，可以作为共识算法中的工作量证明。</p>
+</blockquote>
+<h2 id="哈希指针和数据结构"><a href="#哈希指针和数据结构" class="headerlink" title="哈希指针和数据结构"></a>哈希指针和数据结构</h2><h2 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h2><p>关于数字签名可以参考另外两篇博文</p>
+<p><a href="https://notes.mengxin.science/2017/05/12/x509-in-practice-1-digital-signature/">X509证书从理论到实践之数字签名理论基础</a></p>
+<p><a href="https://notes.mengxin.science/2017/05/18/x509-in-practice-2-digital-cert/">X509证书从理论到实践之数字证书</a></p>
+<h2 id="公钥身份体制"><a href="#公钥身份体制" class="headerlink" title="公钥身份体制"></a>公钥身份体制</h2><h2 id="简单加密货币设计"><a href="#简单加密货币设计" class="headerlink" title="简单加密货币设计"></a>简单加密货币设计</h2><h3 id="Groofy-Coin"><a href="#Groofy-Coin" class="headerlink" title="Groofy Coin"></a>Groofy Coin</h3><p>这是教程提出的一种最简化的数字加密货币。该货币有如下特点：</p>
+<ol>
+<li>是一个中心化的货币，因为<strong>有且仅有</strong> <code>Groofy</code> 能创建货币，其他参与者只能使用货币</li>
+<li>这里有两种交易 <code>Transaction</code> 类型：<code>CreateCoin</code> 和 <code>Pay</code>。</li>
+<li><code>Groofy</code> 可以产生 <code>CreateCoin</code> 交易，需要使用他自己的私钥签名，以保证其合法性，并且每个 <code>Coin</code> 都有一个唯一的 <code>ID</code></li>
+<li>任何参与者都可以产生 <code>Pay</code> 交易，同时需要使用自己的私钥签名，以保证其合法性。</li>
+<li><code>Pay</code> 是关联两个参与者的，<code>Pay</code> 的创建者需要使用自己的私钥签名，而 Pay 的收款方则使用公钥来表示。</li>
+<li>任何人在收到 <code>Coin</code>之后都可以验证每一个 <code>Coin</code> 是否是合法的。验证方法就是根据交易的指向前一个交易的指针追溯，知道找到由 <code>Groofy</code> 使用自己私钥签名的 <code>CreateCoin</code> 的交易。这里理论上需要有一个 <code>CA</code>，用来验证整条链上的参与者的公钥的合法性。只要公钥合法，就可以验证交易的合法，从而确保 <code>Coin</code> 的生成过程是合法的。</li>
+</ol>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201881-groofy-coint.png" alt="Groofy Coin"></p>
+<p>综上，由于该货币是中心化的，我们可以用我们现有的实体货币和支付宝进行对比分析一下，他们之间有什么不同。</p>
+<h4 id="与实体货币对比"><a href="#与实体货币对比" class="headerlink" title="与实体货币对比"></a>与实体货币对比</h4><p>实体货币最为熟悉：</p>
+<ol>
+<li>由国家发行，也就是国家类似于 <code>Groofy</code></li>
+<li>货币需要有防伪标志，理论上阻止伪造，类似于 <code>Groofy</code> 对创建货币进行签名</li>
+<li>参与者（人民）可以根据防伪标志来验证货币的合法性</li>
+<li>参与者可以使用货币自由交易，也就是 <code>Pay</code> 的交易</li>
+</ol>
+<p>区别：</p>
+<ol>
+<li>实体货币没有公开的交易记录，每个参与者可以自行任意记录，但是没有任何公开可信的记录。</li>
+<li>实体货币的防伪性不嫩完全杜绝伪造，其验证也就无法做到百分百正确</li>
+<li>实体货币一旦交易完成，银货两讫，不可能把货币再进行其他交易。但是 <code>Groofy</code> 没有方式杜绝这种情况出现。这里也就是所谓的双花问题 （double-spending）。假设 <code>Alice</code> 有一个 <code>Coin</code>，她分别向两个人提出了 <code>Pay</code> 类型的交易，比如 <code>Pay</code> 给 <code>Bob</code> 和 <code>Chuck</code> 各一个 <code>Coin</code>，这时候通过链条 <code>Bob</code> 和 <code>Chuck</code> 都发现这个 <code>Coin</code> 是合法的，但是实际上只有一个 <code>Coin</code>。所以我们必须解决这个问题，该加密货币系统（CryptoCurrenty）才完善。</li>
+</ol>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201881-double-spending.png" alt="double-spending"></p>
+<h4 id="与支付宝对比"><a href="#与支付宝对比" class="headerlink" title="与支付宝对比"></a>与支付宝对比</h4><p>如果我们把支付宝看做一种货币</p>
+<ol>
+<li>由阿里发行，实际上这个货币只存在阿里系统内部，</li>
+<li>阿里的中心服务器来验证</li>
+<li>一旦交易完成，阿里服务器保证银货两讫，支付宝余额不能双花</li>
+</ol>
+<h3 id="Scrooge-Coin"><a href="#Scrooge-Coin" class="headerlink" title="Scrooge Coin"></a>Scrooge Coin</h3><p>下面就开始针对双花问题进行对 <code>Groofy Coin</code> 进行改造，得到升级版电子加密货币 <code>Scrooge Coin</code>。<code>Scrooge Coin</code> 的规则是在现有 <code>Groofy Coin</code> 上进行扩展，所以所有  <code>Groofy Coin</code> 的规则都适用于 <code>Scrooge Coin</code>。</p>
+<p>首先我们简要的说明一下解决双花问题的思路：<code>Scrooge Coin</code> 使用交易历史记录来去检测 <code>double-spending</code> 问题。类似于检测 <code>Coin</code> 的合法性，同样通过交易的链条能够检测每一笔 <code>Pay</code> 是否合法，如果参与者收到一个 <code>Coin</code>，除了检查<code>Coin</code> 是否合法，还要检查 <code>Pay</code> 是否合法，也就是查看这个 <code>Coin</code> 是否已经出现在发送者已有的 <code>Pay</code> 交易中。</p>
+<p>扩展规则如下：</p>
+<h4 id="Create-Coins-规则变更"><a href="#Create-Coins-规则变更" class="headerlink" title="Create Coins 规则变更"></a>Create Coins 规则变更</h4><ol>
+<li><code>Scrooge</code> 可以在一个 <code>Transaction</code> 中创建多个 <code>Coin</code>，这里 <code>Coin</code> 有价值，价值不再是离散的了，而是连续的，而且每一个创建过程可以创建若干价值的一个 <code>Coin</code>。我们姑且称之为<strong>货币创建记录</strong>，每一个创建记录有：<strong>编号</strong>（num），<strong>货币价值</strong>（value）和一个<strong>收款方（或称为初始拥有者 initial owner）的公钥</strong>（recipient）。一个交易里面可以有多个这样的创建记录。这个扩展规则，除了可以一次创建多个货币外，还可以直接指定收款方，后面一个操作在 <code>Groofy Coin</code> 中实际是另一个 <code>Pay</code> 类型的 <code>Transaction</code> 完成的。</li>
+<li>通过上面的创建，<code>Coin</code> 的 <code>ID</code> 并不是在 <code>Groofy Coin</code> 中指定的，而是通过 <code>Transaction</code> 的 <code>ID</code> 和 创建记录的编号（num）的组合来唯一确定。比如交易记录为 73，那么编号为0的创建的 <code>Coin</code>的 <code>ID</code> 就是 <code>73(0)</code></li>
+</ol>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201881-scrooge-coin-create-coins-id.png" alt="enter description here"></p>
+<h4 id="Pay-Coins-规则变更"><a href="#Pay-Coins-规则变更" class="headerlink" title="Pay Coins 规则变更"></a>Pay Coins 规则变更</h4><p>这种类型的交易和之前的已经完全不同，这里我们根据教程总结如下几点</p>
+<ol>
+<li>该类型的交易目标是消费 <code>Coins</code> 并销毁这些 <code>Coins</code>，同时创建相同总价值的 <code>Coins</code>。和之前的相比，这里没有直接将原来的 <code>Coins</code> 转给其他参与者，而是先销毁，再创建，并在创建的时候指定其他参与者的公钥。</li>
+<li>教程给了一个案例，这里大家一定不要和前一种类型的交易混淆，虽然两者的数据是一样的，而且ID是一样。这次的创建是因为进行了 <code>Coins</code> 的 <code>Consume</code>。而前面 <code>CreateCoins</code> 类型的交易是 <code>Scrooge</code> 自发的创建了货币。意义是不同的，不知道其他人是否有一样的误区，自己之前一直和前面的类型混淆。</li>
+</ol>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201881-scrooge-pay-coins.png" alt="enter description here"></p>
+<p>案例：本次交易号位 73，类型是：<code>PayCoins</code>。这次交易共消费了三个 <code>Coins</code>，分别是 68(1)，42(0)，72(3)。说明有3个其他的交易的<code>Coin</code> 创建的 <code>recipient</code> 指向的是当前用户。这三个 <code>Coins</code> 被消费并被销毁，然后我们增加若干个 <code>Coin</code>，并使其总价值和这三个 <code>Coins</code> 相同，并且指向消费对象的公钥。最后是签名，这个签名也不仅仅是一个，而是多个，是所有在这次交易中付出了 <code>Coins</code> 的参与者共同的签名。</p>
+<p>最后讨论了一下关于 <code>Coins</code> 可变的问题，<code>Coins</code> 一旦创建，其价值就是不可变的，那么如何灵活的 <code>Consume</code> 其价值呢？可以通过 <code>Transaction</code> 来实现目标，我们可以在消费销毁 <code>Coins</code> 后，通过创建不同的新的 <code>Coins</code> 的组合来实现价值的在分割。比如我们可以在上面例子用将 72(3) 这个 <code>Coin</code>分割成两部分，一部分给其他参与者，一部分可以指向原拥有者，从而达到只消费了某个 <code>Coin</code> 的部分价值。</p>
+<p>教程中只显示了一个 <code>Transaction</code> 的数据结构，而且个人感觉，对于 <code>Coin</code> 的 <code>Consumer</code> 并不明确。下面我们对该案例延伸，相信通过该图就能够深入的透彻的连接这个 <code>PayCoins</code> 类型的交易。</p>
+<p><img src="./attachments/1533158035561.drawio.html" alt="Diagram"></p>
+<p>参考下图：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201881-pay-coin-detail.png" alt="enter description here"></p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><p>依赖于 <code>Scrooge</code> 的诚实可信，以及其持续的参与。一旦 <code>Scrooge</code> 不在诚实，或者退出整个系统，则该电子加密货币无法继续维持。</p>
+<p>所以我们下一步就是要研究如何将加密货币系统进行去中心化！</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Bitcoin/" rel="tag"># Bitcoin</a>
+          
+            <a href="/tags/Blockchain/" rel="tag"># Blockchain</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/30/study-driving-licence-in-uk-7/" rel="next" title="英国学车记第七课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第七课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/02/Bitcoin-and-Cryptocurrency-Technologies-week1-code/" rel="prev" title="比特币与数字加密技术学习笔记week1-scrooge-coin代码分析">
+                比特币与数字加密技术学习笔记week1-scrooge-coin代码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#哈希函数"><span class="nav-number">1.</span> <span class="nav-text">哈希函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#无冲突"><span class="nav-number">1.1.</span> <span class="nav-text">无冲突</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐藏"><span class="nav-number">1.2.</span> <span class="nav-text">隐藏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#puzzle-friendly"><span class="nav-number">1.3.</span> <span class="nav-text">puzzle-friendly</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哈希指针和数据结构"><span class="nav-number">2.</span> <span class="nav-text">哈希指针和数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数字签名"><span class="nav-number">3.</span> <span class="nav-text">数字签名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公钥身份体制"><span class="nav-number">4.</span> <span class="nav-text">公钥身份体制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单加密货币设计"><span class="nav-number">5.</span> <span class="nav-text">简单加密货币设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Groofy-Coin"><span class="nav-number">5.1.</span> <span class="nav-text">Groofy Coin</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#与实体货币对比"><span class="nav-number">5.1.1.</span> <span class="nav-text">与实体货币对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#与支付宝对比"><span class="nav-number">5.1.2.</span> <span class="nav-text">与支付宝对比</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Scrooge-Coin"><span class="nav-number">5.2.</span> <span class="nav-text">Scrooge Coin</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Create-Coins-规则变更"><span class="nav-number">5.2.1.</span> <span class="nav-text">Create Coins 规则变更</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pay-Coins-规则变更"><span class="nav-number">5.2.2.</span> <span class="nav-text">Pay Coins 规则变更</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">5.2.3.</span> <span class="nav-text">缺点</span></a></li></ol></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/';
+          this.page.identifier = '2018/07/31/Bitcoin-and-Cryptocurrency-Technologies-week1/';
+          this.page.title = '比特币与数字加密技术学习笔记week1';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

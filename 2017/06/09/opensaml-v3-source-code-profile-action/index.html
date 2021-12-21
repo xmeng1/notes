@@ -1,0 +1,998 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="opensaml-v3,source-code," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要： 本文将针对 OpenSaml V3 的新特性进行源码分析。由于 OpenSAML 最新版刚 release 不久，所以资料甚少，最好的学习方法就是阅读源码。作为一个优秀的开源 SAML 库，其代码和测试都具有较高的参考性。能够认真分析一下其源码，受益匪浅。">
+<meta name="keywords" content="opensaml-v3,source-code">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Opensaml-v3源码解析之ProfileAction">
+<meta property="og:url" content="https://notes.mengxin.science/2017/06/09/opensaml-v3-source-code-profile-action/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要： 本文将针对 OpenSaml V3 的新特性进行源码分析。由于 OpenSAML 最新版刚 release 不久，所以资料甚少，最好的学习方法就是阅读源码。作为一个优秀的开源 SAML 库，其代码和测试都具有较高的参考性。能够认真分析一下其源码，受益匪浅。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/ProfileRequestContext.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/profileAction-related-class.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Opensaml-v3源码解析之ProfileAction">
+<meta name="twitter:description" content="摘要： 本文将针对 OpenSaml V3 的新特性进行源码分析。由于 OpenSAML 最新版刚 release 不久，所以资料甚少，最好的学习方法就是阅读源码。作为一个优秀的开源 SAML 库，其代码和测试都具有较高的参考性。能够认真分析一下其源码，受益匪浅。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/ProfileRequestContext.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/06/09/opensaml-v3-source-code-profile-action/"/>
+
+
+
+
+
+  <title> Opensaml-v3源码解析之ProfileAction | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/06/09/opensaml-v3-source-code-profile-action/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Opensaml-v3源码解析之ProfileAction
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-09T23:00:00+00:00">
+                2017-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/开发笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">开发笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/09/opensaml-v3-source-code-profile-action/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/09/opensaml-v3-source-code-profile-action/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：</p>
+<p>本文将针对 <code>OpenSaml V3</code> 的新特性进行源码分析。由于 <code>OpenSAML</code> 最新版刚 release 不久，所以资料甚少，最好的学习方法就是阅读源码。作为一个优秀的开源 <code>SAML</code> 库，其代码和测试都具有较高的参考性。能够认真分析一下其源码，受益匪浅。</p>
+<a id="more"></a>
+<h2 id="源码获取"><a href="#源码获取" class="headerlink" title="源码获取"></a>源码获取</h2><p>本文的源码均参考官方的 <a href="git://git.shibboleth.net/java-opensaml" target="_blank" rel="noopener">git 仓库</a>，当然也可以使用<a href="git@github.com:xmeng1/opensaml-v3.git">我的 github 镜像</a>，会不定期更新，合并官方更新，并增加一些自己的笔记和分类图。</p>
+<h2 id="OpenSaml-v3-新特性概述"><a href="#OpenSaml-v3-新特性概述" class="headerlink" title="OpenSaml v3 新特性概述"></a>OpenSaml v3 新特性概述</h2><p>目前 <code>opensaml</code> v3 的官方文档很少，只是简略的介绍了一些其设计思想。目前最大的设计思路的变化（和第二版相比）主要有三点</p>
+<ol>
+<li>消息相关的组件</li>
+<li>Metadata Providers</li>
+<li>安全配置组件</li>
+</ol>
+<p>个人认为其中的消息的重构是新版 <code>opensaml</code> 最为重要的变化，这也将彻底改变对于 <code>opensaml</code> 这个库的使用思路。</p>
+<p>旧版的消息上下文是一个静态的结构，新版的消息是一个动态可扩展的消息上下文。同时所有的操作都会产生或者处理消息的状态。</p>
+<p>之前版本的消息机制有很多令人费解的概念，如 <code>messag issuer</code>， <code>peer entity</code> 和 <code>relying party</code>。现在这些概念将全部被清楚。 </p>
+<p>另外这里还引入一个讨论，就是那些内容需要在 <code>opensaml</code> 中实现，那些应该归 <code>IdP</code> 来实现。Chad（idp 项目负责人）认为消息处理应该在 <code>idp</code> 做。但是Putman 认为认真思考这个问题，因为目前的 <code>idp</code> 使用了 <code>WebFlow</code> 来处理消息，而 <code>opensaml</code> 致力于创建一套独立于框架的机制。这点个人来讲十分赞同的，因为并不是所有人都用 Spring 框架。</p>
+<p>最后在第三版将会彻底抛弃 <code>org.opensaml.ws.message.MessageContext</code> 这个类。</p>
+<h3 id="新的消息机制的目的"><a href="#新的消息机制的目的" class="headerlink" title="新的消息机制的目的"></a>新的消息机制的目的</h3><blockquote>
+<p>General goals:<br>Support non-XML messaging Existing API assumes all messages are XMLObjects. Fails for OpenID, and other non-XML cases.</p>
+</blockquote>
+<h4 id="支持非-XML-消息"><a href="#支持非-XML-消息" class="headerlink" title="支持非 XML 消息"></a>支持非 XML 消息</h4><p>虽然是 <code>opensaml</code>，其消息应该是 <code>XML</code>，但是这里已经将消息抽象为更加通用形式，看来 <code>opensaml</code> 的目标是兼容更多的协议。</p>
+<h4 id="扩展的状态存储"><a href="#扩展的状态存储" class="headerlink" title="扩展的状态存储"></a>扩展的状态存储</h4><p>解决当前用于以可扩展方式存储状态的上下文的复杂嵌套层次结构。 由于可扩展性的多个维度，这是令人困惑和笨重的。</p>
+<h4 id="重用代码"><a href="#重用代码" class="headerlink" title="重用代码"></a>重用代码</h4><p>尽可能的重用代码，本文介绍的 <code>ProfileAction</code> 就是重用代码的一个重要方法。</p>
+<h4 id="传输的抽象"><a href="#传输的抽象" class="headerlink" title="传输的抽象"></a>传输的抽象</h4><p>之前的输入和输出的抽象同样费解，新版进行改进。</p>
+<h4 id="消息机制的参考"><a href="#消息机制的参考" class="headerlink" title="消息机制的参考"></a>消息机制的参考</h4><p>避免重复造轮子，所以新版的 <code>opensaml</code> 参考了如下开源库：</p>
+<blockquote>
+<p>Apache Axis2; Apache CXF; JAX-WS; Apache Struts 2/WebWork and the Servlet API</p>
+</blockquote>
+<h2 id="Messaging-Context"><a href="#Messaging-Context" class="headerlink" title="Messaging Context"></a>Messaging Context</h2><p><img src="https://www.github.com/xmeng1/images/raw/master/ProfileRequestContext.png" alt="enter description here" title="ProfileRequestContext"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ProfileRequestContext</span>&lt;<span class="title">InboundMessageType</span>, <span class="title">OutboundMessageType</span>&gt; <span class="keyword">extends</span></span></span><br><span class="line"><span class="class">        <span class="title">InOutOperationContext</span>&lt;<span class="title">InboundMessageType</span>, <span class="title">OutboundMessageType</span>&gt;</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ProfileAction"><a href="#ProfileAction" class="headerlink" title="ProfileAction"></a>ProfileAction</h2><p><img src="https://www.github.com/xmeng1/images/raw/master/profileAction-related-class.png" alt="enter description here" title="profileAction-related-class"></p>
+<p>我们这里简要介绍一下 <code>ProfileAction</code> 的机制，由于直接操纵 <code>SAML</code> 对象很容易出错，而且代码比容易维护，并且当有多种 <code>profile</code> 的时候，代码重复率很高。所以 <code>Opensaml</code> 提出一个概念，将某种针对 <code>SAML</code> 对象的操纵封装成一种 <code>Action</code>，然后这个 <code>Action</code> 可以重用。</p>
+<p><code>Opensaml v3</code> 已经创建了若干 <code>Action</code>，比如 </p>
+<p><code>AddStatusResponseShell</code> 创建一个空的 <code>SAML response</code>，其中包含状态。</p>
+<p><code>AddStatusToResponse</code> 向 <code>SAML response</code> 加入 <code>Status</code>。</p>
+<h2 id="Guava-Function"><a href="#Guava-Function" class="headerlink" title="Guava Function"></a>Guava Function</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Function&lt;ProfileRequestContext,IdentifierGenerationStrategy&gt; idGeneratorLookupStrategy;</span><br><span class="line"></span><br><span class="line">idGeneratorLookupStrategy = <span class="keyword">new</span> Function&lt;ProfileRequestContext,IdentifierGenerationStrategy&gt;() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> IdentifierGenerationStrategy <span class="title">apply</span><span class="params">(ProfileRequestContext input)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> SecureRandomIdentifierGenerationStrategy();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure>
+<p>这个 <code>Function</code> 应该就是通过输入的 <code>context</code>，返回一个 <code>IdentifierGenerationStrategy</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Function&lt;A, B&gt;</span><br></pre></td></tr></table></figure>
+<p>输入 A，返回 B。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Function&lt;ProfileRequestContext,String&gt; issuerLookupStrategy;</span><br></pre></td></tr></table></figure>
+<h2 id="案例解析"><a href="#案例解析" class="headerlink" title="案例解析"></a>案例解析</h2><p>我们以 <code>AddStatusToResponse</code> 为例进行简要分析。</p>
+<p>其中 包含有多个 <code>strategy</code>， 这些 <code>strategy</code> 就是用来执行该 <code>action</code> 所准备的数据，比如<code>responseLookupStrategy</code> 表示该 <code>Action</code> 需要执行的对象是如何获取到的。另外我们还可以看到其构造函数中指定了默认的策略，就是返回一个 <code>OutboundMessageContextLookup</code> 也就是获取 <code>ProfileRequestContext</code> 的 <code>outbountMessageContext</code>。我们之前提过，在 <code>action</code> 的执行过程中，大部分都是使用 <code>ProfileRequestContext</code> 来存储各种状态，包括原始数据和最终处理结果。所以我们在使用这个 <code>Action</code> 的时候，如果没有指定<code>responseLookupStrategy</code>，那么就需要在传入该 <code>Action</code> 的 <code>ProfileRequestContext</code>的 <code>outbound</code> 的消息需要是 <code>Saml Response</code> 类型的。</p>
+<p>对于 <code>Action</code> 的执行包含三个阶段，</p>
+<ol>
+<li>doPreExecute</li>
+<li>doExecute</li>
+<li>doPostExecute</li>
+</ol>
+<p>这三个方法是通过抽象类的<code>execute</code>方法来进行执行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (doPreExecute(profileRequestContext)) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        doExecute(profileRequestContext);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Throwable t) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (t <span class="keyword">instanceof</span> Exception) &#123;</span><br><span class="line">                doPostExecute(profileRequestContext, (Exception) t);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                doPostExecute(profileRequestContext);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    doPostExecute(profileRequestContext);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>pre 阶段一般是通过 <code>strategy</code> 来准备出 <code>action</code> 需要操作的数据，比如这里获取到 <code>response</code>： <code>response = responseLookupStrategy.apply(profileRequestContext);</code></p>
+<p>do 阶段最为关键，往往是操作 <code>SAML Object</code> 的核心阶段，通过现有的数据进行更新添加等动作等到目标的数据。如果逻辑复杂还可以创建一些其他的函数来辅助执行动作，比如<code>buildStatusCode</code>，<code>buildStatusMessage</code>等</p>
+<p>post 是在执行完 <code>doExecute</code> 之后进行的操作。</p>
+<p>这样这个 <code>Action</code> 实现后将可以重用，而且想 <code>Shibboleth IdP v3</code> 项目正是通过一个 <code>Flow</code> 来集合一个 <code>action</code> 的序列来完成某些 <code>profile</code>，这样让代码等到了高度重用，而且将复杂的 <code>SAML</code> 对象的操作进行了有效的封装。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/opensaml-v3/" rel="tag"># opensaml-v3</a>
+          
+            <a href="/tags/source-code/" rel="tag"># source-code</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/09/different-base64-encode-research/" rel="next" title="关于在线Base64编码不一致的问题研究">
+                <i class="fa fa-chevron-left"></i> 关于在线Base64编码不一致的问题研究
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/16/hard-driver-check-chkdsk/" rel="prev" title="移动硬盘只显示盘符无法进入">
+                移动硬盘只显示盘符无法进入 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码获取"><span class="nav-number">1.</span> <span class="nav-text">源码获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSaml-v3-新特性概述"><span class="nav-number">2.</span> <span class="nav-text">OpenSaml v3 新特性概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新的消息机制的目的"><span class="nav-number">2.1.</span> <span class="nav-text">新的消息机制的目的</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#支持非-XML-消息"><span class="nav-number">2.1.1.</span> <span class="nav-text">支持非 XML 消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扩展的状态存储"><span class="nav-number">2.1.2.</span> <span class="nav-text">扩展的状态存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重用代码"><span class="nav-number">2.1.3.</span> <span class="nav-text">重用代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#传输的抽象"><span class="nav-number">2.1.4.</span> <span class="nav-text">传输的抽象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息机制的参考"><span class="nav-number">2.1.5.</span> <span class="nav-text">消息机制的参考</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Messaging-Context"><span class="nav-number">3.</span> <span class="nav-text">Messaging Context</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ProfileAction"><span class="nav-number">4.</span> <span class="nav-text">ProfileAction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Guava-Function"><span class="nav-number">5.</span> <span class="nav-text">Guava Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例解析"><span class="nav-number">6.</span> <span class="nav-text">案例解析</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/06/09/opensaml-v3-source-code-profile-action/';
+          this.page.identifier = '2017/06/09/opensaml-v3-source-code-profile-action/';
+          this.page.title = 'Opensaml-v3源码解析之ProfileAction';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

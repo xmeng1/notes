@@ -1,0 +1,956 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="scala," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文基于 Programming Scala 2nd 介绍一下容器的相关操作">
+<meta name="keywords" content="scala">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala 容器操作介绍">
+<meta property="og:url" content="https://notes.mengxin.science/2018/08/28/scala-operation-introduction-by-prog-scala-2nd/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文基于 Programming Scala 2nd 介绍一下容器的相关操作">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala 容器操作介绍">
+<meta name="twitter:description" content="摘要：本文基于 Programming Scala 2nd 介绍一下容器的相关操作">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/08/28/scala-operation-introduction-by-prog-scala-2nd/"/>
+
+
+
+
+
+  <title> Scala 容器操作介绍 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/08/28/scala-operation-introduction-by-prog-scala-2nd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Scala 容器操作介绍
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-28T23:00:00+00:00">
+                2018-08-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/28/scala-operation-introduction-by-prog-scala-2nd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/28/scala-operation-introduction-by-prog-scala-2nd/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文基于 Programming Scala 2nd 介绍一下容器的相关操作</p>
+<a id="more"></a>
+<h2 id="遍历-foreach"><a href="#遍历-foreach" class="headerlink" title="遍历 foreach"></a>遍历 foreach</h2><p>这里给出两个例子，分别是遍历列表和 Map</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 遍历列表</span></span><br><span class="line"><span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>) foreach &#123; i =&gt; println(<span class="string">"Int: "</span> + i) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 遍历 Map 的两种方式</span></span><br><span class="line"><span class="keyword">val</span> stateCapitals = <span class="type">Map</span>(</span><br><span class="line">  <span class="string">"Alabama"</span> -&gt; <span class="string">"Montgomery"</span>,</span><br><span class="line">  <span class="string">"Alaska"</span>  -&gt; <span class="string">"Juneau"</span>,</span><br><span class="line">  <span class="string">"Wyoming"</span> -&gt; <span class="string">"Cheyenne"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第一种很好理解，kv 是 map 的元素，是一个二元元组所以可以分别获取两个元素。</span></span><br><span class="line">stateCapitals foreach &#123; kv =&gt; println(kv._1 + <span class="string">": "</span> + kv._2) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 匿名函数中运用 case 语句，实际上定义了一个偏函数，但这个函数实际上并不“偏”，因为它可以匹配所有输入。</span></span><br><span class="line">stateCapitals foreach &#123; <span class="keyword">case</span> (k, v) =&gt; println(k + <span class="string">": "</span> + v) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 我们可以尝试case 一个元素，会发现直接将元组打印。</span></span><br><span class="line">stateCapitals foreach &#123; <span class="keyword">case</span> (k) =&gt; println(k) &#125;</span><br><span class="line">stateCapitals foreach &#123; k =&gt; println(k) &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 交换操作</span></span><br><span class="line">stateCapitals foreach &#123; x =&gt; println(x.swap._1 + <span class="string">": "</span> + x.swap._2)&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="映射-map"><a href="#映射-map" class="headerlink" title="映射 map"></a>映射 map</h2><p>我们之前已经接触过 map 方法， map 方法返回一个与原集合类型大小相同的新集合，其中的每个元素均由原集合的对应元素转换得到。</p>
+<p>下面给出具体使用案例：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> stateCapitals = <span class="type">Map</span>(</span><br><span class="line">  <span class="string">"Alabama"</span> -&gt; <span class="string">"Montgomery"</span>,</span><br><span class="line">  <span class="string">"Alaska"</span>  -&gt; <span class="string">"Juneau"</span>,</span><br><span class="line">  <span class="string">"Wyoming"</span> -&gt; <span class="string">"Cheyenne"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从一个 string 到 string 的 Map 变成一个 string 到 integer 的 Map</span></span><br><span class="line"><span class="keyword">val</span> lengths = stateCapitals map &#123; </span><br><span class="line">  kv =&gt; (kv._1, kv._2.length) </span><br><span class="line">&#125;</span><br><span class="line">println(lengths)</span><br><span class="line"><span class="comment">// lengths: scala.collection.immutable.Map[String,Int] = </span></span><br><span class="line"><span class="comment">//    Map(Alabama -&gt; 10, Alaska -&gt; 6, Wyoming -&gt; 8)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> caps = stateCapitals map &#123; </span><br><span class="line">  <span class="keyword">case</span> (k, v) =&gt; (k, v.toUpperCase)</span><br><span class="line">&#125;</span><br><span class="line">println(caps)</span><br><span class="line"><span class="comment">// caps: scala.collection.immutable.Map[String,String] = </span></span><br><span class="line"><span class="comment">//    Map(Alabama -&gt; MONTGOMERY, Alaska -&gt; JUNEAU, Wyoming -&gt; CHEYENNE)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stateCapitals2 = stateCapitals + (<span class="string">"Virginia"</span> -&gt; <span class="string">"Richmond"</span>)</span><br><span class="line">println(stateCapitals2)</span><br><span class="line"><span class="comment">// stateCapitals2: scala.collection.immutable.Map[String,String] = </span></span><br><span class="line"><span class="comment">// Map(Alabama -&gt; Montgomery, Alaska -&gt; Juneau, Wyoming -&gt; Cheyenne, Virginia -&gt; Richmond)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> stateCapitals3 = stateCapitals2 + (</span><br><span class="line">  <span class="string">"New York"</span> -&gt; <span class="string">"Albany"</span>, <span class="string">"Illinois"</span> -&gt; <span class="string">"Springfield"</span>)</span><br><span class="line">println(stateCapitals3)</span><br><span class="line"></span><br><span class="line"><span class="comment">// stateCapitals3: scala.collection.immutable.Map[String,String] = </span></span><br><span class="line"><span class="comment">// Map(Alaska -&gt; Juneau, Virginia -&gt; Richmond, Alabama -&gt; Montgomery, New York -&gt; Albany, Illinois -&gt; Springfield, Wyoming -&gt; Cheyenne)</span></span><br></pre></td></tr></table></figure>
+<h2 id="扁平映射-flatmap"><a href="#扁平映射-flatmap" class="headerlink" title="扁平映射 flatmap"></a>扁平映射 flatmap</h2><p>flatMap 是 Map 操作的一种推广。在 flatMap 中，我们对原始集合中的每个元素，都分别产生零或多个元素。我们传入一个函数，该函数对每个输入返回一个集合，而不是一个元素。然后 flatMap 把生成的多个集合“压扁”为一个集合。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = <span class="type">List</span>(<span class="string">"now"</span>, <span class="string">"is"</span>, <span class="string">""</span>, <span class="string">"the"</span>, <span class="string">"time"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// toList 表示将传入的值变成 list，也就是说把  now 变成 list  n o w。</span></span><br><span class="line">list flatMap (s =&gt; s.toList)</span><br><span class="line"><span class="comment">// res0: List[Char] = List(n, o, w, i, s, t, h, e, t, i, m, e)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 我们再举几个例子</span></span><br><span class="line"></span><br><span class="line">list flatMap (s =&gt; s.getBytes)</span><br><span class="line"><span class="comment">// res1: List[Byte] = List(110, 111, 119, 105, 115, 116, 104, 101, 116, 105, 109, 101)</span></span><br><span class="line">list flatMap (s =&gt; s.split(<span class="string">"h"</span>)) <span class="comment">// 这个动作会将压扁操作更改为分割，也就是不会打散字符串，而是分割字符串。</span></span><br><span class="line"><span class="comment">// res2: List[String] = List(now, is, , t, e, time)</span></span><br><span class="line">list flatMap (s =&gt; s.toUpperCase)</span><br><span class="line"><span class="comment">// res3: List[Char] = List(N, O, W, I, S, T, H, E, T, I, M, E)</span></span><br><span class="line">list flatMap (s =&gt; s)   <span class="comment">// 可以看到默认的操作就是将 string 进行压扁</span></span><br><span class="line">list.flatten  <span class="comment">// 这两个等价</span></span><br><span class="line"><span class="comment">// res4: List[Char] = List(n, o, w, i, s, t, h, e, t, i, m, e)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> listInt = <span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>)</span><br><span class="line"><span class="comment">// listInt faltMap (x =&gt; x)</span></span><br><span class="line"><span class="comment">// Error:(12, 76) value faltMap is not a member of List[Int]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> listMultiLevel = <span class="type">List</span>(<span class="type">List</span>(<span class="string">"inner"</span>, <span class="string">"is"</span>, <span class="string">"block"</span>), <span class="string">"is"</span>, <span class="type">List</span>(<span class="string">"inner2"</span>, <span class="string">"is2"</span>, <span class="string">"block2"</span>), <span class="string">"the"</span>, <span class="string">"time"</span>)</span><br><span class="line"></span><br><span class="line">listMultiLevel flatMap &#123;</span><br><span class="line">  <span class="keyword">case</span> list: <span class="type">List</span>[<span class="type">String</span>] =&gt; list;</span><br><span class="line">  <span class="keyword">case</span> str: <span class="type">String</span> =&gt; str</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// res5: List[Any] = List(inner, is, block, i, s, inner2, is2, block2, t, h, e, t, i, m, e)</span></span><br><span class="line"><span class="comment">// 如果有多层，只能压扁一层，不过可以自己压扁内层</span></span><br><span class="line"></span><br><span class="line">listMultiLevel flatMap &#123;</span><br><span class="line">  <span class="keyword">case</span> list: <span class="type">List</span>[<span class="type">String</span>] =&gt; list flatMap( x =&gt; x);</span><br><span class="line">  <span class="keyword">case</span> str: <span class="type">String</span> =&gt; str</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者</span></span><br><span class="line"></span><br><span class="line">listMultiLevel flatMap &#123;</span><br><span class="line">  <span class="keyword">case</span> list: <span class="type">List</span>[<span class="type">String</span>] =&gt; list.flatten</span><br><span class="line">  <span class="keyword">case</span> str: <span class="type">String</span> =&gt; str</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// res5: List[Char] = List(i, n, n, e, r, i, s, b, l, o, c, k, i, s, i, n, n, e, r, 2, i, s, 2, b, l, o, c, k, 2, t, h, e, t, i, m, e)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// flatMap 的行为很像先调用 map，再调用另一个方法 flatten：</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Like flatMap, but flatMap eliminates the intermediate step!</span></span><br><span class="line"><span class="keyword">val</span> list2 = <span class="type">List</span>(<span class="string">"now"</span>, <span class="string">"is"</span>, <span class="string">""</span>, <span class="string">"the"</span>, <span class="string">"time"</span>) map (s =&gt; s.toList)</span><br><span class="line">list2.flatten</span><br><span class="line"></span><br><span class="line"><span class="comment">// list2: List[List[Char]] = List(List(n, o, w), List(i, s), List(), List(t, h, e), List(t, i, m, e))</span></span><br><span class="line"><span class="comment">//  res1: List[Char] = List(n, o, w, i, s, t, h, e, t, i, m, e)</span></span><br></pre></td></tr></table></figure>
+<h2 id="过滤-fitler"><a href="#过滤-fitler" class="headerlink" title="过滤 fitler"></a>过滤 fitler</h2><p>遍历一个集合，然后抽取其中满足特定条件的元素，组成一个新的集合</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> stateCapitals = <span class="type">Map</span>(</span><br><span class="line">  <span class="string">"Alabama"</span> -&gt; <span class="string">"Montgomery"</span>,</span><br><span class="line">  <span class="string">"Alaska"</span>  -&gt; <span class="string">"Juneau"</span>,</span><br><span class="line">  <span class="string">"Wyoming"</span> -&gt; <span class="string">"Cheyenne"</span>)</span><br><span class="line">  </span><br><span class="line"><span class="keyword">val</span> map2 = stateCapitals filter &#123; kv =&gt; kv._1 startsWith <span class="string">"A"</span> &#125;</span><br><span class="line"><span class="comment">// map2: scala.collection.immutable.Map[String,String] = Map(Alabama -&gt; Montgomery, Alaska -&gt; Juneau)</span></span><br><span class="line"><span class="comment">// 过滤map的 key,只保留以 A 开头的条目</span></span><br><span class="line">println( map2 )</span><br></pre></td></tr></table></figure>
+<p>用于完成集合的过滤作用或者返回原始集合中的一部分元素。一些方法在输入无限集合时不会返回；一些方法在输入同一个集合时，除非集合的遍历顺序固定，否则多次运行的情况下会产生不同的输出。也就是说并不是只有 filter 能实现过滤的目标。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">• def drop (n : Int) : TraversableLike.Repr</span><br><span class="line">除起始的 n 个元素，选择其他所有的元素组成一个新的集合并返回。如果原始集合包含</span><br><span class="line">的元素个数小于 n，则方法会返回一个空集合。</span><br><span class="line">• def dropWhile (p : (A) =&gt; Boolean) : TraversableLike.Repr</span><br><span class="line">从头遍历，丢弃满足一定谓词的最长集合前缀。返回一个最长集合后缀，其第一个元素</span><br><span class="line">不满足指定的谓词 p。</span><br><span class="line">• def exists (p : (A) =&gt; Boolean) : Boolean</span><br><span class="line">测试在集合中是否至少有一个元素满足给定的谓词，如果存在则返回 true，否则返回</span><br><span class="line">false。</span><br><span class="line">• def filter (p : (A) =&gt; Boolean) : TraversableLike.Repr</span><br><span class="line">选择集合中所有满足一定谓词的元素，返回的新集合中包含了所有满足该谓词 p 的元</span><br><span class="line">素。元素在原集合中的顺序可以得到保持。</span><br><span class="line">• def filterNot (p : (A) =&gt; Boolean) : TraversableLike.Repr</span><br><span class="line">是 filter 的“反义词”。在遍历原集合时，选择那些不满足给定谓词 p 的元素并组成新</span><br><span class="line">集合返回。</span><br><span class="line">• def find (p : (A) =&gt; Boolean) : Option[A]</span><br><span class="line">遍历原集合，寻找第一个满足给定谓词的元素。如果存在这一元素，返回 Option，且</span><br><span class="line">Option 中包含满足谓词 p 的第一个元素；否则返回 None。</span><br><span class="line">• def forall (p : (A) =&gt; Boolean) : Boolean</span><br><span class="line">测试集合中所有元素是否均满足给定的谓词。如果所有元素均满足谓词 p，则返回 true，</span><br><span class="line">否则返回 false。</span><br><span class="line">• def partition (p : (A) =&gt; Boolean): (TraversableLike.Repr, TraversableLike.Repr)</span><br><span class="line">根据谓词，将可遍历集合分成两个子集合。返回值是两个集合：第一个集合包含所有满</span><br><span class="line">足谓词 p 的元素，而第二个集合包含所有不满足谓词 p 的元素。两个集合中元素间的顺</span><br><span class="line">序均与原集合保持一致。</span><br><span class="line">• def take (n : Int) : TraversableLike.Repr</span><br><span class="line">选择前 n 个元素。返回一个可遍历集合，包含原集合的前 n 个元素，如果原集合包含的</span><br><span class="line">元素小于 n 个，则返回原集合本身。</span><br><span class="line">• def takeWhile (p : (A) =&gt; Boolean) : TraversableLike.Repr</span><br><span class="line">选择满足特定谓词的最长集合前缀。返回的可遍历集合包含一个最长集合前缀，其中的</span><br><span class="line">每个元素均满足谓词 p。</span><br></pre></td></tr></table></figure>
+<h2 id="折叠与归约"><a href="#折叠与归约" class="headerlink" title="折叠与归约"></a>折叠与归约</h2><p>我们把折叠和归约放在一起讨论是因为两者很相似。它们都是将一个集合“缩小”成一个更小的集合或一个值的操作。</p>
+<p>折叠从一个初始的“种子”值开始，然后以该值作为上下文，处理集合中的每个元素。不同的是，归约不需要调用者提供一个初始值。它将集合的其中一个元素当做初始值，通常这个值是集合的第一个元素或最后一个元素</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>) reduce (_ + _)</span><br><span class="line"><span class="comment">//res0: Int = 21</span></span><br><span class="line"></span><br><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>) reduce (_ * _)</span><br><span class="line"><span class="comment">// result  Int = 720</span></span><br><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>).fold (<span class="number">10</span>) (_ * _)</span><br><span class="line">(<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>) fold <span class="number">10</span>) (_ * _) <span class="comment">// 中缀表示法</span></span><br><span class="line"><span class="comment">//res2: Int = 7200  增加一个初始值 10，在归约的基础上乘以 10.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 是一个偏方法，然后可以用这个偏方法继续操作</span></span><br><span class="line"><span class="keyword">val</span> fold1 = (<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>) fold <span class="number">10</span>) _</span><br><span class="line">fold1(_ * _)</span><br><span class="line"><span class="comment">//fold1: ((Int, Int) =&gt; Int) =&gt; Int = &lt;function1&gt;</span></span><br><span class="line"><span class="comment">//res3: Int = 7200</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果我们对任何一个空的集合执行 fold 操作，它会返回初始种子的值。与此不同， reduce</span></span><br><span class="line"><span class="comment">// 无法对空集合进行操作，因为 reduce 没有值可以返回。</span></span><br><span class="line">(<span class="type">List</span>.empty[<span class="type">Int</span>] fold <span class="number">10</span>) (_ + _)</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="type">List</span>.empty[<span class="type">Int</span>] reduce (_ + _)</span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">  <span class="keyword">case</span> e: java.lang.<span class="type">UnsupportedOperationException</span> =&gt; e</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//res4: Int = 10</span></span><br><span class="line"><span class="comment">//res5: Any = java.lang.UnsupportedOperationException: empty.reduceLeft</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//如果不确认集合是否为空，这时候需要使用 reduceOption</span></span><br><span class="line"><span class="type">List</span>.empty[<span class="type">Int</span>] reduceOption  (_ + _)</span><br><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>) reduceOption (_ * _)</span><br><span class="line"><span class="comment">//res6: Option[Int] = None</span></span><br><span class="line"><span class="comment">//res7: Option[Int] = Some(720)</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/scala/" rel="tag"># scala</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/28/study-driving-licence-in-uk-10/" rel="next" title="英国学车记第十课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第十课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/02/gitlab-ci-cd-question-and-answer/" rel="prev" title="GitLab的CI/CD使用问题汇总">
+                GitLab的CI/CD使用问题汇总 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#遍历-foreach"><span class="nav-number">1.</span> <span class="nav-text">遍历 foreach</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#映射-map"><span class="nav-number">2.</span> <span class="nav-text">映射 map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扁平映射-flatmap"><span class="nav-number">3.</span> <span class="nav-text">扁平映射 flatmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过滤-fitler"><span class="nav-number">4.</span> <span class="nav-text">过滤 fitler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#折叠与归约"><span class="nav-number">5.</span> <span class="nav-text">折叠与归约</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/08/28/scala-operation-introduction-by-prog-scala-2nd/';
+          this.page.identifier = '2018/08/28/scala-operation-introduction-by-prog-scala-2nd/';
+          this.page.title = 'Scala 容器操作介绍';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1021 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Google," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="五月四日参加了Google Cloud Next展会的第二天活动，感觉受益匪浅。首先感受到作为互联网公司的头把交椅，Google造势的能力相当强劲。会场布置的科技感十足，除了5大会场外，中间还有很多合作伙伴以及Google的产品体验，比如Google VR，Google Cloud的各项产品等等。另外全会场随处是零食饮料，还有人工调制咖啡，不亚于星巴克和Costa。早餐和午餐十分丰富，甜点沙拉水果">
+<meta name="keywords" content="Google">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google-Cloud-Next观后感">
+<meta property="og:url" content="https://notes.mengxin.science/2017/05/04/google-cloud-next/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="五月四日参加了Google Cloud Next展会的第二天活动，感觉受益匪浅。首先感受到作为互联网公司的头把交椅，Google造势的能力相当强劲。会场布置的科技感十足，除了5大会场外，中间还有很多合作伙伴以及Google的产品体验，比如Google VR，Google Cloud的各项产品等等。另外全会场随处是零食饮料，还有人工调制咖啡，不亚于星巴克和Costa。早餐和午餐十分丰富，甜点沙拉水果">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/next2017-lon-bg-postevent2.jpg">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-spanner.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-telegraph-toby.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-ai-api.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-gpu.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-g-suite-extention.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-opensource.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-kubernete.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-tensorflow.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-kubernete-1.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-spanner-compare.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-family.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-selection.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas-product.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas-partner.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-hardware.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-1.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-2.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-3.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-4.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-multiple-region.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/google-cloud-multi-region-compare.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Google-Cloud-Next观后感">
+<meta name="twitter:description" content="五月四日参加了Google Cloud Next展会的第二天活动，感觉受益匪浅。首先感受到作为互联网公司的头把交椅，Google造势的能力相当强劲。会场布置的科技感十足，除了5大会场外，中间还有很多合作伙伴以及Google的产品体验，比如Google VR，Google Cloud的各项产品等等。另外全会场随处是零食饮料，还有人工调制咖啡，不亚于星巴克和Costa。早餐和午餐十分丰富，甜点沙拉水果">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/next2017-lon-bg-postevent2.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/05/04/google-cloud-next/"/>
+
+
+
+
+
+  <title> Google-Cloud-Next观后感 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/05/04/google-cloud-next/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Google-Cloud-Next观后感
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-04T23:00:00+00:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/04/google-cloud-next/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/04/google-cloud-next/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>五月四日参加了<code>Google Cloud Next</code>展会的第二天活动，感觉受益匪浅。首先感受到作为互联网公司的头把交椅，<code>Google</code>造势的能力相当强劲。会场布置的科技感十足，除了5大会场外，中间还有很多合作伙伴以及<code>Google</code>的产品体验，比如<code>Google VR</code>，<code>Google Cloud</code>的各项产品等等。另外全会场随处是零食饮料，还有人工调制咖啡，不亚于星巴克和Costa。早餐和午餐十分丰富，甜点沙拉水果应有尽有，而且供应充足。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/next2017-lon-bg-postevent2.jpg" alt="enter description here" title="next2017-lon-bg-postevent2"></p>
+<p>本次参会，我主要参加了如下几个Speak：</p>
+<ol>
+<li>Key Note </li>
+<li>Globally scalable microservices with Google Container Engine and Cloud Load Balancing</li>
+<li>Cloud Spanner 101: Google’s mission-critical relational database</li>
+<li>Using Google’s Identity as a Service (IDaaS) for GCP and G Suite </li>
+<li>Google Infrastructure Security Design</li>
+<li>Google Cloud Storage: best practices for selecting the right storage class, reliability, performance and scalability</li>
+</ol>
+<a id="more"></a> 
+<h2 id="KeyNote"><a href="#KeyNote" class="headerlink" title="KeyNote"></a>KeyNote</h2><p>keynote中主要介绍了几个新产品：</p>
+<p>1.Google Spanner，谷歌最新的数据存储服务，该服务基于SQL，但是对SQL进行扩展，使其具有负载均衡，容错，容灾等特性，目前看来定位于谷歌云的最高端存储服务。下一节有详细介绍。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-spanner.png" alt="enter description here" title="google-cloud-spanner"></p>
+<p>2.Using Data，谷歌云以数据为中心，围绕用户如何使用数据创造价值提供了很多功能，比如Big Query，Cloud Dataprep，Pub/Sub，Dataflow，这里Telegraph报社的CTO（Toby Wright）介绍了他们使用的成功案例。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-telegraph-toby.png" alt="enter description here" title="google-cloud-telegraph-toby"></p>
+<p>3.机器学习相关API的开发，包含语音，图像及视频服务。这里<code>Seenit</code>介绍了其成功案例，主要是做视频语义分析，能够搜索视频中出现的内容，比如搜索<code>frog</code>，就能找到所有包含青蛙的视频。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-ai-api.png" alt="enter description here" title="google-cloud-ai-api"></p>
+<p>4.Google GPU，谷歌开放GPU，为大运算量的图形3D渲染提供服务。这时<code>shazam</code>介绍案例，使用GPU进行音乐分类识别算法。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-gpu.png" alt="enter description here" title="google-cloud-gpu"></p>
+<p>5.Google App Engine Flex Environment，介于App Engine Standard Environment和Compute Engine之间的一种服务。<br>6.Goolge Chat，Google Meet 和 Jamboard，都是 Goggle Suite为企业提供的工具，目测Jamboard的那个大屏幕价格不菲，今年夏天英国可以购买到了。keynote演示的时候功能都还流畅，但是会场中演示出现了很多bug，感觉还是不成熟，而且硬件的操作系统未知，扩展性也就未知，那么大个pad如果只用来做whiteboard有点暴殄天物。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-g-suite-extention.png" alt="enter description here" title="google-cloud-g-suite-extention"></p>
+<p>7.Google Open Source，谷歌确实可以称为现在开源社区的模范公司，在2016年就贡献了287024个commit，其中有两个著名的项目Kubernetes和Tensorflow。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-opensource.png" alt="enter description here" title="google-cloud-opensource"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-kubernete.png" alt="enter description here" title="google-cloud-kubernete"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-tensorflow.png" alt="enter description here" title="google-cloud-tensorflow"></p>
+<h2 id="Kubernetes-（自动化容器技术）"><a href="#Kubernetes-（自动化容器技术）" class="headerlink" title="Kubernetes （自动化容器技术）"></a>Kubernetes （自动化容器技术）</h2><p>该技术是近几年开源社区最火的分布式处理技术，谷歌云目前使用其进行负载均衡。讲座中，大概介绍了该项技术的应用及简要技术背景，然后进了Demo演示。Demo演示的一个4台sever的分布式系统，然后部署一个简单的 <code>web server</code> （通过 <code>QRcode</code> 扫描进入一个页面然后点击按钮，返回对应的处理请求的server的问候信息）现场大家点击按钮后，发现服务会被分配到不同的<code>server</code>，通过<code>Google cloud</code>的后台对<code>cluster</code>进行控制。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-kubernete-1.png" alt="enter description here" title="google-cloud-kubernete-1"></p>
+<h2 id="Google-Spanner-（谷歌弹性SQL数据存储）"><a href="#Google-Spanner-（谷歌弹性SQL数据存储）" class="headerlink" title="Google Spanner （谷歌弹性SQL数据存储）"></a>Google Spanner （谷歌弹性SQL数据存储）</h2><p>该存储产品是谷歌对 SQL 进行更深层次的扩展。我们知道云产品数据是核心，所以谷歌已经有很多存储产品，比如 <code>datastore</code>，<code>google SQL</code>，<code>cloud storage</code>，<code>big data</code>.. 这个 <code>spanner</code> 可以说是对SQL数据存储的一种扩展，在保留结构化存储最大优势的前提下，又添加了很多新的特性，比如可扩展性，容灾备份，分布式等等。</p>
+<p>该主题大概介绍Spanner的优势，然后介绍核心技术及架构，然后是进行实例演示，最后综合介绍了所有存储的比较。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-spanner-compare.png" alt="enter description here" title="google-cloud-spanner-compare"></p>
+<p>首先是spanner的优势，基本上是融合了结构化和非机构化两者的优点，当然个人感觉这背后肯定是资源占用以及价格更高。</p>
+<p>下面是谷歌云存储产品家族图谱</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-family.png" alt="enter description here" title="google-cloud-storage-family"></p>
+<p>最后是开发者存储选择指南，可以看到如果你对 Relation 和 Structure 需求很大，同时需要可扩展性，那么 spanner是你的不二选择。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-selection.png" alt="enter description here" title="google-cloud-storage-selection"></p>
+<h2 id="Google-IDaaS-（身份及服务）"><a href="#Google-IDaaS-（身份及服务）" class="headerlink" title="Google IDaaS （身份及服务）"></a>Google IDaaS （身份及服务）</h2><p>通过展会大篇幅的内容和 <code>G Suite</code> 相关，也就是微软的 <code>Office</code> 的竞品。可以看出 <code>Google</code> 希望利用 <code>Cloud</code> 再带动 <code>G Suite</code> 的商业领域的业务。同时商业人数多了，这些用户就变成 <code>Google</code> 的资源了，所以谷歌也加入了 <code>IDaaS</code> 及 用户身份及服务。Google 希望自己成为用户的中心，无论用户需要什么服务都可以和谷歌用户建立联系从而实现互通。简单来讲，Google要做 IdP，以后第三方服务SP都可以接入<code>Google</code>用户。虽然现在 <code>Oauth2</code> 已经使用广泛，但是未来将会全面支持各种协议，比如SAML，比如Open ID Connect （OIDC）。甚至和其他IdP合作扩展自己的业务，这点有点想不通，不知道谷歌如何处理竞争关系。</p>
+<p>这是谷歌的 IDaas 的结构图</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas.png" alt="enter description here" title="google-cloud-idaas"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas-product.png" alt="enter description here" title="google-cloud-idaas-product"></p>
+<p>这是谷歌未开发展，以及与合作伙伴的关系</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-idaas-partner.png" alt="enter description here" title="google-cloud-idaas-partner"></p>
+<h2 id="Google-Security-Infrastructure-（谷歌安全架构）"><a href="#Google-Security-Infrastructure-（谷歌安全架构）" class="headerlink" title="Google Security Infrastructure （谷歌安全架构）"></a>Google Security Infrastructure （谷歌安全架构）</h2><p>本讲座内容有些枯燥，因为只能听一些概述的理论，因为如果深入进入也可能不懂。作为云服务商，安全绝对重要。这里列出了谷歌云的多个层次的安全措施，从底层硬件到顶层应用全部包含了安全措施。</p>
+<p>比如底层硬件，自主控制的网卡加上自主研发的控制芯片来控制服务器的网络和硬件底层处理。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-hardware.png" alt="enter description here" title="google-cloud-security-hardware"></p>
+<p>其它层次也有各种复杂的技术，这里不再一一列举，因为有些实在熟悉，估计每一种技术都值得研究。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-1.png" alt="enter description here" title="google-cloud-security-1"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-2.png" alt="enter description here" title="google-cloud-security-2"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-3.png" alt="enter description here" title="google-cloud-security-3"></p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-security-4.png" alt="enter description here" title="google-cloud-security-4"></p>
+<h2 id="Google-Cloud-Storage-Choose-Strategy-（谷歌云存储的选择方法）"><a href="#Google-Cloud-Storage-Choose-Strategy-（谷歌云存储的选择方法）" class="headerlink" title="Google Cloud Storage Choose Strategy （谷歌云存储的选择方法）"></a>Google Cloud Storage Choose Strategy （谷歌云存储的选择方法）</h2><p>最后这个讲座感觉有些失望，只是讲了一下4中不同region的数据存储的选择，如 多区域，单一区域，最近区域以及冷数据。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-storage-multiple-region.png" alt="enter description here" title="google-cloud-storage-multiple-region"></p>
+<p>基本就是说多区域和单一区域适合经常变化的数据，而另外两种主要是不太经常变化的数据，比如备份日志等数据。所以在开发的时候，需要对数据进行分类，从而优化资源利用率。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/google-cloud-multi-region-compare.png" alt="enter description here" title="google-cloud-multi-region-compare"></p>
+<p>总的来说这次活动受益匪浅，一方面开阔了眼界，看看顶级互联网公司的展会是什么样的，其次其深深体会这种技术至上的氛围。再加上有很多跟目前自己正在开发以及正在使用的技术想契合，收获颇丰。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Google/" rel="tag"># Google</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/04/linux-bash/" rel="next" title="Linux使用命令行控制显示器">
+                <i class="fa fa-chevron-left"></i> Linux使用命令行控制显示器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/05/hexo-blog-github-ci/" rel="prev" title="Hexo个人博客完全指南 (2017最新零基础手册)">
+                Hexo个人博客完全指南 (2017最新零基础手册) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#KeyNote"><span class="nav-number">1.</span> <span class="nav-text">KeyNote</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-（自动化容器技术）"><span class="nav-number">2.</span> <span class="nav-text">Kubernetes （自动化容器技术）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Spanner-（谷歌弹性SQL数据存储）"><span class="nav-number">3.</span> <span class="nav-text">Google Spanner （谷歌弹性SQL数据存储）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-IDaaS-（身份及服务）"><span class="nav-number">4.</span> <span class="nav-text">Google IDaaS （身份及服务）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Security-Infrastructure-（谷歌安全架构）"><span class="nav-number">5.</span> <span class="nav-text">Google Security Infrastructure （谷歌安全架构）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google-Cloud-Storage-Choose-Strategy-（谷歌云存储的选择方法）"><span class="nav-number">6.</span> <span class="nav-text">Google Cloud Storage Choose Strategy （谷歌云存储的选择方法）</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/05/04/google-cloud-next/';
+          this.page.identifier = '2017/05/04/google-cloud-next/';
+          this.page.title = 'Google-Cloud-Next观后感';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,990 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文基于 JDK9 深入分析了 String 的 hashcode 方法，并介绍了一种构造 hash 冲突的方法。">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何生成任意多个 HashCode 相同的字符串">
+<meta property="og:url" content="https://notes.mengxin.science/2018/01/20/how-to-generate-strings-with-same-hashcode/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文基于 JDK9 深入分析了 String 的 hashcode 方法，并介绍了一种构造 hash 冲突的方法。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何生成任意多个 HashCode 相同的字符串">
+<meta name="twitter:description" content="摘要：本文基于 JDK9 深入分析了 String 的 hashcode 方法，并介绍了一种构造 hash 冲突的方法。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/01/20/how-to-generate-strings-with-same-hashcode/"/>
+
+
+
+
+
+  <title> 如何生成任意多个 HashCode 相同的字符串 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/01/20/how-to-generate-strings-with-same-hashcode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                如何生成任意多个 HashCode 相同的字符串
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-20T00:00:00+00:00">
+                2018-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/20/how-to-generate-strings-with-same-hashcode/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/20/how-to-generate-strings-with-same-hashcode/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文基于 JDK9 深入分析了 String 的 hashcode 方法，并介绍了一种构造 hash 冲突的方法。</p>
+<a id="more"></a>
+<h2 id="String-的-hashcode-方法"><a href="#String-的-hashcode-方法" class="headerlink" title="String 的 hashcode 方法"></a>String 的 hashcode 方法</h2><p>String 的 hashcode 的计算方法实际上是把 String 转化为 char 数组，每个 char 实际上就是一个整型，我们假设 char 的总数为 $n$，我们用 $S$ 表示 char 数组，hashcode 则可以使用以下数学公式计算，</p>
+<script type="math/tex; mode=display">
+HashCode(S) = S[0]*31^{n-1}+S[1]*31^{n-2}+...+S[n-2]*31+S[n-1]</script><script type="math/tex; mode=display">
+HashCode(S) = \sum_{i=0}^{n-1}S[i]*31^{n-1-i}</script><p>有了数学基础我们可以再回顾一下源码，这里参考了 JDK9 的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public int hashCode() &#123;</span><br><span class="line">    int h = hash;</span><br><span class="line">    if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">        hash = h = isLatin1() ? StringLatin1.hashCode(value)</span><br><span class="line">                              : StringUTF16.hashCode(value);</span><br><span class="line">    &#125;</span><br><span class="line">    return h;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static int hashCode(byte[] value) &#123;</span><br><span class="line">    int h = 0;</span><br><span class="line">    for (byte v : value) &#123;</span><br><span class="line">        h = 31 * h + (v &amp; 0xff);</span><br><span class="line">    &#125;</span><br><span class="line">    return h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重点在第二个函数，我们可以看到使用了一个循环遍历所有的 char，然后每次都将上一次的 h 乘以 31 在加上当前的 char。另外这里注意对弈 char 值使用了一个 <code>v &amp; 0xff</code>，该语句的目的是只保留最后的 8 个 bit，由于 byte 在 Java 就是 8 个 bit，对于 8 位的 byte：<code>v = v &amp; 0xff</code>。这里可能是预防有些 char 超过了 8 位做一个容错处理（具体意图还是需要研究）。</p>
+<p>另外我写了一个测试函数，打印了计算过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public static int hashCode(byte[] value) &#123;</span><br><span class="line">    System.out.println(Arrays.toString(value));</span><br><span class="line">    int h = 0;</span><br><span class="line">    System.out.println(&quot;h: &quot; + h);</span><br><span class="line">    StringBuilder hDisplay = new StringBuilder(&quot;0&quot;);</span><br><span class="line">    int index = 0;</span><br><span class="line">    for (byte v : value) &#123;</span><br><span class="line">        System.out.println(v + &quot; binary: &quot; + Integer.toBinaryString(Byte.toUnsignedInt(v)));</span><br><span class="line">        System.out.println((v &amp; 0xff) + &quot; v &amp; 0xff: &quot; + Integer.toBinaryString(v &amp; 0xff));</span><br><span class="line">        // why use the v&amp;0xff, just keep the last 8 bit of the byte, see this blog</span><br><span class="line">        // https://oscarliang.com/what-s-the-use-of-and-0xff-in-programming-c-plus-p/</span><br><span class="line">        if (index == 0)</span><br><span class="line">            hDisplay = new StringBuilder(&quot;31 * &quot; + hDisplay + &quot; + &quot; + v);</span><br><span class="line">        else</span><br><span class="line">            hDisplay = new StringBuilder(&quot;31 * (&quot; + hDisplay + &quot;) + &quot; + v);</span><br><span class="line"></span><br><span class="line">        h = 31 * h + (v &amp; 0xff);</span><br><span class="line">        System.out.println(&quot;h: &quot; + h);</span><br><span class="line">        System.out.println(hDisplay);</span><br><span class="line">        index++;</span><br><span class="line">    &#125;</span><br><span class="line">    int number = 31 * (31 * (31 * (31 * (31 * 66 + 66) + 66) + 66) + 66) + 66;</span><br><span class="line">    System.out.println(&quot;test &quot; + number);</span><br><span class="line">    return h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="构造相同-hashcode-字符串的数学基础"><a href="#构造相同-hashcode-字符串的数学基础" class="headerlink" title="构造相同 hashcode 字符串的数学基础"></a>构造相同 hashcode 字符串的数学基础</h2><p>我们再次回顾 hashcode 的数学公式：</p>
+<script type="math/tex; mode=display">
+HashCode(S) = S[0]*31^{n-1}+S[1]*31^{n-2}+...+s[n-2]*31+S[n-1]</script><script type="math/tex; mode=display">
+HashCode(S) = \sum_{i=0}^{n-1}S[i]*31^{n-1-i}</script><p>我们先用两个 char 的数组举例来说明</p>
+<p>假设有两个字符串 $S_a$ 和 $S_b$，其中 $S_a$ 为 [a2,a1]，$S_b$ 为 [b2,b1], 那么这两个字符串的 hashcode 分别为：</p>
+<script type="math/tex; mode=display">
+HashCode(S_a) = S_a[0]*31^1+S_a[1] = a2+a1*31
+HashCode(S_b) = S_b[0]*31^1+S_b[1] = b2+b1*31</script><p>所以只要满足一下公式，两个字符串的 hashcode 将会一样</p>
+<script type="math/tex; mode=display">
+S_a[0]*31^1+S_a[1] = a2+a1*31 = S_b[0]*31^1+S_b[1] = b2+b1*31
+a2+a1*31 = b2+b1*31
+a2+a1*31 - b2 - b1*31 = 0
+a2-b2 + (a1-b1)*31 = 0
+(a1-b1)*31 = b2-a2</script><p>如果 <code>a1-b1 = 1</code>， 那么 <code>b2-a2 = 31</code>，上面的公式就可以成立。也就是说两个字符串后一位的 ASCII 值小1，那么前一位就要多 31 来弥补。</p>
+<p>比如A:65，B:66，a:97，那么我们就可以构造字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Sa = &quot;aA&quot;</span><br><span class="line">hashcode(Sa) = &apos;A&apos;*31 + &apos;a&apos; = 65*31+97 = 65*31+31+66 = (65+1)*31+66</span><br><span class="line">Sb = &quot;BB&quot;</span><br><span class="line">hashcode(Sb) = &apos;B&apos;*31 + &apos;B&apos; = 66*31+66</span><br></pre></td></tr></table></figure>
+<p>这样我就成功构造处理两个字符串的 hashcode 值一致了：“aA” 和 “BB”。逻辑上在 ASCII 字符表（256个字符）中只要能找到3个字符 a，b，c，这三个字符满足关系  b-a=1 &amp;&amp; c-b=31，我们都可以通过这三个字符构造hashcode 相同的字符串</p>
+<h2 id="构造更长的随机字符串"><a href="#构造更长的随机字符串" class="headerlink" title="构造更长的随机字符串"></a>构造更长的随机字符串</h2><p>上一节我们构造了两个字符的字符串，这样的字符串很少，难以满足我们需求，那么有什么办法可以构造更多的字符串有相同的 hashcode？</p>
+<p>我们可以通过<strong>组合短的字符串</strong>来构造更多的长字符串</p>
+<p>下面假设已经存在两组字符串，这两组字符串的 hashcode 是一致的</p>
+<script type="math/tex; mode=display">
+S_a
+S_b
+S_a'
+S_b'</script><script type="math/tex; mode=display">
+HashCode(S_a) = \sum_{i=0}^{n-1}S_a[i]*31^{n-1-i}</script><script type="math/tex; mode=display">
+HashCode(S_b) = \sum_{i=0}^{n-1}S_b[i]*31^{n-1-i}</script><script type="math/tex; mode=display">
+HashCode(S_a') = \sum_{i=0}^{n-1}S_a'[i]*31^{n-1-i}</script><script type="math/tex; mode=display">
+HashCode(S_b') = \sum_{i=0}^{n-1}S_b'[i]*31^{n-1-i}</script><p>假设 $S_1 = S_a + S_b$ 且 $S_2 = S_a’ + S_b’$ 那么我们来证明</p>
+<p>那么我们来证明 S1 和 S2 的 hashcode 也是相同的。</p>
+<p>要证明这个，我们只需要构造一个数学公式，来证明整个字符串的 hashcode 可以通过字符串的两步的 hashcode 来计算。</p>
+<p>我们假设 char 的总数为 $n$，我们用 $S$ 表示 char 数组， $S$ 由两个字符串构成，$S_p$ 和 $S_k$，其长度分别为 $p$ 和 $k$ ，这样$p+k=n$。假设 $S_p$ 在前面，而$S_k$在后面，那么我来进一步推导 hashcode 计算的数学公式</p>
+<script type="math/tex; mode=display">
+HashCode(S) = S[0]*31^{n-1}+S[1]*31^{n-2}+...+S[n-2]*31+S[n-1]</script><p>我们用 p 和 k 来代替 n，n=p+k<br>通过分析我们可以知道，整个字符串的 hashcode，应该就是后半个字符串的 hashcode，加上前半个 hashcode 乘以 31的 后半个字符串长度次方</p>
+<script type="math/tex; mode=display">
+HashCode(S) = HashCode(P)*31^k + HashCode(K)</script><script type="math/tex; mode=display">
+HashCode(S) = \sum_{i=0}^{n-1}S[i]*31^{n-1-i}</script><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>综合上面的介绍，我们就可以开始构造相同 hashcode 的字符串了，首先有个种子，然后在根据需求构造字符串。</p>
+<p>以下为一个<a href="https://stackoverflow.com/a/12926279/2000468" target="_blank" rel="noopener">样例代码</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">public class HashCUtil &#123;</span><br><span class="line"></span><br><span class="line">    private static String[] base = new String[] &#123;&quot;Aa&quot;, &quot;BB&quot;&#125;;</span><br><span class="line"></span><br><span class="line">    public static List&lt;String&gt; generateN(int n)</span><br><span class="line">    &#123;</span><br><span class="line">        if(n &lt;= 0)</span><br><span class="line">        &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt; list = generateOne(null);</span><br><span class="line">        for(int i = 1; i &lt; n; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            list = generateOne(list);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static List&lt;String&gt; generateOne(List&lt;String&gt; strList)</span><br><span class="line">    &#123;   </span><br><span class="line">        if((null == strList) || (0 == strList.size()))</span><br><span class="line">        &#123;</span><br><span class="line">            strList = new ArrayList&lt;String&gt;();</span><br><span class="line">            for(int i = 0; i &lt; base.length; ++i)</span><br><span class="line">            &#123;</span><br><span class="line">                strList.add(base[i]);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return strList;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt; result = new ArrayList&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">        for(int i = 0; i &lt; base.length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            for(String str: strList)</span><br><span class="line">            &#123;   </span><br><span class="line">                result.add(base[i]  + str);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return result;      </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/24/chmod-use-guide/" rel="next" title="chmod详解">
+                <i class="fa fa-chevron-left"></i> chmod详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/20/w169-benz-A160-brake-change-diy/" rel="prev" title="w169-benz-A160-brake-change-diy">
+                w169-benz-A160-brake-change-diy <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#String-的-hashcode-方法"><span class="nav-number">1.</span> <span class="nav-text">String 的 hashcode 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造相同-hashcode-字符串的数学基础"><span class="nav-number">2.</span> <span class="nav-text">构造相同 hashcode 字符串的数学基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造更长的随机字符串"><span class="nav-number">3.</span> <span class="nav-text">构造更长的随机字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/01/20/how-to-generate-strings-with-same-hashcode/';
+          this.page.identifier = '2018/01/20/how-to-generate-strings-with-same-hashcode/';
+          this.page.title = '如何生成任意多个 HashCode 相同的字符串';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1011 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ssh,powershell," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文介绍如何实现通过 SSH 远程连接到 PowerShell。其使用场景主要在 Linux 环境下远程访问 Windows 下的 PowerShell，从而能够将 Windows 的相关操作和部署脚本自动化。">
+<meta name="keywords" content="ssh,powershell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Remote SSH Access PowerShell">
+<meta property="og:url" content="https://notes.mengxin.science/2018/08/21/Remote-SSH-Access-PowerShell/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文介绍如何实现通过 SSH 远程连接到 PowerShell。其使用场景主要在 Linux 环境下远程访问 Windows 下的 PowerShell，从而能够将 Windows 的相关操作和部署脚本自动化。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/2018823-Snipaste_2018-08-23_08-43-35.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Remote SSH Access PowerShell">
+<meta name="twitter:description" content="摘要：本文介绍如何实现通过 SSH 远程连接到 PowerShell。其使用场景主要在 Linux 环境下远程访问 Windows 下的 PowerShell，从而能够将 Windows 的相关操作和部署脚本自动化。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/2018823-Snipaste_2018-08-23_08-43-35.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/08/21/Remote-SSH-Access-PowerShell/"/>
+
+
+
+
+
+  <title> Remote SSH Access PowerShell | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/08/21/Remote-SSH-Access-PowerShell/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Remote SSH Access PowerShell
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-21T23:00:00+00:00">
+                2018-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/21/Remote-SSH-Access-PowerShell/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/08/21/Remote-SSH-Access-PowerShell/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文介绍如何实现通过 <code>SSH</code> 远程连接到 <code>PowerShell</code>。其使用场景主要在 <code>Linux</code> 环境下远程访问 <code>Windows</code> 下的 <code>PowerShell</code>，从而能够将 <code>Windows</code> 的相关操作和部署脚本自动化。</p>
+<a id="more"></a>
+<p>本文主要参考微软官方文档：<a href="https://docs.microsoft.com/en-us/powershell/scripting/core-powershell/ssh-remoting-in-powershell-core?view=powershell-6" target="_blank" rel="noopener">PowerShell Remoting Over SSH</a>，同时介绍在配置过程中遇到的问题。该文档十分详细，并且介绍了各种操作系统之间的配置，这里我们主要介绍 <code>Windows</code> 作为服务器，<code>Linux</code> 作为客户端的场景。</p>
+<p>另外这篇文章<a href="https://4sysops.com/archives/configure-ssh-based-powershell-core-remoting-between-windows-and-linux/" target="_blank" rel="noopener">Configure SSH-based PowerShell Core remoting between Windows and Linux</a>也比较详细，可以对比参考。</p>
+<h2 id="安装-PowerShell-Core-for-Windows"><a href="#安装-PowerShell-Core-for-Windows" class="headerlink" title="安装 PowerShell Core for Windows"></a>安装 <code>PowerShell Core for Windows</code></h2><p>目前最新的 <code>Windows</code> 已经集成了 <code>PowerShell</code>，但是这里还是需要单独安装一份，因为这个 <code>PowerShell</code> 将会配置为 <code>SSH</code> 的子系统。而且新安装的 <code>PowerShell</code> 和内置的是独立。</p>
+<p>单独安装的好处：</p>
+<ol>
+<li>版本统一，我们可以使用当前 GitHub 最新的 PowerShell，并且在客户端和服务器端部署一致的版本。</li>
+<li>配置简单，不需要知道内置的 PowerShell 的属性。</li>
+</ol>
+<p>安装过程很简单，一般情况下我们字需要到 <a href="https://github.com/PowerShell/PowerShell/releases" target="_blank" rel="noopener"><code>GitHub</code> 的 <code>Release</code></a> 页面上下载 <code>MSI</code> 安装包 <code>PowerShell-版本号-win-x64.msi</code>，直接下一步就可以了。</p>
+<p>默认安装完成后我们会在 <code>C:\Program Files\PowerShell\6-preview</code> 路径下看到 <code>PowerShell</code> 的相关文件。最后一层文件夹是版本号。</p>
+<p>安装完成后，我们需要测试一下是否支持 <code>SSH Remoting</code></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-Command</span> <span class="built_in">New-PSSession</span> -syntax</span><br></pre></td></tr></table></figure>
+<p>预期的结果应该包含：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">New-PSSession</span> [-HostName] &lt;string[]&gt; [-Name &lt;string[]&gt;] [-UserName &lt;string&gt;] [-KeyFilePath &lt;string&gt;] [-SSHTransport] [&lt;CommonParameters&gt;]</span><br></pre></td></tr></table></figure>
+<h2 id="安装-Win32-OpenSSH"><a href="#安装-Win32-OpenSSH" class="headerlink" title="安装 Win32 OpenSSH"></a>安装 <code>Win32 OpenSSH</code></h2><p>通过 <a href="https://github.com/PowerShell/Win32-OpenSSH/releases" target="_blank" rel="noopener"><code>GitHub</code> 的 <code>Release</code></a> 页面上下载 <code>ZIP</code>，解压到指定文件夹，一般为：<code>C:\Program Files\OpenSSH</code>。</p>
+<p>然后通过参考官方安装文档 <a href="https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH" target="_blank" rel="noopener">Install Win32 OpenSSH</a> 进行安装，这里使用命令行进行安装</p>
+<p>执行安装 <code>PowerShell</code> 脚本</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe -ExecutionPolicy Bypass -File install-sshd.ps1</span><br></pre></td></tr></table></figure>
+<p>配置防火墙</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows 2012 above</span></span><br><span class="line">New-NetFirewallRule -Name sshd -DisplayName <span class="string">'OpenSSH Server (sshd)'</span> -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort <span class="number">22</span></span><br><span class="line"><span class="comment"># Other</span></span><br><span class="line">netsh advfirewall firewall add rule name=sshd dir=<span class="keyword">in</span> action=allow protocol=TCP localport=<span class="number">22</span></span><br></pre></td></tr></table></figure>
+<p>启动服务，并且配置自动启动</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net start sshd</span><br><span class="line"><span class="built_in">Set-Service</span> sshd -StartupType Automatic</span><br><span class="line"><span class="built_in">Set-Service</span> ssh-agent -StartupType Automatic</span><br></pre></td></tr></table></figure>
+<h2 id="配置-sshd"><a href="#配置-sshd" class="headerlink" title="配置 sshd"></a>配置 <code>sshd</code></h2><p>这一步是最关键的，也是最容易报错的。</p>
+<h3 id="基础配置项"><a href="#基础配置项" class="headerlink" title="基础配置项"></a>基础配置项</h3><p>在 <code>Windows</code> 环境下，<code>sshd</code> 的配置文件和相关的证书日志，都会存放在 <code>C:\ProgramData\ssh</code> 下，这点需要注意，安装路径存放这一份默认的配置，这个只是为了恢复使用的。<a href="https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH" target="_blank" rel="noopener">官方的安装手册的第7条</a>有介绍：</p>
+<blockquote>
+<p>To use existing customized sshd_config, you need to copy it from binary location to %programdata%\ssh\sshd_config (Note that %programdata% is a hidden directory).</p>
+</blockquote>
+<h4 id="使用-password-authentication"><a href="#使用-password-authentication" class="headerlink" title="使用 password authentication"></a>使用 <code>password authentication</code></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PasswordAuthentication yes</span><br></pre></td></tr></table></figure>
+<h4 id="使用-key-authentication-（可选）"><a href="#使用-key-authentication-（可选）" class="headerlink" title="使用 key authentication （可选）"></a>使用 <code>key authentication</code> （可选）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PubkeyAuthentication yes</span><br></pre></td></tr></table></figure>
+<h4 id="配置子系统"><a href="#配置子系统" class="headerlink" title="配置子系统"></a>配置子系统</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subsystem powershell c:/program files/powershell/6.0.4/pwsh.exe -sshs -NoLogo -NoProfile</span><br></pre></td></tr></table></figure>
+<p>这里需要说明，如果遇到问题，可以是因为配置子系统的路径中有空格导致，这也是一个目前还是 <code>Open</code> 的 <a href="https://github.com/PowerShell/Win32-OpenSSH/issues/784" target="_blank" rel="noopener">Issue</a>。可以通过创建 <code>symlink</code> 来解决这个问题。</p>
+<p>首先我们将原始 <code>PowerShell</code> 的安装路径创建一个 <code>symlink</code>，这里注意，如果在 <code>PowerShell</code> 中执行 <code>mklink</code> 需要加 <code>cmd /c</code> 因为这个执行不是 <code>PowerShell</code> 的，参考<a href="https://superuser.com/a/98480/579654" target="_blank" rel="noopener">该回答</a>。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd /c mklink /D c:\pwsh <span class="string">"C:\Program Files\PowerShell\6-preview"</span></span><br></pre></td></tr></table></figure>
+<p>然后我们就用 <code>symlink</code> 来配置子系统，这样就排除了空格的问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subsystem powershell c:\pwsh\pwsh.exe -sshs -NoLogo -NoProfile</span><br></pre></td></tr></table></figure>
+<p><a href="https://docs.microsoft.com/en-us/powershell/scripting/core-powershell/ssh-remoting-in-powershell-core?view=powershell-6" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/powershell/scripting/core-powershell/ssh-remoting-in-powershell-core?view=powershell-6</a></p>
+<p><a href="https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH" target="_blank" rel="noopener">https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH</a></p>
+<h4 id="重启服务"><a href="#重启服务" class="headerlink" title="重启服务"></a>重启服务</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Restart-Service</span> sshd</span><br></pre></td></tr></table></figure>
+<h3 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h3><p>我们一般通过开启调试日志的方式调试 <code>sshd</code>，官方有专门的 <a href="https://github.com/PowerShell/Win32-OpenSSH/wiki/Troubleshooting-Steps" target="_blank" rel="noopener">Troubleshooting</a> 页面，一般我们开启调试配置。</p>
+<p>删除原有的日志文件，在配置文件 <code>sshd_config</code> 增加如下条目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SyslogFacility LOCAL0</span><br><span class="line">LogLevel to DEBUG </span><br><span class="line"># (or DEBUG2/DEBUG3 for higher levels of logging)</span><br></pre></td></tr></table></figure>
+<p>然后重启</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Stop-Service</span> sshd</span><br><span class="line"><span class="built_in">Start-Service</span> sshd</span><br></pre></td></tr></table></figure>
+<p>这时候访问就会产生日志文件，写入 <code>log</code> 文件夹中。</p>
+<h2 id="Linux-客户端配置"><a href="#Linux-客户端配置" class="headerlink" title="Linux 客户端配置"></a>Linux 客户端配置</h2><p>本人使用 <code>Fedora</code>，其他的发行版基本是一样的。</p>
+<p>首先在 <code>Linux</code> 上安装 <code>PowerShell</code>， 参考该文：<a href="https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-powershell-core-on-linux?view=powershell-6" target="_blank" rel="noopener">Installing PowerShell Core on Linux</a>。</p>
+<p>Ubuntu, Debian    </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install -y powershell	</span><br><span class="line">sudo apt-get install -y powershell-preview</span><br></pre></td></tr></table></figure>
+<p>CentOS, RedHat<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y powershell	</span><br><span class="line">sudo yum install -y powershell-preview</span><br></pre></td></tr></table></figure></p>
+<p>OpenSUSE<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo zypper install powershell	</span><br><span class="line">sudo zypper install powershell-preview</span><br></pre></td></tr></table></figure></p>
+<p>Fedora<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo dnf install -y powershell	</span><br><span class="line">sudo dnf install -y powershell-preview</span><br></pre></td></tr></table></figure></p>
+<p>安装好后就可以使用 <code>PowerShell</code>，直接使用 pwsh 命令进入 <code>PowerShell</code> 的命令行窗口。</p>
+<p>然后使用如下指令远程连接到服务器：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Enter-PSSession</span> -HostName [IP or HostName] -UserName Administrator</span><br></pre></td></tr></table></figure>
+<p>当然按照官方文档所述，还可以定义 <code>$session</code> 变量，然后通过变量登陆。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$session</span> = <span class="built_in">New-PSSession</span> -HostName UbuntuVM1 -UserName TestUser</span><br><span class="line"><span class="variable">$session</span></span><br><span class="line"><span class="built_in">Enter-PSSession</span> <span class="variable">$session</span></span><br></pre></td></tr></table></figure>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><h4 id="subsystem-request-failed-on-channel-0"><a href="#subsystem-request-failed-on-channel-0" class="headerlink" title="subsystem request failed on channel 0"></a>subsystem request failed on channel 0</h4><p>检查 <code>sshd</code> 的子系统的配置，有可能是空格问题，使用 <code>symlink</code> 配置。</p>
+<h4 id="sshd-日志：CreateProcessAsUser-failed-error-1314"><a href="#sshd-日志：CreateProcessAsUser-failed-error-1314" class="headerlink" title="sshd 日志：CreateProcessAsUser failed error:1314"></a>sshd 日志：CreateProcessAsUser failed error:1314</h4><blockquote>
+<p>“To resolve this problem, you’ll need to elevate the rights of the account calling CreateProcessAsUser with the “Replace a process level token” right. To do so, open the Control Panel / Administrative Tools / Local Security Policy and add the user account to the “Replace a process level token” right. (You may have to logout or even reboot to have this change take effect.)”</p>
+</blockquote>
+<p>参考该文章解决: <a href="https://social.msdn.microsoft.com/Forums/vstudio/en-US/c905c900-cae1-4081-b0c9-00f10238e7ad/createprocessasuser-failed?forum=clr" target="_blank" rel="noopener">https://social.msdn.microsoft.com/Forums/vstudio/en-US/c905c900-cae1-4081-b0c9-00f10238e7ad/createprocessasuser-failed?forum=clr</a></p>
+<p>主要就是在 <code>Control Panel / Administrative Tools / Local Security Policy</code> 找到 <code>Replace a process level token</code> 权限,然后将需要远程连接的用户的加入到这个权限中. 需要重启电脑.</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/2018823-Snipaste_2018-08-23_08-43-35.png" alt="enter description here"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过这个配置，我们就可以针对 <code>Windows</code> 服务器进行 <code>Devops</code>，比如 <code>GitLab</code> 就支持执行 <code>PowerShell</code> 脚本，参考：<a href="https://docs.gitlab.com/runner/shells/" target="_blank" rel="noopener">Shells supported by GitLab Runner</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ssh/" rel="tag"># ssh</a>
+          
+            <a href="/tags/powershell/" rel="tag"># powershell</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/21/study-driving-licence-in-uk-9/" rel="next" title="英国学车记第九课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第九课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/23/scala-implicit-how-to-constraint-generic-type/" rel="prev" title="Scala 隐式参数限定可用实例案例分析">
+                Scala 隐式参数限定可用实例案例分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-PowerShell-Core-for-Windows"><span class="nav-number">1.</span> <span class="nav-text">安装 PowerShell Core for Windows</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Win32-OpenSSH"><span class="nav-number">2.</span> <span class="nav-text">安装 Win32 OpenSSH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-sshd"><span class="nav-number">3.</span> <span class="nav-text">配置 sshd</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础配置项"><span class="nav-number">3.1.</span> <span class="nav-text">基础配置项</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-password-authentication"><span class="nav-number">3.1.1.</span> <span class="nav-text">使用 password authentication</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-key-authentication-（可选）"><span class="nav-number">3.1.2.</span> <span class="nav-text">使用 key authentication （可选）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置子系统"><span class="nav-number">3.1.3.</span> <span class="nav-text">配置子系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重启服务"><span class="nav-number">3.1.4.</span> <span class="nav-text">重启服务</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题排查"><span class="nav-number">3.2.</span> <span class="nav-text">问题排查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-客户端配置"><span class="nav-number">4.</span> <span class="nav-text">Linux 客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#subsystem-request-failed-on-channel-0"><span class="nav-number">5.0.1.</span> <span class="nav-text">subsystem request failed on channel 0</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sshd-日志：CreateProcessAsUser-failed-error-1314"><span class="nav-number">5.0.2.</span> <span class="nav-text">sshd 日志：CreateProcessAsUser failed error:1314</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/08/21/Remote-SSH-Access-PowerShell/';
+          this.page.identifier = '2018/08/21/Remote-SSH-Access-PowerShell/';
+          this.page.title = 'Remote SSH Access PowerShell';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

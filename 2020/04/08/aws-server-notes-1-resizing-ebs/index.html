@@ -1,0 +1,1079 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="AWS,EBS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要:  最近游戏上线，开始第一次维护真正的游戏服务，同时也开始面对服务器可用性的压力。虽然目前处于 Techinical Launch，目前大约不到 2K 的 UV，但是对于服务器来讲还是有不少压力。">
+<meta name="keywords" content="AWS,EBS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS维护笔记1:EBS 动态扩容">
+<meta property="og:url" content="https://notes.mengxin.science/2020/04/08/aws-server-notes-1-resizing-ebs/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要:  最近游戏上线，开始第一次维护真正的游戏服务，同时也开始面对服务器可用性的压力。虽然目前处于 Techinical Launch，目前大约不到 2K 的 UV，但是对于服务器来讲还是有不少压力。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-24-47.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-25-20.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-25-59.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-27-03.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-28-10.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-28-19.jpg">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS维护笔记1:EBS 动态扩容">
+<meta name="twitter:description" content="摘要:  最近游戏上线，开始第一次维护真正的游戏服务，同时也开始面对服务器可用性的压力。虽然目前处于 Techinical Launch，目前大约不到 2K 的 UV，但是对于服务器来讲还是有不少压力。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-24-47.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2020/04/08/aws-server-notes-1-resizing-ebs/"/>
+
+
+
+
+
+  <title> AWS维护笔记1:EBS 动态扩容 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2020/04/08/aws-server-notes-1-resizing-ebs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                AWS维护笔记1:EBS 动态扩容
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-08T23:00:00+00:00">
+                2020-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Knowledge/" itemprop="url" rel="index">
+                    <span itemprop="name">Knowledge</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/04/08/aws-server-notes-1-resizing-ebs/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2020/04/08/aws-server-notes-1-resizing-ebs/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要:  最近游戏上线，开始第一次维护真正的游戏服务，同时也开始面对服务器可用性的压力。虽然目前处于 Techinical Launch，目前大约不到 2K 的 UV，但是对于服务器来讲还是有不少压力。</p>
+<a id="more"></a>
+<h1 id="EBS动态扩容"><a href="#EBS动态扩容" class="headerlink" title="EBS动态扩容"></a>EBS动态扩容</h1><p>遇到的第一个问题就是 15G 的 EBS（ELASTIC BLOCK STORE） SSD 被占满了，要说 AWS 的服务器虽然贵，但是贵有贵的道理，SSD被占满的情况下服务器服务依然正常，只是日志无法再写入了。首先想到为 EBS 扩容，如何保证服务不停止，动态的为 EBS 扩容呢？<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html" target="_blank" rel="noopener">AWS 官方文档为了介绍相关方案</a>。当然也可以参考其他文章比如： <a href="https://hackernoon.com/tutorial-how-to-extend-aws-ebs-volumes-with-no-downtime-ec7d9e82426e" target="_blank" rel="noopener">Tutorial: how to extend AWS EBS volumes with no downtime</a>，不过还是官方文档更加可靠，毕竟是线上系统。而且需要理解所有操作的内部原理，保证对 live server 的完全掌控。</p>
+<p>整个过程分为 4 步</p>
+<ol>
+<li>AWS Console EBS 扩容操作</li>
+<li>确认文件系统</li>
+<li>扩展分区</li>
+<li>扩展文件系统</li>
+</ol>
+<h2 id="AWS-Console-EBS-扩容操作"><a href="#AWS-Console-EBS-扩容操作" class="headerlink" title="AWS Console EBS 扩容操作"></a>AWS Console EBS 扩容操作</h2><p>这一步的目标就是为 EBS 增加容量，类似于在物理上为服务器增加容量，比如电脑硬盘有 500G，我们初始只使用了 100G，还有 400G 处于未使用状态，但是发现不够用了，需要再增加 50G，这一步就类似于增加 50G。只不过 AWS 提供了一个无限的总容量可供扩容，按需付费使用。</p>
+<p>通过 EC2 我们可以直接定位到对应的 EBS，对于有多个 EC2 instance 更加方便，不容易出错。</p>
+<p>在 EC2 列表找到对应需要扩容的 instance，查看 Root Device 信息，这里只有一块 EBS，如果有多块，需要确认扩容哪一块：</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-24-47.jpg" alt=""></p>
+<p>点击link，弹出悬浮窗口，通过上面的链接可以直到 EBS 页面</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-25-20.jpg" alt=""></p>
+<p>EBS 列表已经是经过筛选的结果，直接在 volume 上右键选择 <code>Modify Volume</code>，开始扩容：</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-25-59.jpg" alt=""></p>
+<p>按照需求增加容量：</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-27-03.jpg" alt=""></p>
+<p>点击 <code>Modify</code>，弹出确认窗口，并确认</p>
+<p><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-28-10.jpg" alt=""></p>
+<p>Yes 确认<br><img src="https://raw.githubusercontent.com/xmeng1/images/master/imagesXnip2020-04-11_09-28-19.jpg" alt=""></p>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>完成上述步骤后，我们可以 SSH 到 EC2 查看效果，可以通过 <code>lsblk</code> 命令查看硬盘信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip ~]$ lsblk</span><br><span class="line">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">nvme0n1       259:0    0  20G  0 disk </span><br><span class="line">├─nvme0n1p1   259:1    0  15G  0 part /</span><br><span class="line">└─nvme0n1p128 259:2    0   1M  0 part</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，硬盘总空间已经变成 20G，而使用的 <code>/</code> 根分区只使用 15G，说明我们已经完成 5G 的扩容。</p>
+<blockquote>
+<p>lsblk: list block devices.<br> <strong>lsblk命令</strong>用于列出所有可用块设备的信息，而且还能显示他们之间的依赖关系，但是它不会列出RAM盘的信息。块设备有硬盘，闪存盘，CD-ROM等等。</p>
+</blockquote>
+<h2 id="确认文件系统"><a href="#确认文件系统" class="headerlink" title="确认文件系统"></a>确认文件系统</h2><p>硬件准备好后，还需要在 Linux 上系统上进行一些维护。首先我们需要确认文件系统。常见的有两种 <code>XFS</code> 和 <code>ext4</code>。目前主流的是 XFS 系统，配备 NVMe 高性能 SSD 硬盘。</p>
+<p><strong>Example: File Systems on a Nitro-based Instance</strong></p>
+<p>The following example shows a  <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#ec2-nitro-instances" target="_blank" rel="noopener">Nitro-based instance</a>  that has a boot volume with an XFS file system and an additional volume with an XFS file system.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ sudo file -s /dev/nvme?n*</span><br><span class="line">/dev/nvme0n1:     x86 boot sector ...</span><br><span class="line">/dev/nvme0n1p1:   SGI XFS filesystem data ...</span><br><span class="line">/dev/nvme0n1p128: data</span><br><span class="line">/dev/nvme1n1:     SGI XFS filesystem data ...</span><br></pre></td></tr></table></figure>
+<p><strong>Example: File Systems on a T2 Instance</strong></p>
+<p>The following example shows a T2 instance that has a boot volume with an ext4 file system and an additional volume with an XFS file system.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ sudo file -s /dev/xvd*</span><br><span class="line">/dev/xvda:  DOS/MBR boot sector ..</span><br><span class="line">/dev/xvda1: Linux rev 1.0 ext4 filesystem data ...</span><br><span class="line">/dev/xvdf:  SGI XFS filesystem data ...</span><br></pre></td></tr></table></figure>
+<h2 id="扩展分区"><a href="#扩展分区" class="headerlink" title="扩展分区"></a>扩展分区</h2><p>如果 EBS Volume 包含分区 Partition，需要将 Partition 扩展到新的 Volume 容量。 使用 <code>lsblk</code> 检测信息，使用 <code>growpart</code> 扩展分区。官方文档给出了两个例子</p>
+<h3 id="Partitions-on-a-Nitro-based-Instance"><a href="#Partitions-on-a-Nitro-based-Instance" class="headerlink" title="Partitions on a Nitro-based Instance"></a>Partitions on a Nitro-based Instance</h3><p>扩展前</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ lsblk</span><br><span class="line">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">nvme1n1       259:0    0  30G  0 disk /data</span><br><span class="line">nvme0n1       259:1    0  16G  0 disk</span><br><span class="line">└─nvme0n1p1   259:2    0   8G  0 part /</span><br><span class="line">└─nvme0n1p128 259:3    0   1M  0 part</span><br></pre></td></tr></table></figure>
+<ol>
+<li>该案例有两个 volume ：<code>nvme0n1</code> 和 <code>nvme1n1</code>，其中 <code>nvme0n1</code> 分配到了根路径<code>/</code>，<code>nvme1n1</code> 用于数据盘 <code>/data</code></li>
+<li>我们扩容的 volume 是 <code>nvme0n1</code>，<code>nvme0n1</code> 有一个分区 <code>nvme0n1p1</code>。我们可以看到，扩容后 voumne 是 16G，但是分区仍然是 8G。这就说明我们需要将分区扩展到我们扩容后的容量。</li>
+<li>对于 <code>nvme1n1</code>，没有分区，所有完成扩容后，直接显示了新的容量。</li>
+</ol>
+<p>下面我们通过 <code>growpart</code> 来完成扩展分区到 volume 空间</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ sudo growpart /dev/nvme0n1 1</span><br></pre></td></tr></table></figure>
+<p>命令分析： 这里 <code>growpart</code> 使用非常简单，只需要两个参数:</p>
+<blockquote>
+<p>growpart - extend a partition in a partition table to fill available space<br><strong>DISK</strong><br>The device or disk image to operate on<br><strong>PARTITION-NUMBER</strong><br>The number of the partition to resize (counting from 1)</p>
+</blockquote>
+<p>所以这里的意思是，我们将设备 <code>/dev/nvme0n1</code> 的分区 <code>1</code> 扩展到整个设备可用空间。也就是将分区 <code>nvme0n1p1</code> 扩展到 <code>/dev/nvme0n1</code>整个可用空间。</p>
+<p>我们可以通过 lsblk 重新显示信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ lsblk</span><br><span class="line">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">nvme1n1       259:0    0  30G  0 disk /data</span><br><span class="line">nvme0n1       259:1    0  16G  0 disk</span><br><span class="line">└─nvme0n1p1   259:2    0  16G  0 part /</span><br><span class="line">└─nvme0n1p128 259:3    0   1M  0 part</span><br></pre></td></tr></table></figure>
+<p><code>nvme0n1p1</code> 新的 SIZE 已经和 <code>nvme0n1</code> 完全一样了。</p>
+<h3 id="Partitions-on-a-T2-Instance"><a href="#Partitions-on-a-T2-Instance" class="headerlink" title="Partitions on a T2 Instance"></a>Partitions on a T2 Instance</h3><p>这里简单的介绍官方文档流程。</p>
+<p>为扩展前：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ lsblk</span><br><span class="line">NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">xvda    202:0    0  16G  0 disk</span><br><span class="line">└─xvda1 202:1    0   8G  0 part /</span><br><span class="line">xvdf    202:80   0  30G  0 disk</span><br><span class="line">└─xvdf1 202:81   0   8G  0 part /data</span><br></pre></td></tr></table></figure>
+<p><code>xvda1</code> 和 <code>xvdf1</code> 扩展</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ sudo growpart /dev/xvda 1</span><br><span class="line">[ec2-user ~]$ sudo growpart /dev/xvdf 1</span><br></pre></td></tr></table></figure>
+<p>扩展后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ lsblk</span><br><span class="line">NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">xvda    202:0    0  16G  0 disk</span><br><span class="line">└─xvda1 202:1    0  16G  0 part /</span><br><span class="line">xvdf    202:80   0  30G  0 disk</span><br><span class="line">└─xvdf1 202:81   0  30G  0 part /data</span><br></pre></td></tr></table></figure>
+<h3 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h3><p>扩展前</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ lsblk</span><br><span class="line">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">nvme0n1       259:0    0  20G  0 disk </span><br><span class="line">├─nvme0n1p1   259:1    0  15G  0 part /</span><br><span class="line">└─nvme0n1p128 259:2    0   1M  0 part</span><br></pre></td></tr></table></figure>
+<p>扩展</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo growpart /dev/nvme0n1 1</span><br><span class="line">CHANGED: partition=1 start=4096 old: size=31453151 end=31457247 new: size=41938911 end=41943007</span><br></pre></td></tr></table></figure>
+<p>扩展后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ lsblk</span><br><span class="line">NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">nvme0n1       259:0    0  20G  0 disk </span><br><span class="line">├─nvme0n1p1   259:1    0  20G  0 part /</span><br><span class="line">└─nvme0n1p128 259:2    0   1M  0 part</span><br></pre></td></tr></table></figure>
+<h2 id="扩展文件系统"><a href="#扩展文件系统" class="headerlink" title="扩展文件系统"></a>扩展文件系统</h2><p>完成上一步后，如果通过 <code>df -h</code> 会发现可以空间并没有增加，因为完成分区扩展后，还需要进一步扩展文件系统。同样这一步也根据不同的文件系统操作不同：</p>
+<h3 id="Example-Extend-an-XFS-file-system"><a href="#Example-Extend-an-XFS-file-system" class="headerlink" title="Example: Extend an XFS file system"></a>Example: Extend an XFS file system</h3><p>操作前</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ df -h</span><br><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/nvme0n1p1   8.0G  1.6G  6.5G  20% /</span><br><span class="line">/dev/nvme1n1     8.0G   33M  8.0G   1% /data</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">扩容：</span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line">[ec2-user ~]$ sudo yum install xfsprogs</span><br><span class="line">[ec2-user ~]$ sudo xfs_growfs -d /</span><br><span class="line">[ec2-user ~]$ sudo xfs_growfs -d /data</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>xfs_growfs, xfs_info - expand an XFS filesystem<br>xfs_growfs expands an existing XFS filesystem (see xfs(5)). The mount-point argument is the pathname of the directory where the filesystem is mounted. The filesystem must be mounted to be grown (see mount(8)). The existing contents of the filesystem are undisturbed, and the added space becomes available for additional file storage.<br>-d | -D size<br>Specifies that the data section of the filesystem should be grown. If the -D size option is given, the data section is grown to that size, otherwise the <strong>data section is grown to the largest size possible with the -d option.</strong> The size is expressed in filesystem blocks.</p>
+</blockquote>
+<p>这里我们使用 -d 的默认值，扩展到最大可用容量。</p>
+<p>扩容后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ df -h</span><br><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/nvme0n1p1    16G  1.6G   15G  10% /</span><br><span class="line">/dev/nvme1n1      30G   33M   30G   1% /data</span><br></pre></td></tr></table></figure>
+<h3 id="Example-Extend-an-ext2-ext3-or-ext4-file-system"><a href="#Example-Extend-an-ext2-ext3-or-ext4-file-system" class="headerlink" title="Example: Extend an ext2, ext3, or ext4 file system"></a>Example: Extend an ext2, ext3, or ext4 file system</h3><p>操作前</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ df -h</span><br><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/xvda1       8.0G  1.9G  6.2G  24% /</span><br><span class="line">/dev/xvdf1       8.0G   45M  8.0G   1% /data</span><br></pre></td></tr></table></figure>
+<p>操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ sudo resize2fs /dev/xvda1</span><br><span class="line">[ec2-user ~]$ sudo resize2fs /dev/xvdf1</span><br></pre></td></tr></table></figure>
+<p>操作后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ df -h</span><br><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/xvda1        16G  1.9G  14G  12% /</span><br><span class="line">/dev/xvdf1        30G   45M  30G   1% /data</span><br></pre></td></tr></table></figure>
+<h3 id="实际案例-1"><a href="#实际案例-1" class="headerlink" title="实际案例"></a>实际案例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ df -h</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">devtmpfs        963M     0  963M   0% /dev</span><br><span class="line">tmpfs           981M     0  981M   0% /dev/shm</span><br><span class="line">tmpfs           981M  508K  981M   1% /run</span><br><span class="line">tmpfs           981M     0  981M   0% /sys/fs/cgroup</span><br><span class="line">/dev/nvme0n1p1   15G  6.6G  8.5G  44% /</span><br><span class="line">tmpfs           197M     0  197M   0% /run/user/1000</span><br></pre></td></tr></table></figure>
+<p>扩展 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ sudo xfs_growfs -d /</span><br><span class="line">meta-data=/dev/nvme0n1p1         isize=512    agcount=8, agsize=524159 blks</span><br><span class="line">         =                       sectsz=512   attr=2, projid32bit=1</span><br><span class="line">         =                       crc=1        finobt=1 spinodes=0</span><br><span class="line">data     =                       bsize=4096   blocks=3931643, imaxpct=25</span><br><span class="line">         =                       sunit=0      swidth=0 blks</span><br><span class="line">naming   =version 2              bsize=4096   ascii-ci=0 ftype=1</span><br><span class="line"><span class="built_in">log</span>      =internal               bsize=4096   blocks=2560, version=2</span><br><span class="line">         =                       sectsz=512   sunit=0 blks, lazy-count=1</span><br><span class="line">realtime =none                   extsz=4096   blocks=0, rtextents=0</span><br><span class="line">data blocks changed from 3931643 to 5242363</span><br></pre></td></tr></table></figure>
+<p>扩展后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ df -h</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">devtmpfs        963M     0  963M   0% /dev</span><br><span class="line">tmpfs           981M     0  981M   0% /dev/shm</span><br><span class="line">tmpfs           981M  508K  981M   1% /run</span><br><span class="line">tmpfs           981M     0  981M   0% /sys/fs/cgroup</span><br><span class="line">/dev/nvme0n1p1   20G  6.6G   14G  33% /</span><br><span class="line">tmpfs           197M     0  197M   0% /run/user/1000</span><br></pre></td></tr></table></figure>
+<h1 id="寻找罪魁祸首"><a href="#寻找罪魁祸首" class="headerlink" title="寻找罪魁祸首"></a>寻找罪魁祸首</h1><p>下面介绍一下如果搜索空间占用问题，这里主要是通过命令逐层搜索空间占用：</p>
+<p>根路径，这里通过 <code>grep</code> 的正则表达式只过滤带有 <code>G</code> 的字符串，其他占用少的就过滤掉。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ sudo du -h / | grep [0-9]G</span><br><span class="line">du: cannot access ‘/proc/28031/task/28031/fd/3’: No such file or directory</span><br><span class="line">du: cannot access ‘/proc/28031/task/28031/fdinfo/3’: No such file or directory</span><br><span class="line">du: cannot access ‘/proc/28031/fd/4’: No such file or directory</span><br><span class="line">du: cannot access ‘/proc/28031/fdinfo/4’: No such file or directory</span><br><span class="line">2.1G    /var/lib/docker/containers/xxx</span><br><span class="line">2.1G    /var/lib/docker/containers</span><br><span class="line">1.1G    /var/lib/docker/overlay2</span><br><span class="line">3.1G    /var/lib/docker</span><br><span class="line">3.1G    /var/lib</span><br><span class="line">3.7G    /var</span><br><span class="line">1.2G    /usr</span><br><span class="line">1.6G    /home/ec2-user/server-composer/live/logs</span><br><span class="line">1.6G    /home/ec2-user/server-composer/live</span><br><span class="line">1.6G    /home/ec2-user/server-composer</span><br><span class="line">1.6G    /home/ec2-user</span><br><span class="line">1.6G    /home</span><br><span class="line">6.5G    /</span><br></pre></td></tr></table></figure></p>
+<p>我们发现 <code>3.7G    /var</code> 是空间占用最大的，继续搜索</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ sudo du -h /var/ | grep [0-9]G</span><br><span class="line">2.1G    /var/lib/docker/containers/xxx</span><br><span class="line">2.1G    /var/lib/docker/containers</span><br><span class="line">1.1G    /var/lib/docker/overlay2</span><br><span class="line">3.1G    /var/lib/docker</span><br><span class="line">3.1G    /var/lib</span><br><span class="line">3.7G    /var/</span><br></pre></td></tr></table></figure>
+<p>可以发现是某个 container 占用最大，继续搜索</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ sudo ls -halt /var/lib/docker/containers/xxx</span><br><span class="line">total 2.1G</span><br><span class="line">-rw-r----- 1 root root 1.4G Apr 11 01:23 xxx-json.log</span><br><span class="line">drwx------ 3 root root   78 Apr  4 00:43 ..</span><br><span class="line">drwx------ 4 root root  237 Apr  4 00:43 .</span><br><span class="line">-rw-r--r-- 1 root root 1.6K Apr  4 00:43 hostconfig.json</span><br><span class="line">-rw------- 1 root root 4.0K Apr  4 00:43 config.v2.json</span><br><span class="line">-rw-r--r-- 1 root root   98 Apr  4 00:43 resolv.conf</span><br><span class="line">-rw-r--r-- 1 root root   13 Apr  4 00:43 hostname</span><br><span class="line">drwx------ 3 root root   17 Apr  4 00:43 mounts</span><br><span class="line">-rw-r--r-- 1 root root  174 Apr  4 00:43 hosts</span><br><span class="line">-rw-r--r-- 1 root root   71 Apr  4 00:43 resolv.conf.hash</span><br><span class="line">drwx------ 2 root root    6 Apr  4 00:43 checkpoints</span><br></pre></td></tr></table></figure>
+<p>最终发现居然是一个 json.log 文件十分巨大，这个文件是 docker container 的日志文件，由于我们的日志在 console 也输出导致其越来越大。所以需要维护和清理。</p>
+<p>其他命令参考</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br><span class="line">du -sh .</span><br><span class="line">sudo du -h /var/ | grep [0-9]G</span><br><span class="line">sudo du -h /var/lib/docker/containers/ | grep [0-9]G</span><br></pre></td></tr></table></figure>
+<h1 id="解决根本问题"><a href="#解决根本问题" class="headerlink" title="解决根本问题"></a>解决根本问题</h1><p>目前解决方法有两个</p>
+<ol>
+<li>定期清理 container 的 xxx-json.log 文件</li>
+<li>docker-compose 限制日志文件大小及数目</li>
+</ol>
+<p>后一种方法更好，但是需要重启 container，所以目前采用前一种方法。</p>
+<h2 id="定期清理-container-的-xxx-json-log-文件"><a href="#定期清理-container-的-xxx-json-log-文件" class="headerlink" title="定期清理 container 的 xxx-json.log 文件"></a>定期清理 container 的 xxx-json.log 文件</h2><p>原理就是通过 echo 将文件清空。当然我们已经定位了日志文件，可以手动清理，但是如果 container 较多，不太容易实现自动化，通过搜索发现 <code>docker inspect</code> 命令可以帮助完成日志文件名搜索的过程。</p>
+<p>简答来说，只需要知道 container name 或者 id，然后通过如下命令既可清除当前的日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">""</span> &gt; $(docker inspect --format=<span class="string">'&#123;&#123;.LogPath&#125;&#125;'</span> &lt;container_name_or_id&gt;)</span><br></pre></td></tr></table></figure>
+<p>参考如下： </p>
+<ol>
+<li><a href="https://stackoverflow.com/a/42510314/2000468" target="_blank" rel="noopener">https://stackoverflow.com/a/42510314/2000468</a></li>
+<li><a href="https://serverfault.com/a/742426/398427" target="_blank" rel="noopener">https://serverfault.com/a/742426/398427</a></li>
+</ol>
+<p>为了定期清理，配置 cornjob 每一个小时清理一次：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 需要管理员权限</span></span><br><span class="line">sudo su </span><br><span class="line">crontab -e</span><br><span class="line"><span class="comment"># 编辑配置并保存</span></span><br></pre></td></tr></table></figure>
+<p>编辑配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0 * * * * <span class="built_in">echo</span> <span class="string">""</span> &gt; $(docker inspect --format=<span class="string">'&#123;&#123;.LogPath&#125;&#125;'</span> 7a53309889a2)</span><br></pre></td></tr></table></figure>
+<p>这样就可以每个小时处理一次。cornjob 配置： <a href="https://crontab.guru/every-1-hour" target="_blank" rel="noopener">every-hour</a></p>
+<p>如果希望产看 cornjob 的执行历史，可以通过日志文件来查看，可以看到对应的命令被执行的记录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat /var/<span class="built_in">log</span>/cron</span><br><span class="line">Apr 10 22:00:01 ip-172-31-4-9 CROND[23887]: (root) CMD (<span class="built_in">echo</span> <span class="string">""</span> &gt; $(docker inspect --format=<span class="string">'&#123;&#123;.LogPath&#125;&#125;'</span> 7a53309889a2))</span><br></pre></td></tr></table></figure>
+<h2 id="docker-compose-限制日志文件大小及数目"><a href="#docker-compose-限制日志文件大小及数目" class="headerlink" title="docker-compose 限制日志文件大小及数目"></a>docker-compose 限制日志文件大小及数目</h2><p>参考<br><a href="https://medium.com/@Quigley_Ja/rotating-docker-logs-keeping-your-overlay-folder-small-40cfa2155412" target="_blank" rel="noopener">https://medium.com/@Quigley_Ja/rotating-docker-logs-keeping-your-overlay-folder-small-40cfa2155412</a><br><a href="https://docs.docker.com/config/containers/logging/configure/#configure-the-logging-driver-for-a-container" target="_blank" rel="noopener">https://docs.docker.com/config/containers/logging/configure/#configure-the-logging-driver-for-a-container</a><br><a href="https://stackoverflow.com/a/42883229/2000468" target="_blank" rel="noopener">https://stackoverflow.com/a/42883229/2000468</a></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  db:</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">    image:</span> <span class="attr">mysql:5.7</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">3306</span><span class="string">:3306</span></span><br><span class="line"><span class="attr">    logging:</span></span><br><span class="line"><span class="attr">      options:</span></span><br><span class="line"><span class="attr">        max-size:</span> <span class="number">50</span><span class="string">m</span></span><br></pre></td></tr></table></figure>
+<p>为 compose 的 service 增加如下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">my-app:</span><br><span class="line">    image: my-app:latest</span><br><span class="line">    logging:</span><br><span class="line">        driver: &quot;json-file&quot;</span><br><span class="line">        options:</span><br><span class="line">            max-file: 5</span><br><span class="line">            max-size: 10m</span><br></pre></td></tr></table></figure>
+<p>json-file 选项介绍： <a href="https://docs.docker.com/config/containers/logging/json-file/" target="_blank" rel="noopener">https://docs.docker.com/config/containers/logging/json-file/</a></p>
+<ol>
+<li>json-file    The logs are formatted as JSON. The default logging driver for Docker.</li>
+<li>max-size    The maximum size of the log before it is rolled. A positive integer plus a modifier representing the unit of measure (k, m, or g). Defaults to -1 (unlimited).    —log-opt max-size=10m</li>
+<li>max-file    The maximum number of log files that can be present. If rolling the logs creates excess files, the oldest file is removed. Only effective when max-size is also set. A positive integer. Defaults to 1.    —log-opt max-file=3<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTEwNzc1NTU1Ml19
+--></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AWS/" rel="tag"># AWS</a>
+          
+            <a href="/tags/EBS/" rel="tag"># EBS</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/01/ngixn-proxy-letsencrypt-docker-nexus-repo-cn/" rel="next" title="使用 Nginx-proxy + Let's Encrypt + Docker 部署 Nexus Repository">
+                <i class="fa fa-chevron-left"></i> 使用 Nginx-proxy + Let's Encrypt + Docker 部署 Nexus Repository
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/16/dynamodb-notes-2-migrate-region/" rel="prev" title="DynamoDB笔记2-Migrate region">
+                DynamoDB笔记2-Migrate region <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#EBS动态扩容"><span class="nav-number">1.</span> <span class="nav-text">EBS动态扩容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AWS-Console-EBS-扩容操作"><span class="nav-number">1.1.</span> <span class="nav-text">AWS Console EBS 扩容操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#验证"><span class="nav-number">1.1.1.</span> <span class="nav-text">验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确认文件系统"><span class="nav-number">1.2.</span> <span class="nav-text">确认文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展分区"><span class="nav-number">1.3.</span> <span class="nav-text">扩展分区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Partitions-on-a-Nitro-based-Instance"><span class="nav-number">1.3.1.</span> <span class="nav-text">Partitions on a Nitro-based Instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Partitions-on-a-T2-Instance"><span class="nav-number">1.3.2.</span> <span class="nav-text">Partitions on a T2 Instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际案例"><span class="nav-number">1.3.3.</span> <span class="nav-text">实际案例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展文件系统"><span class="nav-number">1.4.</span> <span class="nav-text">扩展文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example-Extend-an-XFS-file-system"><span class="nav-number">1.4.1.</span> <span class="nav-text">Example: Extend an XFS file system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Example-Extend-an-ext2-ext3-or-ext4-file-system"><span class="nav-number">1.4.2.</span> <span class="nav-text">Example: Extend an ext2, ext3, or ext4 file system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际案例-1"><span class="nav-number">1.4.3.</span> <span class="nav-text">实际案例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#寻找罪魁祸首"><span class="nav-number">2.</span> <span class="nav-text">寻找罪魁祸首</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决根本问题"><span class="nav-number">3.</span> <span class="nav-text">解决根本问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定期清理-container-的-xxx-json-log-文件"><span class="nav-number">3.1.</span> <span class="nav-text">定期清理 container 的 xxx-json.log 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose-限制日志文件大小及数目"><span class="nav-number">3.2.</span> <span class="nav-text">docker-compose 限制日志文件大小及数目</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2020/04/08/aws-server-notes-1-resizing-ebs/';
+          this.page.identifier = '2020/04/08/aws-server-notes-1-resizing-ebs/';
+          this.page.title = 'AWS维护笔记1:EBS 动态扩容';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

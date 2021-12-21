@@ -1,0 +1,980 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="angular,material,theme,official," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文通过研究 Angular Material 的官方文档站 的源码，学习了其实现主题切换的方法。">
+<meta name="keywords" content="angular,material,theme,official">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Angular Material 官方实现主题切换的实现研究">
+<meta property="og:url" content="https://notes.mengxin.science/2018/01/27/angular-material-theme-switch-in-official-doc-site/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文通过研究 Angular Material 的官方文档站 的源码，学习了其实现主题切换的方法。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_16-47-56.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_16-47-56.png">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_17-00-50.gif">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Angular Material 官方实现主题切换的实现研究">
+<meta name="twitter:description" content="摘要：本文通过研究 Angular Material 的官方文档站 的源码，学习了其实现主题切换的方法。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_16-47-56.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/01/27/angular-material-theme-switch-in-official-doc-site/"/>
+
+
+
+
+
+  <title> Angular Material 官方实现主题切换的实现研究 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/01/27/angular-material-theme-switch-in-official-doc-site/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Angular Material 官方实现主题切换的实现研究
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-27T00:00:00+00:00">
+                2018-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/27/angular-material-theme-switch-in-official-doc-site/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/27/angular-material-theme-switch-in-official-doc-site/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文通过研究 <a href="https://material.angular.io/guide/theming" target="_blank" rel="noopener">Angular Material 的官方文档站</a> 的源码，学习了其实现主题切换的方法。</p>
+<span itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject"><img itemprop="url image" src="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_16-47-56.png" class="full-image"><meta itemprop="width" content="auto"><meta itemprop="height" content="auto"></span>
+<a id="more"></a>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_16-47-56.png" alt="feature image" title="2018-01-27_16-47-56"></p>
+<h2 id="原理概述"><a href="#原理概述" class="headerlink" title="原理概述"></a>原理概述</h2><p>这里的原理十分简单，是通过动态替换整个网页的主题 css 文件来实现的，我们可以通过以下的 GIF 图来直观的感受一下：</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/%E5%B0%8F%E4%B9%A6%E5%8C%A0/2018-01-27_17-00-50.gif" alt="the basic theory of angular material theme switch" title="2018-01-27_17-00-50"></p>
+<p>通过切换主题，可以看到网页源码中的 css 在变化，当选择默认主题时，这个 css 的链接消失，从而实现了主题的切换。</p>
+<h2 id="SCSS-相关主题文件及编译"><a href="#SCSS-相关主题文件及编译" class="headerlink" title="SCSS 相关主题文件及编译"></a>SCSS 相关主题文件及编译</h2><p>对于如何使用主题，我们可以通过官方文档学习。实现切换主题是基于基础配置的。首先我们来看 scss 文件的结构：</p>
+<ol>
+<li>styles.scss 配置默认主题，并引用主题文件</li>
+<li>_app-theme.scss 主要的主题配置文件，一方面配置全局的和主题相关的 css，另一方面引用 Component 中主题相关的配置，请参考<a href="https://notes.mengxin.science/2018/01/27/angular-material-themeing-your-custom-components/">Angular Material 组件定制主题</a></li>
+<li>assets/custom-themes/purple-green.scss 各个主题配置文件，每个主题单独一个文件，其配置和配置默认主题一致，不过这里需要加入 _app-theme.scss 的依赖，也就是说各个主题下，同样要应用 _app-theme.scss 的配置。实际上这些文件和 styles.scss 处于同等地位。</li>
+</ol>
+<p>有了这些文件，基本的主题 SCSS 文件就准备好，下面我们需要编译生成 csss 的主题文件。</p>
+<p>这里需要注意编译命令所执行的位置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># because this shell will be execute from package.json, so the path should be in the root folder</span></span><br><span class="line">DEST_PATH=src/assets</span><br><span class="line">INPUT_PATH=<span class="variable">$DEST_PATH</span>/custom-themes/</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> Building custom theme scss files.</span><br><span class="line"></span><br><span class="line"><span class="comment"># Get the files</span></span><br><span class="line">FILES=$(find src/assets/custom-themes -name <span class="string">"*.scss"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> FILE <span class="keyword">in</span> <span class="variable">$FILES</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  FILENAME=<span class="variable">$&#123;FILE#$INPUT_PATH&#125;</span></span><br><span class="line">  BASENAME=<span class="variable">$&#123;FILENAME%.scss&#125;</span></span><br><span class="line">  $(npm bin)/node-sass <span class="variable">$FILE</span> &gt; <span class="variable">$DEST_PATH</span>/<span class="variable">$BASENAME</span>.css</span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> Finished building CSS.</span><br></pre></td></tr></table></figure>
+<p>该文件 <code>build-themes.sh</code> 放置于 <code>src/tools</code> 下面，但是我们不能执行，需要在 <code>package.json</code> 中加入命令来执行： <code>&quot;build-themes&quot;: &quot;bash ./tools/build-themes.sh&quot;,</code> 为什么呢？因为 <code>scss</code> 文件又相互引用的关系，引用中使用了相对路径，这样就导致了路径基准需要一致，所以该命令需要在 <code>src</code> 目录下执行。 所以最好的方法就是在 <code>package.json</code> 中执行命令，这样以后集成部署都很方便。</p>
+<p>编译完成之后我们会发现在 <code>asset</code> 目录下多处理若干个 <code>css</code> 文件，这些文件和不同主题是相对应的。其内容不仅包含了顶层主题的配置，还包含了各个模块自定义的和主题相关的<code>css</code>。</p>
+<h2 id="StyleManager"><a href="#StyleManager" class="headerlink" title="StyleManager"></a>StyleManager</h2><p>该组件是主题切换的核心，我们来一下，该服务是如何实现动态管理主题的，其中的核心方法是 <code>setStyle</code> 和 <code>removeStyle</code>。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> StyleManager &#123;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Set the stylesheet with the specified key.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  setStyle(key: <span class="built_in">string</span>, href: <span class="built_in">string</span>) &#123;</span><br><span class="line">    getLinkElementForKey(key).setAttribute(<span class="string">'href'</span>, href);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Remove the stylesheet with the specified key.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  removeStyle(key: <span class="built_in">string</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> existingLinkElement = getExistingLinkElementByKey(key);</span><br><span class="line">    <span class="keyword">if</span> (existingLinkElement) &#123;</span><br><span class="line">      <span class="built_in">document</span>.head.removeChild(existingLinkElement);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过源码我们可以看到，这里 <code>setStyle</code> 就是将指定主题元素的 <code>DOM</code> 元素的 <code>href</code> 连接动态设为所指定的主题。而这个方法就是根据主题的key 去寻找指定元素的 <code>DOM</code>，该方法同时还要兼容默认主题的处理。 如果是默认主题，实际上这个<code>DOM</code> 应该不存在，所以我们需要处理没有该 <code>DOM</code> 的情形。</p>
+<h2 id="ThemePicker"><a href="#ThemePicker" class="headerlink" title="ThemePicker"></a>ThemePicker</h2><p>相面我们来介绍一下主题切换器的实现方法。</p>
+<h3 id="Theme-模型和其存储"><a href="#Theme-模型和其存储" class="headerlink" title="Theme 模型和其存储"></a>Theme 模型和其存储</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> SiteTheme &#123;</span><br><span class="line">  href: <span class="built_in">string</span>;</span><br><span class="line">  accent: <span class="built_in">string</span>;</span><br><span class="line">  primary: <span class="built_in">string</span>;</span><br><span class="line">  isDark?: <span class="built_in">boolean</span>;</span><br><span class="line">  isDefault?: <span class="built_in">boolean</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里使用 localStorage 来存储主题选择，这样可以在不清空缓存的情况下保持用户的主题选择。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Injectable</span>()</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> ThemeStorage &#123;</span><br><span class="line">  <span class="keyword">static</span> storageKey = <span class="string">'site-theme-storage-current'</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> onThemeUpdate: EventEmitter&lt;SiteTheme&gt; = <span class="keyword">new</span> EventEmitter&lt;SiteTheme&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> storeTheme(theme: SiteTheme) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.localStorage[ThemeStorage.storageKey] = <span class="built_in">JSON</span>.stringify(theme);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.onThemeUpdate.emit(theme);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> getStoredTheme(): SiteTheme &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">JSON</span>.parse(<span class="built_in">window</span>.localStorage[ThemeStorage.storageKey] || <span class="literal">null</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> clearStorage() &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.localStorage.removeItem(ThemeStorage.storageKey);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Theme-Picker-的实现"><a href="#Theme-Picker-的实现" class="headerlink" title="Theme Picker 的实现"></a>Theme Picker 的实现</h3><p>有了 <code>styleManager</code> 和主题的数据结构及存储方法，最终的主题选择器比较简单。</p>
+<p>只需要一个下拉菜单，通过点击不同的主题来使用 <code>styleManager</code> 来配置相应的主题，同时进行储存即可。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">installTheme(theme: SiteTheme) &#123;</span><br><span class="line">    <span class="keyword">this</span>.currentTheme = <span class="keyword">this</span>._getCurrentThemeFromHref(theme.href);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (theme.isDefault) &#123;</span><br><span class="line">      <span class="keyword">this</span>.styleManager.removeStyle(<span class="string">'theme'</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.styleManager.setStyle(<span class="string">'theme'</span>, <span class="string">`assets/<span class="subst">$&#123;theme.href&#125;</span>`</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.currentTheme) &#123;</span><br><span class="line">      <span class="keyword">this</span>._themeStorage.storeTheme(<span class="keyword">this</span>.currentTheme);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="项目配置"><a href="#项目配置" class="headerlink" title="项目配置"></a>项目配置</h2><p>当增加了新的 component theme style，需要重新编译样式文件。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/angular/" rel="tag"># angular</a>
+          
+            <a href="/tags/material/" rel="tag"># material</a>
+          
+            <a href="/tags/theme/" rel="tag"># theme</a>
+          
+            <a href="/tags/official/" rel="tag"># official</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/27/angular-material-themeing-your-custom-components/" rel="next" title="Angular Material 组件定制主题">
+                <i class="fa fa-chevron-left"></i> Angular Material 组件定制主题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/31/xin-angular-development-note/" rel="prev" title="Xin-Angular 开发笔记">
+                Xin-Angular 开发笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原理概述"><span class="nav-number">1.</span> <span class="nav-text">原理概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SCSS-相关主题文件及编译"><span class="nav-number">2.</span> <span class="nav-text">SCSS 相关主题文件及编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StyleManager"><span class="nav-number">3.</span> <span class="nav-text">StyleManager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ThemePicker"><span class="nav-number">4.</span> <span class="nav-text">ThemePicker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Theme-模型和其存储"><span class="nav-number">4.1.</span> <span class="nav-text">Theme 模型和其存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Theme-Picker-的实现"><span class="nav-number">4.2.</span> <span class="nav-text">Theme Picker 的实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目配置"><span class="nav-number">5.</span> <span class="nav-text">项目配置</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/01/27/angular-material-theme-switch-in-official-doc-site/';
+          this.page.identifier = '2018/01/27/angular-material-theme-switch-in-official-doc-site/';
+          this.page.title = 'Angular Material 官方实现主题切换的实现研究';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

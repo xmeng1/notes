@@ -1,0 +1,988 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Shiro," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文通过源码追踪，介绍 Shiro 如何实现简单的登陆控制。本文的源码追踪十分详细，基本所有的调用以及接口对象关系都包含其中。">
+<meta name="keywords" content="Java,Shiro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Shiro源码分析笔记-简单的登陆流程分析">
+<meta property="og:url" content="https://notes.mengxin.science/2017/08/30/shiro-source-study-simplest-shiro-login/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文通过源码追踪，介绍 Shiro 如何实现简单的登陆控制。本文的源码追踪十分详细，基本所有的调用以及接口对象关系都包含其中。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/ShiroAuthenticationSequence.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Shiro源码分析笔记-简单的登陆流程分析">
+<meta name="twitter:description" content="摘要：本文通过源码追踪，介绍 Shiro 如何实现简单的登陆控制。本文的源码追踪十分详细，基本所有的调用以及接口对象关系都包含其中。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/ShiroAuthenticationSequence.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/08/30/shiro-source-study-simplest-shiro-login/"/>
+
+
+
+
+
+  <title> Shiro源码分析笔记-简单的登陆流程分析 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/08/30/shiro-source-study-simplest-shiro-login/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Shiro源码分析笔记-简单的登陆流程分析
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-30T23:00:00+00:00">
+                2017-08-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/30/shiro-source-study-simplest-shiro-login/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/08/30/shiro-source-study-simplest-shiro-login/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文通过源码追踪，介绍 <strong>Shiro</strong> 如何实现简单的登陆控制。本文的源码追踪十分详细，基本所有的调用以及接口对象关系都包含其中。</p>
+<a id="more"></a>
+<p>首先我们看一张图，这张图简要介绍了<code>Shiro</code>登陆说需要的主要组件，大家可以查看<a href="https://shiro.apache.org/authentication.html#authentication-sequence" target="_blank" rel="noopener">官方的登陆步骤参考</a>。</p>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/ShiroAuthenticationSequence.png" alt="Shiro Authentication Sequence" title="ShiroAuthenticationSequence"></p>
+<p>我们接下来更加详细介绍一下在登陆过程中源码的调用流程，前6步为生产环境的代码，也就是我们自己需要实现的最简单的登陆逻辑代码。从第7步开始为 <code>Shiro</code> 源码的调用。</p>
+<h3 id="1-SecurityManager-的工厂类"><a href="#1-SecurityManager-的工厂类" class="headerlink" title="1. SecurityManager 的工厂类"></a>1. <code>SecurityManager</code> 的工厂类</h3><p>创建一个 <code>SecurityManager</code> 的工厂类，配置权限，这里我们可以使用最简单的 ini 配置文件来导入账号和权限。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Factory&lt;org.apache.shiro.mgt.SecurityManager&gt; factory =</span><br><span class="line">                <span class="keyword">new</span> IniSecurityManagerFactory(<span class="string">"classpath:shiro-realm.ini"</span>);</span><br></pre></td></tr></table></figure>
+<p><code>shiro-realm.ini</code> 文件</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[main]</span></span><br><span class="line"><span class="comment">#define realms</span></span><br><span class="line"><span class="attr">myRealm1</span>=MyRealm1</span><br><span class="line"><span class="comment">#specified realms implementation of securityManager</span></span><br><span class="line">securityManager.realms=$myRealm1</span><br></pre></td></tr></table></figure>
+<p>我们在下面的步骤中我们会详细介绍自定义的 <code>myRealm1</code>。 </p>
+<h3 id="2-SecurityManager-实例"><a href="#2-SecurityManager-实例" class="headerlink" title="2. SecurityManager 实例"></a>2. <code>SecurityManager</code> 实例</h3><p>使用工厂模式获取一个 <code>SecurityManager</code> 的实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">org.apache.shiro.mgt.SecurityManager securityManager </span><br><span class="line">    = factory.getInstance();</span><br></pre></td></tr></table></figure>
+<h3 id="3-配置当前-SecurityManager"><a href="#3-配置当前-SecurityManager" class="headerlink" title="3. 配置当前 SecurityManager"></a>3. 配置当前 <code>SecurityManager</code></h3><p>使用 <code>SecurityUtils</code> 设置该实例为当前的 <code>SecurityManager</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SecurityUtils.setSecurityManager(securityManager);</span><br></pre></td></tr></table></figure>
+<h3 id="4-获取-Subject"><a href="#4-获取-Subject" class="headerlink" title="4. 获取 Subject"></a>4. 获取 <code>Subject</code></h3><p>使用 SecurityUtils 获取当前的 Subject</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
+<h3 id="5-准备登陆的数据，"><a href="#5-准备登陆的数据，" class="headerlink" title="5. 准备登陆的数据，"></a>5. 准备登陆的数据，</h3><p>简单的登陆数据为：用户名和密码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(<span class="string">"wang"</span>, <span class="string">"123"</span>);</span><br></pre></td></tr></table></figure>
+<p>这组数据应该是放到 <code>myRealm1</code> 中进行匹配的。所以后面我们会看到这个用户名和密码在 <code>myRealm1</code> 是如何进行验证的。</p>
+<h3 id="6-开始登陆"><a href="#6-开始登陆" class="headerlink" title="6. 开始登陆"></a>6. 开始登陆</h3><p>使用 <code>Subject</code> 的 <code>login</code> 方法传入准备的登陆数据来进行验证。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    subject.login(token);</span><br><span class="line">&#125; <span class="keyword">catch</span> (AuthenticationException e) &#123;</span><br><span class="line">    <span class="comment">//If authentication failed will get exception.</span></span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="7-Subject-的-login-方法"><a href="#7-Subject-的-login-方法" class="headerlink" title="7. Subject 的 login 方法"></a>7. <code>Subject</code> 的 <code>login</code> 方法</h3><p><code>login</code> 为 <code>Subject</code> 的接口，实际调用的是 <code>DelegationgSubject</code> 的 <code>login</code> 的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">login</span><span class="params">(AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException</span></span><br></pre></td></tr></table></figure>
+<h3 id="8-SecurityManager-的-login"><a href="#8-SecurityManager-的-login" class="headerlink" title="8. SecurityManager 的 login"></a>8. <code>SecurityManager</code> 的 <code>login</code></h3><p><code>DelegationSubject</code> 只是一个代理，在 <code>login</code> 方法中调用 <code>securityManager.login(this, token)</code>, <code>this</code> 指的是 <code>Subject</code> 对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = securityManager.login(<span class="keyword">this</span>, token);</span><br></pre></td></tr></table></figure>
+<h3 id="9-DefaultSecurityManager-的-login"><a href="#9-DefaultSecurityManager-的-login" class="headerlink" title="9. DefaultSecurityManager 的 login"></a>9. <code>DefaultSecurityManager</code> 的 <code>login</code></h3><p>这个 <code>login</code>  还是一个接口，这回是 <code>SecurityManager</code> 的接口，实际调用 <code>DefaultSecurityManager</code> 的 <code>login</code> 实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Subject <span class="title">login</span><span class="params">(Subject subject, AuthenticationToken token)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="10-login-的具体实现"><a href="#10-login-的具体实现" class="headerlink" title="10. login 的具体实现"></a>10. <code>login</code> 的具体实现</h3><p>在该login 实现中，定义了一个 <code>AuthenticationInfo</code> 的 <code>info</code> 对象，这个 info 变量将是我们授权过程重要对象。然后调用父类的 <code>authenticate(token)</code> 方法，该方法为 <code>AuthenticatingSecurityManager</code> 抽象类中的方法，该方法实际是调用了成员变量 <code>private Authenticator authenticator</code> 的 <code>authenticate(token)</code> 方法。该方法是 <code>Authenticator</code> 的接口，这时候调用抽象类 <code>AbstractAuthenticator</code> 的实现。这个 <code>authencitcator</code> 在 <code>AuthenticatingSecurityManager</code> 的构造函数中实际上是实例了 <code>ModularRealmAuthenticator</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">AuthenticationInfo info;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    info = authenticate(token);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">///AuthenticatingSecurityManager.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AuthenticationInfo <span class="title">authenticate</span><span class="params">(AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.authenticator.authenticate(token);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//AuthenticatingSecurityManager.java 构造函数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">AuthenticatingSecurityManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>();</span><br><span class="line">    <span class="keyword">this</span>.authenticator = <span class="keyword">new</span> ModularRealmAuthenticator();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//AbstractAuthenticator.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AuthenticationInfo <span class="title">authenticate</span><span class="params">(AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">        AuthenticationInfo info;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            info = doAuthenticate(token);</span><br></pre></td></tr></table></figure>
+<h3 id="11-doAuthenticate-开始授权"><a href="#11-doAuthenticate-开始授权" class="headerlink" title="11. doAuthenticate 开始授权"></a>11. <code>doAuthenticate</code> 开始授权</h3><p>上一步的 <code>authenticate</code> 方法实现中，调用了 <code>doAuthenticate(token)</code> 来开始授权。这个 <code>doAuthenticate</code> 实际上是调用的 <code>ModularRealmAuthenticator</code> 的 <code>doAuthenticate</code>。该方法首先获取 <code>realm</code> 的数量，如果是一个 <code>realm</code> 则进入 <code>doSingleRealmAuthentication</code> ，否则进入 <code>doMultiRealmAuthentication</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> AuthenticationInfo <span class="title">doAuthenticate</span><span class="params">(AuthenticationToken authenticationToken)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">    assertRealmsConfigured();</span><br><span class="line">    Collection&lt;Realm&gt; realms = getRealms();</span><br><span class="line">    <span class="keyword">if</span> (realms.size() == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> doSingleRealmAuthentication(realms.iterator().next(), authenticationToken);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> doMultiRealmAuthentication(realms, authenticationToken);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="12-Realm"><a href="#12-Realm" class="headerlink" title="12. Realm"></a>12. Realm</h3><p>简单案例是单 <code>realm</code>，所以进入 <code>doSingleRealmAuthentication</code> ，函数中调用 <code>AuthenticationInfo info = realm.getAuthenticationInfo(token);</code> 来获取 <code>info</code>。这个 <code>realm</code> 实际上是我们在配置 ini 文件中的 <code>MyRealm1</code> 类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRealm1</span> <span class="keyword">implements</span> <span class="title">Realm</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"myrealm1"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supports</span><span class="params">(AuthenticationToken token)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> token <span class="keyword">instanceof</span> UsernamePasswordToken; <span class="comment">//仅支持UsernamePasswordToken类型的Token</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AuthenticationInfo <span class="title">getAuthenticationInfo</span><span class="params">(AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line"></span><br><span class="line">        String username = (String)token.getPrincipal();  <span class="comment">//得到用户名</span></span><br><span class="line">        String password = <span class="keyword">new</span> String((<span class="keyword">char</span>[])token.getCredentials()); <span class="comment">//得到密码</span></span><br><span class="line">        <span class="keyword">if</span>(!<span class="string">"zhang"</span>.equals(username)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UnknownAccountException(); <span class="comment">//如果用户名错误</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="string">"123"</span>.equals(password)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IncorrectCredentialsException(); <span class="comment">//如果密码错误</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果身份认证验证成功，返回一个AuthenticationInfo实现；</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SimpleAuthenticationInfo(username, password, getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="13-Realm-授权逻辑"><a href="#13-Realm-授权逻辑" class="headerlink" title="13. Realm 授权逻辑"></a>13. <code>Realm</code> 授权逻辑</h3><p>如果不自己实现 <code>Realm</code> 将会调用了抽象 <code>realm</code> 实现 <code>AuthenticatingRealm</code> 的 <code>getAuthenticationInfo</code> 方法。而这里将会调用我们自定义的 <code>Realm</code> 的 <code>getAuthenticationInfo</code>，自定义<code>getAuthenticationInfo</code>十分简单就是匹配用户名和密码成功就返回<code>SimpleAuthenticationInfo</code>。</p>
+<p>这里我们介绍一下抽象的 <code>AuthenticatingRealm</code> 的实现方法，该方法分两步，第一步是拿到 info，第二步是验证 credential 信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AuthenticationInfo <span class="title">getAuthenticationInfo</span><span class="params">(AuthenticationToken token)</span> <span class="keyword">throws</span> AuthenticationException </span>&#123;</span><br><span class="line">    AuthenticationInfo info = getCachedAuthenticationInfo(token);</span><br><span class="line">    <span class="keyword">if</span> (info == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//otherwise not cached, perform the lookup:</span></span><br><span class="line">        info = doGetAuthenticationInfo(token);</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (info != <span class="keyword">null</span>) &#123;</span><br><span class="line">        assertCredentialsMatch(token, info);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        log.debug(<span class="string">"No AuthenticationInfo found for submitted AuthenticationToken [&#123;&#125;].  Returning null."</span>, token);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> info;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>info = doGetAuthenticationInfo(token);</code> 这个方法直接把传入的 <code>token</code> 强制转化为  <code>UsernamePasswordToken</code> 父类。然后使用 <code>getUser(token)</code> 获取账号信息 <code>SimpleAccount account = getUser(upToken.getUsername());</code> 实际上这个 <code>User</code> 是在配置 realm 的时候能够获取的，可以是最简单的 user/password 配置。</li>
+<li><code>assertCredentialsMatch(token, info);</code> 这个方法是使用 <code>token</code> 来匹配 <code>info</code> 信息，如果没有异常表示匹配成功，如果有异常则表示匹配失败。 该方法是匹配逻辑的关键，首先获取一个 <code>matcher</code>：cm，本例最简单的 <code>SimpleCredentialsMatcher</code>。 然后 <code>cm.doCredentialsMatch(token, info)</code> 来进行匹配，该函数就是获取 <code>token</code> 中的 <code>credential</code>，然后获取 <code>AuthenticationInfo info</code> 的 <code>credential</code> 然后判断是否相等，具体如何相等，这里就是简单的匹配。</li>
+</ol>
+<p>如果匹配成功无异常，返回知道返回 info 为止。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">doCredentialsMatch</span><span class="params">(AuthenticationToken token, AuthenticationInfo info)</span> </span>&#123;</span><br><span class="line">        Object tokenCredentials = getCredentials(token);</span><br><span class="line">        Object accountCredentials = getCredentials(info);</span><br><span class="line">        <span class="keyword">return</span> equals(tokenCredentials, accountCredentials);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>至此一个完整的简单的 Shiro 登陆的源码的详细流程就走完了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Shiro/" rel="tag"># Shiro</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/29/english-pod-lesson-9/" rel="next" title="English Pod Study Note Lesson 9">
+                <i class="fa fa-chevron-left"></i> English Pod Study Note Lesson 9
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/30/english-pod-lesson-10/" rel="prev" title="English Pod Study Note Lesson 10">
+                English Pod Study Note Lesson 10 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-SecurityManager-的工厂类"><span class="nav-number">1.</span> <span class="nav-text">1. SecurityManager 的工厂类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-SecurityManager-实例"><span class="nav-number">2.</span> <span class="nav-text">2. SecurityManager 实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-配置当前-SecurityManager"><span class="nav-number">3.</span> <span class="nav-text">3. 配置当前 SecurityManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-获取-Subject"><span class="nav-number">4.</span> <span class="nav-text">4. 获取 Subject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-准备登陆的数据，"><span class="nav-number">5.</span> <span class="nav-text">5. 准备登陆的数据，</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-开始登陆"><span class="nav-number">6.</span> <span class="nav-text">6. 开始登陆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Subject-的-login-方法"><span class="nav-number">7.</span> <span class="nav-text">7. Subject 的 login 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-SecurityManager-的-login"><span class="nav-number">8.</span> <span class="nav-text">8. SecurityManager 的 login</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-DefaultSecurityManager-的-login"><span class="nav-number">9.</span> <span class="nav-text">9. DefaultSecurityManager 的 login</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-login-的具体实现"><span class="nav-number">10.</span> <span class="nav-text">10. login 的具体实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-doAuthenticate-开始授权"><span class="nav-number">11.</span> <span class="nav-text">11. doAuthenticate 开始授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-Realm"><span class="nav-number">12.</span> <span class="nav-text">12. Realm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-Realm-授权逻辑"><span class="nav-number">13.</span> <span class="nav-text">13. Realm 授权逻辑</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/08/30/shiro-source-study-simplest-shiro-login/';
+          this.page.identifier = '2017/08/30/shiro-source-study-simplest-shiro-login/';
+          this.page.title = 'Shiro源码分析笔记-简单的登陆流程分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

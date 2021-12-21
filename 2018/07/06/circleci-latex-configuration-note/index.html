@@ -1,0 +1,985 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="circleci,Continuous Integration," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：本文记录在配置使用 CircleCI 来自动化部署 Latex 时遇到的问题，希望通过该文，能够避免犯同样的错误，同时也可以快速搭建 CircleCI 的配置部署 。">
+<meta name="keywords" content="circleci,Continuous Integration">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CircleCI 配置 Latex 备忘录">
+<meta property="og:url" content="https://notes.mengxin.science/2018/07/06/circleci-latex-configuration-note/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：本文记录在配置使用 CircleCI 来自动化部署 Latex 时遇到的问题，希望通过该文，能够避免犯同样的错误，同时也可以快速搭建 CircleCI 的配置部署 。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.github.com/xmeng1/images/raw/master/images/201877-circleci-store-artifacts.png">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CircleCI 配置 Latex 备忘录">
+<meta name="twitter:description" content="摘要：本文记录在配置使用 CircleCI 来自动化部署 Latex 时遇到的问题，希望通过该文，能够避免犯同样的错误，同时也可以快速搭建 CircleCI 的配置部署 。">
+<meta name="twitter:image" content="https://www.github.com/xmeng1/images/raw/master/images/201877-circleci-store-artifacts.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/07/06/circleci-latex-configuration-note/"/>
+
+
+
+
+
+  <title> CircleCI 配置 Latex 备忘录 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/07/06/circleci-latex-configuration-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                CircleCI 配置 Latex 备忘录
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T23:00:00+00:00">
+                2018-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/06/circleci-latex-configuration-note/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/06/circleci-latex-configuration-note/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：本文记录在配置使用 <code>CircleCI</code> 来自动化部署 <code>Latex</code> 时遇到的问题，希望通过该文，能够避免犯同样的错误，同时也可以快速搭建 <code>CircleCI</code> 的配置部署 。</p>
+<a id="more"></a>
+<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>在使用 <code>Latex</code> 撰写文章的时候，有时候需要将编译好的 <code>PDF</code> 发布到线上，如果需要不断更新文章的版本，就需要手动生成 <code>PDF</code>，然后更新线上 <code>PDF</code> 的版本，这个过程步骤虽然不多，但是十分繁琐，再加上如果有其他的更新操作，就会在发布新版本的时候越来越复杂。那么有什么办法可以自动化完成这个更新部署呢？</p>
+<p>那就是持续集成 （<code>CI</code>），如今的持续集成绝对不仅仅是代码的持续集成，任何能使用命令自动化完成的东西都可以考虑用自动化持续集成，这将会极大程度的降低重复劳动。</p>
+<p>虽然研究持续集成脚本的编写十分费时，有时候如果不熟悉构建的环境还需要不断的尝试才能最终达到希望的效果。但是这绝对是一劳永逸的工作。</p>
+<p>下面本文将会使用 <code>CircleCI</code> 来完成这个持续集成部署的过程，同时也穿插一些 <code>CircleCI</code> 使用中的注意点。</p>
+<h1 id="CircleCI-配置基础"><a href="#CircleCI-配置基础" class="headerlink" title="CircleCI 配置基础"></a>CircleCI 配置基础</h1><p>首先我们先熟悉一下 <code>CircleCI</code> 的配置方法，之前介绍过使用 <a href="https://notes.mengxin.science/2017/05/05/hexo-blog-github-ci/#Travis-CI-%E9%85%8D%E7%BD%AE">Travis-CI 来部署 Hexo 博客</a>。<code>Travis-CI</code> 免费版只能支持 <code>Public</code> 的 <code>Repository</code>，而 CircleCI 是针对构建资源进行限制，所以这一点上 <code>CircleCI</code> 更适用于个人使用。</p>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>不同于 Travis-CI （在根目录创建配置文件<code>.travis.yml</code>）， <code>CircleCI</code> 是需要创建一个  <code>.circleci</code> 的文件夹，然后将 <code>config.yml</code> 文件放入该文件夹中来执行持续集成的。原理大同小异，通过定义 <code>YAML</code> 的语法来执行命令。</p>
+<h2 id="基础配置"><a href="#基础配置" class="headerlink" title="基础配置"></a>基础配置</h2><p>首先我们可以先纵览一下整个配置文件，简单了了解下配置文件的结构，下面有详细的注释说明配置文件项目的用途。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 版本号，这里推荐使用版本2，版本1近期可能会退役</span></span><br><span class="line"><span class="attr">version:</span> <span class="number">2</span></span><br><span class="line"><span class="comment"># job 是 CircleCI 的指定单元，我们在 CircleCI 的控制面板的第一个主菜单就是 Jobs。</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="comment"># 我们可以给每个 Job 进行命名， 通过这个名字，我们可以在Workflows 中指定该Job 执行</span></span><br><span class="line"><span class="attr">  build:</span></span><br><span class="line">  	<span class="comment"># 支持使用 Docker 镜像</span></span><br><span class="line"><span class="attr">    docker:</span></span><br><span class="line"><span class="attr">      - image:</span> <span class="string">koppor/texlive:v1.5.0</span></span><br><span class="line">    <span class="comment"># Job 执行的步骤</span></span><br><span class="line"><span class="attr">    steps:</span></span><br><span class="line">      <span class="comment"># checkout source code</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">checkout</span></span><br><span class="line">      <span class="comment"># build latex</span></span><br><span class="line"><span class="attr">      - run:</span> <span class="string">xelatex</span> <span class="string">cv.tex</span></span><br><span class="line">      <span class="comment"># create dir for publish script running</span></span><br><span class="line"><span class="attr">      - run:</span> <span class="string">mkdir</span> <span class="string">build</span> <span class="string">&amp;&amp;</span> <span class="string">cp</span> <span class="bullet">-r</span> <span class="string">cv.pdf</span> <span class="string">.circleci/latest-version.txt</span> <span class="string">build/</span></span><br><span class="line">      <span class="comment"># 需要参考该链接： https://circleci.com/docs/2.0/artifacts/</span></span><br><span class="line">	  <span class="comment"># 主要功能就是将 build 目录保存下来供下面的步骤使用，同时我们还可以在面板上看到储存的这些内容。参考下图</span></span><br><span class="line"><span class="attr">      - store_artifacts:</span></span><br><span class="line"><span class="attr">          path:</span> <span class="string">build/</span></span><br><span class="line">      <span class="comment"># only publish the master branch</span></span><br><span class="line">	  <span class="comment"># 这里我们可以执行 sh 脚本，通过这个脚本，我们可以完成各种各样的工作。</span></span><br><span class="line"><span class="attr">      - run:</span> <span class="string">chmod</span> <span class="string">+x</span> <span class="string">.circleci/gh_publish.sh</span></span><br><span class="line"><span class="attr">      - run:</span> <span class="string">if</span> <span class="string">[</span> <span class="string">"$CIRCLE_BRANCH"</span> <span class="string">==</span> <span class="string">"master"</span> <span class="string">];</span> <span class="string">then</span> <span class="string">.circleci/gh_publish.sh</span> <span class="string">build/;</span> <span class="string">fi</span></span><br><span class="line">      <span class="comment"># test pdflatex compilation</span></span><br><span class="line"><span class="attr">      - run:</span> <span class="string">git</span> <span class="string">clean</span> <span class="bullet">-xdf</span></span><br><span class="line">      <span class="comment"># - run: pdflatex cv.tex</span></span><br><span class="line"><span class="comment"># 定义 workflows</span></span><br><span class="line"><span class="attr">workflows:</span></span><br><span class="line"><span class="attr">  version:</span> <span class="number">2</span></span><br><span class="line">  <span class="comment"># 定义一个 workflow 并命名</span></span><br><span class="line"><span class="attr">  cv-workflow:</span></span><br><span class="line">  	<span class="comment"># 指定 workflow 需要运行的 Jobs</span></span><br><span class="line"><span class="attr">    jobs:</span></span><br><span class="line">	  <span class="comment"># 这个名字就是我们上面指定的 Job 名字。</span></span><br><span class="line"><span class="attr">      - build:</span></span><br><span class="line">      	  <span class="comment"># 为这个 Job 指定一个 Context，参考下一节</span></span><br><span class="line"><span class="attr">          context:</span> <span class="string">GitHub</span></span><br><span class="line">		  <span class="comment"># 指定过滤器，这里主要是过滤 Git 的 Branch，只有 master 才执行。</span></span><br><span class="line"><span class="attr">          filters:</span></span><br><span class="line"><span class="attr">            branches:</span></span><br><span class="line"><span class="attr">              only:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://www.github.com/xmeng1/images/raw/master/images/201877-circleci-store-artifacts.png" alt="store_artifacts"></p>
+<h2 id="Workflow-与-Context"><a href="#Workflow-与-Context" class="headerlink" title="Workflow 与 Context"></a>Workflow 与 Context</h2><p><code>CircleCI</code> 有一个 <code>Workflows</code> 的概念，具体可以参考<a href="https://circleci.com/docs/2.0/workflows/" target="_blank" rel="noopener">官方文档</a>，我们这里使用 <code>Workflows</code> 并没有使用太多高级功能，只是用到了一个 <code>Context</code> 概念，个人觉得这个 <code>Context</code> 的理念十分方便，之前在 <code>Travis-CI</code> 中每个项目都要定义若干环境变量 （安全目的，尤其是一些<code>Token</code>），但是 <code>CircleCI</code> 可以在个人配置中配置一个 <code>Context</code> 也就是一组变量，然后这个 <code>Context</code> 可以在多个项目中共享。比如个人 <code>GitHub</code> 的用户名和邮箱这种变量就可以放到这个 <code>Context</code> 里面。具体配置方法如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">workflows:</span></span><br><span class="line"><span class="attr">  version:</span> <span class="number">2</span></span><br><span class="line">  <span class="comment"># 定义一个 workflow 并命名</span></span><br><span class="line"><span class="attr">  cv-workflow:</span></span><br><span class="line">  	<span class="comment"># 指定 workflow 需要运行的 Jobs</span></span><br><span class="line"><span class="attr">    jobs:</span></span><br><span class="line">	  <span class="comment"># 这个名字就是我们上面指定的 Job 名字。</span></span><br><span class="line"><span class="attr">      - build:</span></span><br><span class="line">      	  <span class="comment"># 为这个 Job 指定一个 Context，参考下一节</span></span><br><span class="line"><span class="attr">          context:</span> <span class="string">GitHub</span></span><br></pre></td></tr></table></figure>
+<p>这里需要注意 <code>Context</code> 放置的位置，根据<a href="https://circleci.com/docs/2.0/contexts/" target="_blank" rel="noopener">官方文档</a>和自己的实践发现，这个 <code>Context</code> 好像只能放在 <code>Workflow</code> 中的 <code>Job</code>， 不能直接放在 <code>Job</code> 的定义中。</p>
+<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><ol>
+<li>执行 shell 脚本之前可能需要为其加入执行权限<code>chmod -x xxx.sh</code>。</li>
+<li>有些指令，比如安装指令 <code>apt-get</code> 都只能在 <code>run</code> 中执行，不能在脚本中执行。</li>
+</ol>
+<h1 id="部署配置"><a href="#部署配置" class="headerlink" title="部署配置"></a>部署配置</h1><h2 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h2><p>参考该<a href="https://github.com/latextemplates/scientific-thesis-template/blob/master/.circleci/config.yml" target="_blank" rel="noopener">网站的开源程序的配置</a>，它的目标和本问题有些相似。</p>
+<p>这里主要有两个 <code>Repository</code>，一个是私有，保存了 <code>Latex</code> 的源文件，另一个是公有，作为<code>PDF</code>外链存储仓库。假设分别 <code>source</code> 和 <code>publish</code>。</p>
+<p>我们的自动化部署总的来说就是：使用 <code>source</code> 构建 <code>PDF</code> 文件，然后再用一种机制更新到 <code>publish</code> 仓库中。</p>
+<h2 id="Latex-编辑"><a href="#Latex-编辑" class="headerlink" title="Latex 编辑"></a>Latex 编辑</h2><p>现在云端应用越来越强大，基本能像都的服务都能在云上找到相应的产品。同样 <code>Latex</code> 的编辑器也用，之前有两个比较不错的 <code>ShareLatex</code> 和 <code>Overleaf</code>，现在 <code>Overleaf</code> 收购了 <code>ShareLatex</code>，目前 <a href="https://v2.overleaf.com?r=24287d0d&amp;rm=d&amp;rs=b" target="_blank" rel="noopener"><code>Overleaf</code> <code>V2</code></a> 功能十分强大。而且它支持 <code>GitHub</code> 同步，这样 <code>Overleaf</code> 无缝融合到本自动化部署的内容更新端。</p>
+<h2 id="版本-Release-控制"><a href="#版本-Release-控制" class="headerlink" title="版本 Release 控制"></a>版本 Release 控制</h2><p>一般情况下，我们会使用 <code>Git</code> 来通过 <code>Tag</code> 来管理发布版本，但是 <code>Overleaf</code> 还不支持 Tag 的同步操作，所以我想了一个方案，在 <code>CircleCI</code> 的配置文件夹中加入一个版本的文件 <code>latest-version.txt</code>，同时在发布的仓库中加入一个版本文件 <code>version.txt</code>。这样每次希望发布新版本的 PDF，只需要更新这个 <code>latest-version</code>，这个版本会大于 <code>version</code>，只要 <code>latest-version</code> 大于 <code>version</code> 那就发布新版本，并修改 <code>version</code> 为最新，等待下一次更新 <code>latest-version</code>。</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><ol>
+<li>使用 <code>Overleaf</code> 编辑 <code>Latex</code>，同步到 <code>GitHub</code> <code>Master</code> 分支</li>
+<li>CircleCI 触发执行</li>
+<li>下载源码，使用 xelatex 编译，这里需要和 <code>Overleaf</code> 的配置一致。生成了 <code>PDF</code> 文件。</li>
+<li>Git 检出 public 仓库，<code>latest-version</code> 大于 <code>version</code>，那么开始更新，首先将当前最新的 <code>PDF</code> 替换为新版本，同时将最新的 <code>PDF</code> 另存为对应的版本名称，用于归档。</li>
+<li>将 public 仓库的更新提交并推送到GitHub中。</li>
+<li>发布的网页比如 <code>PDF viewer</code>，使用最新版本链接，这样不用更改网站配置，就可以同步显示最新的 <code>PDF</code> 了。</li>
+</ol>
+<h2 id="Bash-脚本遇到的问题"><a href="#Bash-脚本遇到的问题" class="headerlink" title="Bash 脚本遇到的问题"></a>Bash 脚本遇到的问题</h2><ol>
+<li>需要理清楚路径</li>
+<li>在执行脚本的时候，可以指定参数，并且在脚本中可以获取该参数</li>
+<li>有些命令可能需要依赖安装包，这个需要检查，否则会出错。比如一个比较版本的函数就依赖 <code>test</code>， <code>sort</code>等，所以无法执行，这里只检测了版本号是不是一样。</li>
+<li>if 语句的写法一定要注意，加空格，加中括号</li>
+<li>多定义变量</li>
+</ol>
+<p>下面附上脚本源码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="comment"># ideas used from https://gist.github.com/motemen/8595451</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># abort the script if there is a non-zero error</span></span><br><span class="line"><span class="built_in">set</span> -e</span><br><span class="line"></span><br><span class="line"><span class="comment"># show where we are on the machine</span></span><br><span class="line"><span class="built_in">pwd</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># get current remote url</span></span><br><span class="line"><span class="comment"># remote=$(git config remote.origin.url)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># because the config.yml run the command with parameter:path, set it.</span></span><br><span class="line">siteSource=<span class="string">"<span class="variable">$1</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="string">"<span class="variable">$siteSource</span>"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> &lt;site source dir&gt;"</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$&#123;siteSource&#125;</span></span><br><span class="line"><span class="comment">#########</span></span><br><span class="line"><span class="comment"># version manage: actually, we need to use git to manage the version, and use CI automatically</span></span><br><span class="line"><span class="comment">#   to retrieve the version. But we want to use the Overleaf to edit Latex, so it cannot make</span></span><br><span class="line"><span class="comment">#   make tag. So I decide to use the hand-made or script-made separate txt file to manage</span></span><br><span class="line"><span class="comment">#   verion.</span></span><br><span class="line"><span class="comment">#########</span></span><br><span class="line"><span class="comment"># get the latest version from the source code</span></span><br><span class="line">latest_version=$(cat latest-version.txt)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"latest version:"</span><span class="variable">$&#123;latest_version&#125;</span></span><br><span class="line"><span class="comment"># make a directory to put the public project</span></span><br><span class="line">publish_folder=publish</span><br><span class="line">mkdir <span class="variable">$&#123;publish_folder&#125;</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$&#123;publish_folder&#125;</span></span><br><span class="line"><span class="comment"># now lets setup a new repo so we can update the gh-pages branch</span></span><br><span class="line">git config --global user.email <span class="string">"<span class="variable">$GH_EMAIL</span>"</span> &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">git config --global user.name <span class="string">"<span class="variable">$GH_NAME</span>"</span> &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">git init</span><br><span class="line"><span class="comment"># get current publish</span></span><br><span class="line">git remote add --fetch origin <span class="string">"<span class="variable">$GH_CV_PUBLISH</span>"</span></span><br><span class="line">git pull origin master</span><br><span class="line"><span class="comment"># get the latest version from the source code</span></span><br><span class="line">current_version=$(cat version.txt)</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"current version:"</span><span class="variable">$current_version</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># firstly, check the version, the latest_version should bigger than current_version.</span></span><br><span class="line"><span class="comment"># function version_gt() &#123; test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; &#125;</span></span><br><span class="line"></span><br><span class="line">PDF_NAME_PREFIX=<span class="string">"professional_cv_"</span></span><br><span class="line">PDF_NAME_LATEST=<span class="variable">$&#123;PDF_NAME_PREFIX&#125;</span><span class="string">"latest.pdf"</span></span><br><span class="line">PDF_NAME_NEW_VERSION=<span class="variable">$&#123;PDF_NAME_PREFIX&#125;</span><span class="string">"v"</span><span class="variable">$&#123;latest_version&#125;</span><span class="string">".pdf"</span></span><br><span class="line">PDF_BUILD=<span class="string">"../cv.pdf"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># compare=vercomp $&#123;latest_version&#125; $&#123;current_version&#125;</span></span><br><span class="line"><span class="comment"># return 1, v1 &gt; v2</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$current_version</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;latest_version&#125;</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$latest_version</span>"</span> != <span class="string">"<span class="variable">$current_version</span>"</span> ] ; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Start version update"</span></span><br><span class="line">    ls -al</span><br><span class="line">    <span class="comment"># update the current version</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$&#123;latest_version&#125;</span> &gt; version.txt</span><br><span class="line">    <span class="comment"># remove the current latest pdf</span></span><br><span class="line">    rm -f <span class="variable">$&#123;PDF_NAME_LATEST&#125;</span></span><br><span class="line">    <span class="comment"># update the latest and add new version pdf</span></span><br><span class="line">    cp <span class="variable">$&#123;PDF_BUILD&#125;</span> <span class="variable">$&#123;PDF_NAME_LATEST&#125;</span></span><br><span class="line">    cp <span class="variable">$&#123;PDF_BUILD&#125;</span> <span class="variable">$&#123;PDF_NAME_NEW_VERSION&#125;</span></span><br><span class="line">    <span class="comment"># push</span></span><br><span class="line">    git add -A</span><br><span class="line">    git commit -m <span class="string">"update to version: "</span><span class="variable">$&#123;latest_version&#125;</span></span><br><span class="line">    git push --quiet origin master</span><br><span class="line">    <span class="built_in">cd</span> ..</span><br><span class="line">    rm -rf <span class="variable">$&#123;publish_folder&#125;</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Update version finish"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/circleci/" rel="tag"># circleci</a>
+          
+            <a href="/tags/Continuous-Integration/" rel="tag"># Continuous Integration</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/02/study-driving-licence-in-uk-3/" rel="next" title="英国学车记第三课">
+                <i class="fa fa-chevron-left"></i> 英国学车记第三课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/07/learning-sso-opensaml-initializer-analysis/" rel="prev" title="跟我学SSO-OpenSAML初始化源码分析">
+                跟我学SSO-OpenSAML初始化源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#目标"><span class="nav-number">1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CircleCI-配置基础"><span class="nav-number">2.</span> <span class="nav-text">CircleCI 配置基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件"><span class="nav-number">2.1.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础配置"><span class="nav-number">2.2.</span> <span class="nav-text">基础配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Workflow-与-Context"><span class="nav-number">2.3.</span> <span class="nav-text">Workflow 与 Context</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意点"><span class="nav-number">2.4.</span> <span class="nav-text">注意点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署配置"><span class="nav-number">3.</span> <span class="nav-text">部署配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#整体思路"><span class="nav-number">3.1.</span> <span class="nav-text">整体思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Latex-编辑"><span class="nav-number">3.2.</span> <span class="nav-text">Latex 编辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本-Release-控制"><span class="nav-number">3.3.</span> <span class="nav-text">版本 Release 控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">3.4.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-脚本遇到的问题"><span class="nav-number">3.5.</span> <span class="nav-text">Bash 脚本遇到的问题</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/07/06/circleci-latex-configuration-note/';
+          this.page.identifier = '2018/07/06/circleci-latex-configuration-note/';
+          this.page.title = 'CircleCI 配置 Latex 备忘录';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

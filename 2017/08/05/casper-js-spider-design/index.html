@@ -1,0 +1,1006 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blog," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要： 本文记录了使用 Casperjs 进行网站内容采集的设计与实现过程，主要是对大概一个星期左右的边学边编程进行记录，总结其中设计的知识点以及设计思路，以备未来升级回顾使用。">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Casperjs的网站内容采集器设计">
+<meta property="og:url" content="https://notes.mengxin.science/2017/08/05/casper-js-spider-design/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要： 本文记录了使用 Casperjs 进行网站内容采集的设计与实现过程，主要是对大概一个星期左右的边学边编程进行记录，总结其中设计的知识点以及设计思路，以备未来升级回顾使用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Casperjs的网站内容采集器设计">
+<meta name="twitter:description" content="摘要： 本文记录了使用 Casperjs 进行网站内容采集的设计与实现过程，主要是对大概一个星期左右的边学边编程进行记录，总结其中设计的知识点以及设计思路，以备未来升级回顾使用。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2017/08/05/casper-js-spider-design/"/>
+
+
+
+
+
+  <title> 基于Casperjs的网站内容采集器设计 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2017/08/05/casper-js-spider-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于Casperjs的网站内容采集器设计
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-05T23:00:00+00:00">
+                2017-08-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/05/casper-js-spider-design/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/08/05/casper-js-spider-design/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：</p>
+<p>本文记录了使用 <code>Casperjs</code> 进行网站内容采集的设计与实现过程，主要是对大概一个星期左右的边学边编程进行记录，总结其中设计的知识点以及设计思路，以备未来升级回顾使用。<br><a id="more"></a></p>
+<h2 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a>需求描述</h2><p>现在国内有若干产品可以实现网站内容的采集，比如火车头，章鱼等，通过试用发现免费版的功能极其有限（比如火车头会限制导出的方式，免费版貌似只能连接 access 导出，章鱼的导出是需要积分的，虽然初始注册给了积分够导出大概2万条数据，但是这个限制对于使用十分不方便），并且都只有 <code>Windows</code> 平台的客户端。所以对于一个几乎完全摆脱 <code>Windows</code> 的人来说，这些工具统统难以入法眼。</p>
+<p>另一方面，这些采集器大多数是对页面进行解析，很难进行更深入的扩展，比如动态获取 <code>POST</code> 的 <code>Response</code> 这种需求很难完成。 所以我毅然选择自己写一个爬虫来完成这个工作。</p>
+<p>下面我简要描述一下我的需求，这里我们不特定某个网站，但是我需要采集的内容有一定的特性（目前是定制，未来考虑将程序做的更加通用）。</p>
+<p>某视频资源网站 A，其网站基于不同类别的视频为分页结构，比如电影页面，每一页有若干个电影的简要信息，其中包含链接跳转到电影详情页面，在详情页面又包含有播放链接，同样该播放链接也是新页面，用来加载视频资源。其中视频资源的加载比较复杂，是通过内嵌 JS 来发送请求动态获取的资源地址。</p>
+<p>我们的目标就是将所有的视频信息及播放地址进行格式化输出，一般为 <code>JSON</code> 格式，然后将这个数据动态上传至数据库或其他存储。</p>
+<h2 id="依赖技术简介"><a href="#依赖技术简介" class="headerlink" title="依赖技术简介"></a>依赖技术简介</h2><h3 id="SlimerJS-amp-PhantomJS"><a href="#SlimerJS-amp-PhantomJS" class="headerlink" title="SlimerJS &amp; PhantomJS"></a>SlimerJS &amp; PhantomJS</h3><p>对于爬虫技术，可能现在主流的技术是使用 <code>Python</code> 和 <code>Javascript</code> 来做，<code>Python</code> 因为有很多开源的程序，但是发现对于上面的需求，可能还是使用 <code>Javascript</code> 来做比较合适，因为视频资源的获取最简单的方法还是模拟浏览器访问来获取。</p>
+<p>一开始尝试 <code>PhantomJS</code>，因为这个是基于彻底的 <code>Headless Browser</code>，也就是说用 <code>PhantomJS</code> 模拟访问页面完全看不到任何界面。但是通过测试发现，<a href="https://stackoverflow.com/questions/12009881/using-phantomjs-to-read-the-response-body" target="_blank" rel="noopener">难以获取 <code>POST</code> 的 <code>Response</code> 的具体内容</a>，所以后来选择了 <code>SlimerJS</code>，它使用了 <code>Gecko</code>，这样在运行的时候会弹出一个小的窗口来运行，经过测试可以完美获取，所以最终选择使用 <code>SlimerJS</code> 作为爬虫的网页加载引擎。</p>
+<h3 id="CasperJS"><a href="#CasperJS" class="headerlink" title="CasperJS"></a>CasperJS</h3><p>为了让程序更加通用，我选择使用 <code>CasperJS</code> 来编写爬虫，实际上 <code>CapserJS</code> 是进一步封装，其目的就是简化自动化测试和网站抓取的代码。所以用这个来写 JS 然后使用 <code>SlimerJS</code> 作为引擎，应该算是一个比较好的选择，以后万一 <code>PhantomJS</code> 更加强大了，可以无缝切换。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">casperjs xxx.js --engine=slimerjs &gt; result.txt</span><br></pre></td></tr></table></figure>
+<h3 id="Firebase"><a href="#Firebase" class="headerlink" title="Firebase"></a>Firebase</h3><p>Firebase 的实时数据库目前看来是最好的选择，免费有1G 存储空间，作为自用足够了，而且 <code>SDK</code> 完善，还有 <code>Restful API</code>，可以说非常容易集成到任何的代码中。（不过他没有 Java Client 的 SDK）</p>
+<h3 id="Tor-Proxy"><a href="#Tor-Proxy" class="headerlink" title="Tor Proxy"></a>Tor Proxy</h3><p>现在大部分网站都有访问限制策略，也就是说如果你的爬虫大量的访问资源，很容易被检测并且被封锁。这是用 <code>Tor</code> 可以给予一定的帮助，至少自己的 IP 地址不会被封锁，通过测试方法，仍然会有访问一段时间会短暂的无法访问，但是总体来讲比直接用自己的 IP 要好很多。</p>
+<h2 id="具体实现过程"><a href="#具体实现过程" class="headerlink" title="具体实现过程"></a>具体实现过程</h2><h3 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h3><p>主要是使用递归方法，通过设置三个级别和三个独立的 URL 数组来控制递归的 URL，三个级别分别是 集合类（Level 1），详情类（Level 2）和视频资源类（Level 3）。<code>Level 1</code>，表示该 URL 的页面是一个集合，包含若干的详情链接；<code>Level 2</code>，表示这个链接的页面是包含资源具体详情信息的。<code>Level 3</code>，表示该页面会加载视频资源。分成三个级别是因为不同级别页面的处理是不同的</p>
+<p>Level1：主要是 <code>HTML</code> 解析，获取链接<br>Level2：主要是 <code>HTML</code> 解析，获取语义信息<br>Level3：主要是 <code>POST/Response</code> 解析，获取视频资源</p>
+<h3 id="程序的逻辑"><a href="#程序的逻辑" class="headerlink" title="程序的逻辑"></a>程序的逻辑</h3><p>三个链接数组</p>
+<ul>
+<li>集合页面链接 <code>collectionUrl</code></li>
+<li>视频详情链接 <code>initialDetailUrl</code></li>
+<li>视频播放链接 <code>detailChainUrl</code></li>
+</ul>
+<ol>
+<li>配置参数，集合页面的基础 URL，分页的参数，以及搜索的页码</li>
+<li>开始加载第一个集合页面，设为 level1， 然后采集页面的所有视频详情的 URL，并且加入到 <code>initialDetailUrl</code> 数组中。</li>
+<li>通过判断 <code>initialDetailUrl</code> 不为空，设置 level2，并且开始解析 <code>initialDetailUrl</code> 中的 url，在解析的过程中，获取影片播放的地址，存入 <code>detailChainUrl</code>。</li>
+<li>通过判断 <code>detailChainUrl</code> 不为空，设置 level3， 开始获取视频播放详细地址，如果获取成功，那么由于 <code>detailChainUrl</code> 为空，则开始继续分析下一个视频详情地址，直到视频详情地址为空为止，则开始分析下一个集合页面。</li>
+</ol>
+<h3 id="如何正确处理多于的请求返回"><a href="#如何正确处理多于的请求返回" class="headerlink" title="如何正确处理多于的请求返回"></a>如何正确处理多于的请求返回</h3><p>由于在抓取中个，通过监听 <code>resource.received</code> 来获取资源，但是这个过程中会有其他的请求资源返回，我们如何尽可能的减少这些资源的干扰呢？</p>
+<p>首先我们通过资源返回的特征来判断是否是我们需要的资源:</p>
+<p>level1: <code>if (resource.url === currentUrl &amp;&amp; resource.body !== &quot;&quot;) {}</code><br>level2: <code>if (resource.url === currentUrl &amp;&amp; resource.body !== &quot;&quot;) {}</code><br>level3: <code>if (!hasGotVideoUrl &amp;&amp; JSON.stringify(resource).indexOf(subString) !== -1) {}</code> 这个请求比较特殊，我们希望拿到视频链接后就不再进行任何处理，所以加入一个标志来判断是否已经获取到视频链接。</p>
+<p>然后我们还需要一个标志标明我们已经完成了本次链接分析工作已经完成，所以在每次收到资源返回时将<code>var finishTheUrlWork = false;</code>，这样如果没有得到匹配的资源，就直接结束处理，如果得到匹配的资源，则进入对应的资源处理流程，处理完后需要将 <code>finishTheUrlWork = true;</code>。</p>
+<p>最后，只有<code>finishTheUrlWork = true;</code>的时候，才会进行下一个链接的处理</p>
+<h3 id="程序的配置逻辑"><a href="#程序的配置逻辑" class="headerlink" title="程序的配置逻辑"></a>程序的配置逻辑</h3><p>为了应对不同任务：</p>
+<ol>
+<li>更新采集</li>
+<li>历史采集</li>
+</ol>
+<p>我们设定了如下的配置来灵活定制采集的内容</p>
+<ol>
+<li>采集页码范围：表示我们只采集范围内的页码资源</li>
+<li>是否设定起始视频详情链接：如果我们需要继续上一次采集，这样可能一个页面上的部分视频资源已经采集过来，为了不重复，通过设定一个起始链接并且，资源本身是顺序的，所以可以通过这个标志链接来决定是否开始进行采集。</li>
+<li>起始视频详情链接：上一个配置为 true 的时候，需要配置这个。</li>
+<li>结束视频链接：如果是更新的视频资源，可能我们只需采集一个页面上的最前面的若干个视频资源，所以我们设定一个终止链接，也就是上一次采集的第一个链接，然后一旦采集遇到该链接就会停止进行采集。</li>
+</ol>
+<h3 id="关于应对网站频繁请求资源屏蔽的解决方法"><a href="#关于应对网站频繁请求资源屏蔽的解决方法" class="headerlink" title="关于应对网站频繁请求资源屏蔽的解决方法"></a>关于应对网站频繁请求资源屏蔽的解决方法</h3><ol>
+<li>在每次进行页面采集的时候进行等待若干分钟来模拟个人操作行为</li>
+<li>如果请求失败，将会无法进行递归，我们通过判断链接数组是否还有数据来判断是否是异常退出了，如果是异常退出，等待若干分钟，然后再进行重试。</li>
+</ol>
+<h2 id="Javascript-知识点备忘"><a href="#Javascript-知识点备忘" class="headerlink" title="Javascript 知识点备忘"></a>Javascript 知识点备忘</h2><h3 id="HTML-字符串-DOM-查找"><a href="#HTML-字符串-DOM-查找" class="headerlink" title="HTML 字符串 DOM 查找"></a>HTML 字符串 DOM 查找</h3><p>最开始我是用正则表达式匹配，但是发现这种匹配放到一个内容很多 <code>HTML</code> 页面中时，很难设计唯一匹配规则，这样一旦匹配失败将无法获取信息。后来发现既然 <code>HTML</code> 是一个结构化的页面，那么我还是通过 DOM 来定位信息更加方便也更加准确。一些介绍如何操作：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> htmlString = resource.body;</span><br><span class="line"><span class="comment">// parse the html string to DOM</span></span><br><span class="line"><span class="keyword">var</span> html = <span class="built_in">document</span>.createElement(<span class="string">'html'</span>);</span><br><span class="line">html.innerHTML = htmlString;</span><br><span class="line"><span class="comment">// get the specific DOM by CSS selector</span></span><br><span class="line"><span class="comment">// this element is contain 25 movie DOM</span></span><br><span class="line"><span class="keyword">var</span> detailDom = html.querySelector(<span class="string">"div.className ul"</span>);</span><br></pre></td></tr></table></figure>
+<p>基本思路就是将 <code>String</code> 转化为 <code>Element</code>，然后再用 <code>Element</code> 的 <code>querySelector</code> 来定位 <code>DOM</code>，这个 <code>selector</code> 就是 <code>CSS</code> 标准的选择器，大部分情况可以准确定位到目标资源。</p>
+<p>另外还可以定位一组 <code>DOM</code>，然后再循环遍历</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var anchors = detailDom.querySelectorAll(&quot;div.className a&quot;);</span><br><span class="line">var href;</span><br><span class="line">for (var i = 0; i &lt; anchors.length; ++i) &#123;</span><br><span class="line">    //.....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Casper-定时等待"><a href="#Casper-定时等待" class="headerlink" title="Casper 定时等待"></a>Casper 定时等待</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if(detailChainUrls.length===0 &amp;&amp; initialDetailUrls.length===0 &amp;&amp; collectionUrls.length===0)&#123;</span><br><span class="line">    console.log(&quot;finish the casper right&quot;);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    //wait for several time</span><br><span class="line">    console.log(&quot;not right, need to wait and start again&quot;);</span><br><span class="line">    this.wait(config.waitingAfterRequestNumber, function() &#123;</span><br><span class="line">        //try to continue</span><br><span class="line">        console.log(&quot;try to continue&quot;);</span><br><span class="line">        spider(currentUrl);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="程序使用手册"><a href="#程序使用手册" class="headerlink" title="程序使用手册"></a>程序使用手册</h2><p>一般情况下，只需要修改</p>
+<pre><code>config.pageStart = 12;
+config.pageEnd = 12;
+</code></pre><p>然后如果不是从头开始，或者一直到结尾，可以通过设置</p>
+<pre><code>config.startDetailUrl = &quot;xxxx.html&quot;
+config.enableStartCheck = true
+config.stopDetailUrl  = &quot;xxxxx&quot;
+</code></pre><p>如果是从头开始，</p>
+<pre><code>config.enableStartCheck = false
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过这个程序，学习了一些知识，包括 Javascript，CasperJS，SlimerJS 等等，还包括代理 Tor 的知识。最后列出一些参考资料以备回顾：</p>
+<p><a href="https://www.scrapehero.com/how-to-prevent-getting-blacklisted-while-scraping/" target="_blank" rel="noopener">How to prevent getting blacklisted while scraping</a><br><a href="https://gist.github.com/tpai/e7717bad169a8401f6ee" target="_blank" rel="noopener">use both Tor and Privoxy with Mac OSX</a><br><a href="http://www.leesome.com/blog/2013/05/27/tor-ifying-casperjs/" target="_blank" rel="noopener">Tor-ifying CasperJS</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blog/" rel="tag"># blog</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/19/how-to-connect-android-emulator-in-lan/" rel="next" title="远程连接局域网内的Android模拟器">
+                <i class="fa fa-chevron-left"></i> 远程连接局域网内的Android模拟器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/19/book-review-the-phoenix-project/" rel="prev" title="《凤凰项目》阅读笔记">
+                《凤凰项目》阅读笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求描述"><span class="nav-number">1.</span> <span class="nav-text">需求描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖技术简介"><span class="nav-number">2.</span> <span class="nav-text">依赖技术简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SlimerJS-amp-PhantomJS"><span class="nav-number">2.1.</span> <span class="nav-text">SlimerJS &amp; PhantomJS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CasperJS"><span class="nav-number">2.2.</span> <span class="nav-text">CasperJS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Firebase"><span class="nav-number">2.3.</span> <span class="nav-text">Firebase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tor-Proxy"><span class="nav-number">2.4.</span> <span class="nav-text">Tor Proxy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实现过程"><span class="nav-number">3.</span> <span class="nav-text">具体实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概要"><span class="nav-number">3.1.</span> <span class="nav-text">概要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#程序的逻辑"><span class="nav-number">3.2.</span> <span class="nav-text">程序的逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何正确处理多于的请求返回"><span class="nav-number">3.3.</span> <span class="nav-text">如何正确处理多于的请求返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#程序的配置逻辑"><span class="nav-number">3.4.</span> <span class="nav-text">程序的配置逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于应对网站频繁请求资源屏蔽的解决方法"><span class="nav-number">3.5.</span> <span class="nav-text">关于应对网站频繁请求资源屏蔽的解决方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Javascript-知识点备忘"><span class="nav-number">4.</span> <span class="nav-text">Javascript 知识点备忘</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML-字符串-DOM-查找"><span class="nav-number">4.1.</span> <span class="nav-text">HTML 字符串 DOM 查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Casper-定时等待"><span class="nav-number">4.2.</span> <span class="nav-text">Casper 定时等待</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序使用手册"><span class="nav-number">5.</span> <span class="nav-text">程序使用手册</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2017/08/05/casper-js-spider-design/';
+          this.page.identifier = '2017/08/05/casper-js-spider-design/';
+          this.page.title = '基于Casperjs的网站内容采集器设计';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

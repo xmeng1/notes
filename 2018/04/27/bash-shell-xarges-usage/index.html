@@ -1,0 +1,1012 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="shell,bash," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="摘要：在使用命令行时，有时我们希望把某些命令的输出传入到其他命令中去，但是并不是所有的命令都能使用管道 | 来完成这个操作，这时候 Xargs 就派上用场。Xargs 可以算是命令组合的神器。">
+<meta name="keywords" content="shell,bash">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xargs命令详解">
+<meta property="og:url" content="https://notes.mengxin.science/2018/04/27/bash-shell-xarges-usage/index.html">
+<meta property="og:site_name" content="Xin&#39;s Notes">
+<meta property="og:description" content="摘要：在使用命令行时，有时我们希望把某些命令的输出传入到其他命令中去，但是并不是所有的命令都能使用管道 | 来完成这个操作，这时候 Xargs 就派上用场。Xargs 可以算是命令组合的神器。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-12-21T09:52:36.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Xargs命令详解">
+<meta name="twitter:description" content="摘要：在使用命令行时，有时我们希望把某些命令的输出传入到其他命令中去，但是并不是所有的命令都能使用管道 | 来完成这个操作，这时候 Xargs 就派上用场。Xargs 可以算是命令组合的神器。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'LRRR8WO27T',
+      apiKey: '52f38cdd494149d36c3b9a986a36836c',
+      indexName: 'prod_notes',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://notes.mengxin.science/2018/04/27/bash-shell-xarges-usage/"/>
+
+
+
+
+
+  <title> Xargs命令详解 | Xin's Notes </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-40931165-6', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Xin's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Develop Notes</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true, gaTrack: true, gaId: 'UA-40931165-7'}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://notes.mengxin.science/2018/04/27/bash-shell-xarges-usage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xin Meng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar-2.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xin's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Xargs命令详解
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T23:00:00+00:00">
+                2018-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识积累/" itemprop="url" rel="index">
+                    <span itemprop="name">知识积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/27/bash-shell-xarges-usage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/27/bash-shell-xarges-usage/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>摘要：在使用命令行时，有时我们希望把某些命令的输出传入到其他命令中去，但是并不是所有的命令都能使用管道 <code>|</code> 来完成这个操作，这时候 <code>Xargs</code> 就派上用场。<code>Xargs</code> 可以算是命令组合的神器。</p>
+<a id="more"></a>
+<h2 id="由一个问题开始"><a href="#由一个问题开始" class="headerlink" title="由一个问题开始"></a>由一个问题开始</h2><p>在一个文件夹下有若干文件和子文件夹，希望将除去某个子文件夹外的所有文件和文件夹移动到该子文件夹中。 [后来找到其他的解决方法：<a href="https://askubuntu.com/a/91743/582639" target="_blank" rel="noopener">https://askubuntu.com/a/91743/582639</a>]</p>
+<p>其中的一种思路就是，首先将需要移动的文件和文件夹 list 出来，然后在将这些 item 一一传入到 mv 命令中，完成移动操作。这里有几个问题需要解决：</p>
+<ol>
+<li>list 需要过滤目标文件夹</li>
+<li>移动需要传参数</li>
+<li>移动是一个循环</li>
+</ol>
+<h3 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls | grep -v dist | xargs -I file mv file dist</span><br></pre></td></tr></table></figure>
+<ol>
+<li>首先通过 ls + grep，使用 -v 参数排除掉 dist</li>
+<li>然后通过 xargs 将数据结果循环赋值给 file，其中 -I 参数就是实现依次处理功能</li>
+<li>移动文件到指定文件夹</li>
+</ol>
+<blockquote>
+<p>-I replstr<br>     Execute utility for each input line, replacing one or more occurrences of replstr in<br>     up to replacements (or 5 if no -R flag is specified) arguments to utility with the<br>     entire line of input.  The resulting arguments, after replacement is done, will not be<br>     allowed to grow beyond 255 bytes; this is implemented by concatenating as much of the<br>     argument containing replstr as possible, to the constructed arguments to utility, up<br>     to 255 bytes.  The 255 byte limit does not apply to arguments to utility which do not<br>     contain replstr, and furthermore, no replacement will be done on utility itself.<br>     Implies -x.</p>
+</blockquote>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p><a href="http://czmmiao.iteye.com/blog/1949225" target="_blank" rel="noopener">参考1</a>， <a href="http://man.linuxde.net/xargs" target="_blank" rel="noopener">参考2</a></p>
+<h3 id="0-处理特殊字符"><a href="#0-处理特殊字符" class="headerlink" title="-0 处理特殊字符"></a>-0 处理特殊字符</h3><p>-0 ：当sdtin含有特殊字元时候，将其当成一般字符，想/‘空格等</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"/ /  "</span>|xargs <span class="built_in">echo</span></span></span><br><span class="line">/ /</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">"/ /  "</span>|xargs -0 <span class="built_in">echo</span></span></span><br><span class="line">/ /</span><br></pre></td></tr></table></figure>
+<h3 id="a-文件读取"><a href="#a-文件读取" class="headerlink" title="-a 文件读取"></a>-a 文件读取</h3><p>-a file 从文件中读入作为sdtin</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt </span></span><br><span class="line">aaa  bbb ccc ddd</span><br><span class="line">a    b</span><br><span class="line"><span class="meta">$</span><span class="bash"> xargs -a 1.txt <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb ccc ddd a b</span><br></pre></td></tr></table></figure>
+<h3 id="e-使用-eofstr-作为-EOF逻辑标记"><a href="#e-使用-eofstr-作为-EOF逻辑标记" class="headerlink" title="-e 使用 eofstr 作为 EOF逻辑标记"></a>-e 使用 eofstr 作为 EOF逻辑标记</h3><p>-e flag ，注意有的时候可能会是-E，flag必须是一个以空格分隔的标志，当xargs分析到含有flag这个标志的时候就停止。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> xargs -E <span class="string">'ddd'</span>  -a 1.txt <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb ccc</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt |xargs -E <span class="string">'ddd'</span> <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb ccc</span><br></pre></td></tr></table></figure>
+<h3 id="n-执行次数"><a href="#n-执行次数" class="headerlink" title="-n 执行次数"></a>-n 执行次数</h3><p>-n num 后面加次数，表示命令在执行的时候一次用的argument的个数，默认是用所有的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt |xargs -n 2 <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb</span><br><span class="line">ccc ddd</span><br><span class="line">a b</span><br></pre></td></tr></table></figure>
+<h3 id="p-交互性"><a href="#p-交互性" class="headerlink" title="-p 交互性"></a>-p 交互性</h3><p>-p 操作具有可交互性，每次执行comand都交互式提示用户选择，当每次执行一个argument的时候询问一次用户</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt |xargs -p <span class="built_in">echo</span></span></span><br><span class="line">echo aaa bbb ccc ddd a b ?...y</span><br><span class="line">aaa bbb ccc ddd a b</span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt |xargs -p <span class="built_in">echo</span></span></span><br><span class="line">echo aaa bbb ccc ddd a b ?...n</span><br></pre></td></tr></table></figure>
+<h3 id="t-表示先打印命令，然后再执行。"><a href="#t-表示先打印命令，然后再执行。" class="headerlink" title="-t 表示先打印命令，然后再执行。"></a>-t 表示先打印命令，然后再执行。</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt |xargs -t <span class="built_in">echo</span></span></span><br><span class="line">echo aaa bbb ccc ddd a b </span><br><span class="line">aaa bbb ccc ddd a b</span><br></pre></td></tr></table></figure>
+<h3 id="i-I-遍历输出行"><a href="#i-I-遍历输出行" class="headerlink" title="-i -I 遍历输出行"></a>-i -I 遍历输出行</h3><p>-i 或者是-I，这得看linux支持了，将xargs的每项名称，一般是一行一行赋值给{}，可以用{}代替。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ls</span></span><br><span class="line">1.txt  2.txt  3.txt  log.xml</span><br><span class="line"><span class="meta">$</span><span class="bash"> ls *.txt |xargs -t -i mv &#123;&#125; &#123;&#125;.bak</span></span><br><span class="line">mv 1.txt 1.txt.bak </span><br><span class="line">mv 2.txt 2.txt.bak </span><br><span class="line">mv 3.txt 3.txt.bak </span><br><span class="line"><span class="meta">$</span><span class="bash"> ls</span></span><br><span class="line">1.txt.bak  2.txt.bak  3.txt.bak  log.xml</span><br></pre></td></tr></table></figure>
+<p>注意，-I 必须指定替换字符　－i 是否指定替换字符-可选</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . | xargs -I &#123;&#125; cp &#123;&#125; $D_PATH</span><br></pre></td></tr></table></figure>
+<p>与</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . | xargs -i cp &#123;&#125; $D_PATH</span><br></pre></td></tr></table></figure>
+<p>注意：cshell和tcshell中，需要将{}用单引号、双引号或反斜杠，否则不认识。bash可以不用。<br>find /shell -maxdepth 2 -name a -print | xargs -t -i sed -i ‘1 i\111’ ‘{}‘<br>-r  no-run-if-empty 如果没有要处理的参数传递给xargsxargs 默认是带 空参数运行一次，如果你希望无参数时，停止 xargs，直接退出，使用 -r 选项即可，其可以防止xargs 后面命令带空参数运行报错。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">""</span>|xargs -t mv</span></span><br><span class="line">mv </span><br><span class="line">mv: missing file operand</span><br><span class="line">Try `mv --help' for more information.</span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">echo</span> <span class="string">""</span>|xargs -t -r mv         <span class="comment">#直接退出</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="s-最大命令行字符数"><a href="#s-最大命令行字符数" class="headerlink" title="-s 最大命令行字符数"></a>-s 最大命令行字符数</h3><p>-s num xargs后面那个命令的最大命令行字符数(含空格) </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -s 9 <span class="built_in">echo</span></span></span><br><span class="line">aaa</span><br><span class="line">bbb</span><br><span class="line">ccc</span><br><span class="line">ddd</span><br><span class="line">a b</span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -s 4 <span class="built_in">echo</span></span></span><br><span class="line">xargs: can not fit single argument within argument list size limit      #length(echo)=4</span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -s 8 <span class="built_in">echo</span></span></span><br><span class="line">xargs: argument line too long      #length(echo)=4,length(aaa)=3,length(null)=1,total_length=8</span><br></pre></td></tr></table></figure>
+<h3 id="L-从输入一次读取行数"><a href="#L-从输入一次读取行数" class="headerlink" title="-L 从输入一次读取行数"></a>-L 从输入一次读取行数</h3><p>-L  从标准输入一次读取num行送给Command命令 ，-l和-L功能一样</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak </span></span><br><span class="line">aaa bbb ccc ddd</span><br><span class="line">a b</span><br><span class="line">ccc</span><br><span class="line">dsds</span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -L 4 <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb ccc ddd a b ccc dsds</span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -L 1 <span class="built_in">echo</span></span></span><br><span class="line">aaa bbb ccc ddd</span><br><span class="line">a b</span><br><span class="line">ccc</span><br><span class="line">dsds</span><br></pre></td></tr></table></figure>
+<h3 id="d-分隔符"><a href="#d-分隔符" class="headerlink" title="-d 分隔符"></a>-d 分隔符</h3><p>-d delim 分隔符，默认的xargs分隔符是回车，argument的分隔符是空格，这里修改的是xargs的分隔符</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak </span></span><br><span class="line">aaa@ bbb ccc@ ddd</span><br><span class="line">a b</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> cat 1.txt.bak |xargs  -d <span class="string">'@'</span> <span class="built_in">echo</span></span></span><br><span class="line">aaa  bbb ccc  ddd</span><br><span class="line">a b</span><br></pre></td></tr></table></figure>
+<h3 id="x-退出"><a href="#x-退出" class="headerlink" title="-x 退出"></a>-x 退出</h3><p>-x exit的意思，如果有任何 Command 行大于 -s Size 标志指定的字节数，停止运行 xargs 命令，-L -I -n 默认打开-x参数，主要是配合-s使用<br>-P 修改最大的进程数，默认是1，为0时候为as many as it can 。</p>
+<h2 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h2><p>选项非常多，一般我们需要时可以在查看 man 手册，下面我们看看有哪些常用的使用案例</p>
+<p>用rm 删除太多的文件时候，可能得到一个错误信息：/bin/rm Argument list too long. 用xargs去避免这个问题：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f -name "*.log" -print0 | xargs -0 rm -f</span><br></pre></td></tr></table></figure>
+<p>xargs -0将\0作为定界符。</p>
+<p>统计一个源代码目录中所有php文件的行数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f -name "*.php" -print0 | xargs -0 wc -l</span><br></pre></td></tr></table></figure>
+<p>查找所有的jpg 文件，并且压缩它们：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f -name "*.jpg" -print | xargs tar -czvf images.tar.gz</span><br></pre></td></tr></table></figure>
+<p>xargs其他应用</p>
+<p>假如你有一个文件包含了很多你希望下载的URL，你能够使用xargs下载所有链接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat url-list.txt | xargs wget -c</span><br></pre></td></tr></table></figure>
+<p>1、在当前目录下查找所有用户具有读、写和执行权限的文件，并收回相应的写权限：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> find . -perm -7 -<span class="built_in">print</span> | xargs chmod o-w</span></span><br></pre></td></tr></table></figure>
+<p>2、查找系统中的每一个普通文件，然后使用xargs命令来测试它们分别属于哪类文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> find . -<span class="built_in">type</span> f -<span class="built_in">print</span> | xargs file</span></span><br><span class="line">./liyao: empty</span><br></pre></td></tr></table></figure>
+<p>3、尝试用rm 删除太多的文件，你可能得到一个错误信息：/bin/rm Argument list too long. 用xargs 去避免这个问题</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">find ~ -name ‘*.<span class="built_in">log</span>’ -print0 | xargs -i -0 rm -f &#123;&#125;</span></span><br></pre></td></tr></table></figure>
+<p>4、查找所有的jpg 文件，并且压缩它</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> find / -name *.jpg -<span class="built_in">type</span> f -<span class="built_in">print</span> | xargs tar -cvzf images.tar.gz</span></span><br></pre></td></tr></table></figure>
+<p>5、拷贝所有的图片文件到一个外部的硬盘驱动 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> ls *.jpg | xargs -n1 -i cp &#123;&#125; /external-hard-drive/directory</span></span><br></pre></td></tr></table></figure>
+<h3 id="开始问题的其他解法"><a href="#开始问题的其他解法" class="headerlink" title="开始问题的其他解法"></a>开始问题的其他解法</h3><p>使用 ext 和 dot glob 来快速完成</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shopt -s extglob dotglob</span><br><span class="line">mv !(new) new</span><br><span class="line">shopt -u dotglob</span><br></pre></td></tr></table></figure>
+<p>其中 extglob 为了支持 ! 语法<br>其中 dotglob 为了支持处理所有的隐藏文件 （dot prefix file name）</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/shell/" rel="tag"># shell</a>
+          
+            <a href="/tags/bash/" rel="tag"># bash</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/21/intellij-debug-breakpoint-advance-usage/" rel="next" title="Intellij调试断点高级使用方法">
+                <i class="fa fa-chevron-left"></i> Intellij调试断点高级使用方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/01/Jenkins-usage-in-practise/" rel="prev" title="Jenkins使用笔记">
+                Jenkins使用笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+      
+        
+          <ul class="sidebar-nav motion-element">
+            <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+              文章目录
+            </li>
+            <li class="sidebar-nav-overview" data-target="site-overview">
+              站点概览
+            </li>
+          </ul>
+        
+      
+
+
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar-2.jpg"
+               alt="Xin Meng" />
+          <p class="site-author-name" itemprop="name">Xin Meng</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">152</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">162</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/xmeng1" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/xinmeng_1" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/michealmeng" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/xinmeng1" target="_blank" title="Linkedin">
+                  
+                    <i class="fa fa-fw fa-linkedin"></i>
+                  
+                  Linkedin
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.facebook.com/mengxin.city" target="_blank" title="Facebook">
+                  
+                    <i class="fa fa-fw fa-facebook"></i>
+                  
+                  Facebook
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/xinmeng1" target="_blank" title="Douban">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Douban
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/xinmeng1" target="_blank" title="Zhihu">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Zhihu
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Next
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://theme-next.iissnan.com" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+      
+        
+        <!--noindex-->
+          <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+            <div class="post-toc">
+
+              
+                
+              
+
+              
+                <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#由一个问题开始"><span class="nav-number">1.</span> <span class="nav-text">由一个问题开始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令"><span class="nav-number">1.1.</span> <span class="nav-text">命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用法"><span class="nav-number">2.</span> <span class="nav-text">基本用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-处理特殊字符"><span class="nav-number">2.1.</span> <span class="nav-text">-0 处理特殊字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#a-文件读取"><span class="nav-number">2.2.</span> <span class="nav-text">-a 文件读取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#e-使用-eofstr-作为-EOF逻辑标记"><span class="nav-number">2.3.</span> <span class="nav-text">-e 使用 eofstr 作为 EOF逻辑标记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#n-执行次数"><span class="nav-number">2.4.</span> <span class="nav-text">-n 执行次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#p-交互性"><span class="nav-number">2.5.</span> <span class="nav-text">-p 交互性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#t-表示先打印命令，然后再执行。"><span class="nav-number">2.6.</span> <span class="nav-text">-t 表示先打印命令，然后再执行。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#i-I-遍历输出行"><span class="nav-number">2.7.</span> <span class="nav-text">-i -I 遍历输出行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#s-最大命令行字符数"><span class="nav-number">2.8.</span> <span class="nav-text">-s 最大命令行字符数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#L-从输入一次读取行数"><span class="nav-number">2.9.</span> <span class="nav-text">-L 从输入一次读取行数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d-分隔符"><span class="nav-number">2.10.</span> <span class="nav-text">-d 分隔符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x-退出"><span class="nav-number">2.11.</span> <span class="nav-text">-x 退出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用案例"><span class="nav-number">3.</span> <span class="nav-text">使用案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开始问题的其他解法"><span class="nav-number">3.1.</span> <span class="nav-text">开始问题的其他解法</span></a></li></ol></li></ol></div>
+              
+
+            </div>
+          </section>
+        <!--/noindex-->
+        
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xin Meng</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://mengxin.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://notes.mengxin.science/2018/04/27/bash-shell-xarges-usage/';
+          this.page.identifier = '2018/04/27/bash-shell-xarges-usage/';
+          this.page.title = 'Xargs命令详解';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://mengxin.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.1"></script>
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>
